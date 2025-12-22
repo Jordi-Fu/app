@@ -60,3 +60,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+// Ignore any .git backup folders created when converting submodules
+/.git.backup
+frontend/.git.backup/
