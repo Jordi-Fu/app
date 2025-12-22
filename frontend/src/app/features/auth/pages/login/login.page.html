@@ -12,19 +12,20 @@
       placeholder="Usuario, Telefono movil o email"
       formControlName="credential">
 
-    <div class="password-container">
-      <input 
-        [type]="showPassword ? 'text' : 'password'" 
-        placeholder="Contraseña"
-        formControlName="password">
-      <img 
-        class="eye-icon" 
-        [src]="showPassword ? 'assets/ojo_candado.svg' : 'assets/ojo_abierto.svg'"
-        (click)="togglePasswordVisibility()"
-        alt="toggle password visibility">
+    <div class="password-wrapper">
+      <div class="password-container">
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          placeholder="Contraseña"
+          formControlName="password">
+        <img 
+          class="eye-icon" 
+          [src]="showPassword ? 'assets/ojo_candado.svg' : 'assets/ojo_abierto.svg'"
+          (click)="togglePasswordVisibility()"
+          alt="toggle password visibility">
+      </div>
+      <span class="forgot-password">¿Olvidaste tu contraseña?</span>
     </div>
-
-    <span>¿Olvidaste tu contraseña?</span>
     
     <button type="button" class="google-btn"> 
       <img class="g-icon"
@@ -33,7 +34,7 @@
       Iniciar sesión con google
     </button>
     
-    <span>¿No tienes un cuenta? <a (click)="viajarRegistro()" style="cursor: pointer;">Creala aqui</a></span>
+    <span class="register-link">¿No tienes un cuenta? <a (click)="viajarRegistro()" style="cursor: pointer;">Creala aqui</a></span>
     
     <div class="iniciar_sesion">
       <button type="submit">Iniciar sesión</button>

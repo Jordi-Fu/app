@@ -53,28 +53,44 @@
     margin-top: 20px;
   }
 
-  .password-container {
-    position: relative;
+  .password-wrapper {
     width: $input-width;
     margin-top: 20px;
 
-    input {
+    .password-container {
+      position: relative;
       width: 100%;
-      height: $input-height;
-      border-radius: $border-radius-sm;
-      padding-right: 40px;
-      margin-top: 0;
+
+      input {
+        width: 100%;
+        height: $input-height;
+        border-radius: $border-radius-sm;
+        padding-right: 40px;
+        margin-top: 0;
+      }
+
+      .eye-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+        user-select: none;
+      }
     }
 
-    .eye-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
+    .forgot-password {
+      display: block;
+      margin-top: 5px;
+      text-align: right;
+      font-size: 14px;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
       cursor: pointer;
-      width: 24px;
-      height: 24px;
-      user-select: none;
     }
   }
 
@@ -124,6 +140,13 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     cursor: pointer;
+  }
+
+  .register-link {
+    width: 100%;
+    text-align: center;
+    display: block;
+    margin-top: 10px;
   }
 }
 
