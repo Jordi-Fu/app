@@ -1,1 +1,142 @@
-/* Estilos de login */
+@use '../../../../../theme/variables' as *;
+
+.cuerpo {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: $font-family;
+}
+
+.titulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  :first-child {
+    font-weight: bold;
+    font-size: 40px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  :nth-child(2) {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  :last-child {
+    font-size: 14px;
+    color: $gray-text;
+  }
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  width: 100%;
+
+  input {
+    width: $input-width;
+    height: $input-height;
+    border-radius: $border-radius-sm;
+    margin-top: 20px;
+  }
+
+  .password-container {
+    position: relative;
+    width: $input-width;
+    margin-top: 20px;
+
+    input {
+      width: 100%;
+      height: $input-height;
+      border-radius: $border-radius-sm;
+      padding-right: 40px;
+      margin-top: 0;
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      user-select: none;
+    }
+  }
+
+  > span:first-of-type {
+    margin-top: 5px;
+    align-self: flex-end;
+    font-size: 14px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+
+  > button {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: $input-width;
+    height: $input-height;
+    color: black;
+    background-color: white;
+    position: relative;
+    padding-left: 48px;
+    text-align: center;
+    cursor: pointer;
+    line-height: $input-height;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .g-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  span {
+    font-size: 14px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+}
+
+.iniciar_sesion {
+  button {
+    margin-top: 20px;
+    width: $input-width;
+    height: $button-height;
+    border-radius: $border-radius-lg;
+    background: $primary-gradient;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+}
