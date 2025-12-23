@@ -4,8 +4,10 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
-  //añadir simplemte otra url como arriba
+  // Para emulador Android: 10.0.2.2
+  // Para dispositivo real: IP de tu máquina (192.168.26.207)
+  // Para web: localhost
+  apiUrl: 'http://10.0.2.2:3000/api',
   enableDebug: true
 };
 

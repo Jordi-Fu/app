@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular/standalone';
+import { AlertController, LoadingController } from '@ionic/angular/standalone';
+import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,58 +13,109 @@ import { AlertController } from '@ionic/angular/standalone';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule]
 })
-export class LoginPage implements OnInit {
+export class LoginPage implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   showPassword = false;
+  isLoading = false;
   
-  // Usuario hardcodeado
-  private readonly VALID_USER = {
-    username: 'admin',
-    email: 'admin@ejemplo.com',
-    phone: '1234567890',
-    password: 'Admin123'
-  };
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private loadingController: LoadingController,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
-      credential: ['', Validators.required],
-      password: ['', Validators.required]
+      credential: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100)
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(128)
+      ]]
     });
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   async onSubmit() {
-    if (this.loginForm.valid) {
-      const { credential, password } = this.loginForm.value;
-      
-      // Validar contra usuario hardcodeado
-      const isValid = (
-        (credential === this.VALID_USER.username || 
-         credential === this.VALID_USER.email || 
-         credential === this.VALID_USER.phone) &&
-        password === this.VALID_USER.password
-      );
-      
-      if (isValid) {
-        // Login exitoso
-        this.router.navigate(['/home']);
-      } else {
-        // Mostrar popup de error
-        await this.mostrarErrorCredenciales();
-      }
+    if (this.loginForm.invalid || this.isLoading) {
+      return;
     }
+
+    this.isLoading = true;
+    
+    console.log('🚀 Iniciando login...');
+    console.log('📡 API URL:', this.authService['apiUrl']); // Log de la URL
+    
+    // Mostrar loading
+    const loading = await this.loadingController.create({
+      message: 'Iniciando sesión...',
+      spinner: 'circular'
+    });
+    await loading.present();
+
+    const { credential, password } = this.loginForm.value;
+    
+    console.log('📤 Enviando credenciales:', { credential });
+    
+    this.authService.login({ credential, password })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: async (response) => {
+          console.log('✅ Respuesta recibida:', response);
+          await loading.dismiss();
+          this.isLoading = false;
+          
+          if (response.success) {
+            // Login exitoso
+            console.log('🎉 Login exitoso, navegando a /register');
+            this.router.navigate(['/register']);
+          } else {
+            // Mostrar mensaje de error del servidor
+            console.error('❌ Login fallido:', response.message);
+            await this.mostrarError(response.message);
+          }
+        },
+        error: async (error) => {
+          console.error('💥 Error en login:', error);
+          console.error('Error completo:', JSON.stringify(error, null, 2));
+          
+          await loading.dismiss();
+          this.isLoading = false;
+          
+          let mensaje = 'Error de conexión con el servidor';
+          
+          if (error.status === 0) {
+            mensaje = 'No se puede conectar al servidor. Verifica tu conexión.';
+          } else if (error.error?.message) {
+            mensaje = error.error.message;
+          } else if (error.message) {
+            mensaje = error.message;
+          }
+          
+          // Mostrar mensaje de error
+          await this.mostrarError(mensaje);
+        }
+      });
   }
   
-  async mostrarErrorCredenciales() {
+  async mostrarError(mensaje: string) {
     const alert = await this.alertController.create({
       header: 'Error',
-      message: 'Usuario o contraseña inválidos',
-      backdropDismiss: false
+      message: mensaje,
+      backdropDismiss: false,
+      cssClass: 'error-alert'
     });
     
     await alert.present();
@@ -76,8 +129,7 @@ export class LoginPage implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  
-  viajarRegistro(){
+    viajarRegistro() {
     this.router.navigate(['/register']);
   }
 
