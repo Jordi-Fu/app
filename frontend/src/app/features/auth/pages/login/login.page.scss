@@ -1,5 +1,15 @@
 @use '../../../../../theme/variables' as *;
 
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+ion-content {
+  --background: var(--ion-background-color, #ffffff);
+}
+
 .cuerpo {
   margin: 0;
   padding: 0;
@@ -10,6 +20,8 @@
   justify-content: center;
   align-items: center;
   font-family: $font-family;
+  background-color: var(--ion-background-color, #ffffff);
+  color: var(--ion-text-color, #000000);
 }
 
 .titulo {

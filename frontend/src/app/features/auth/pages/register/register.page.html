@@ -1,13 +1,157 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>register</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <div class="register-container">
+    <!-- Encabezado -->
+    <div class="header">
+      <h1>Registrar</h1>
+    </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Paso 1: Datos Personales -->
+    <div class="step-content" *ngIf="currentStep === 1">
+      <div class="card">
+        <h2>Datos Personales</h2>
+        
+        <form [formGroup]="registerForm" class="form-inputs">
+          <div class="input-group">
+            <label>Nombre</label>
+            <input type="text" formControlName="nombre">
+          </div>
+
+          <div class="input-group">
+            <label>Apellidos</label>
+            <input type="text" formControlName="apellidos">
+          </div>
+
+          <div class="input-group">
+            <label>Telefono</label>
+            <div class="phone-input">
+              <span class="flag">🇪🇸</span>
+              <span class="prefix">+34</span>
+              <input type="tel" formControlName="telefono">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Correo</label>
+            <input type="email" formControlName="email">
+          </div>
+
+          <div class="input-group">
+            <label>Contraseña</label>
+            <div class="password-container">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                formControlName="password">
+              <img 
+                class="eye-icon" 
+                [src]="showPassword ? 'assets/ojo_candado.svg' : 'assets/ojo_abierto.svg'"
+                (click)="togglePasswordVisibility()"
+                alt="toggle">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Confirmar contraseña</label>
+            <div class="password-container">
+              <input 
+                [type]="showConfirmPassword ? 'text' : 'password'" 
+                formControlName="confirmPassword">
+              <img 
+                class="eye-icon" 
+                [src]="showConfirmPassword ? 'assets/ojo_candado.svg' : 'assets/ojo_abierto.svg'"
+                (click)="toggleConfirmPasswordVisibility()"
+                alt="toggle">
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="navigation-buttons">
+        <button class="btn-siguiente" (click)="nextStep()" [disabled]="!isStepValid(1)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+    <!-- Paso 2: Servicios -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <div class="card">
+        <h2>Servicios</h2>
+
+        <form [formGroup]="registerForm" class="form-inputs">
+          <div class="input-group">
+            <label>Categorías</label>
+            <input type="text" formControlName="categorias" placeholder="#Electricista #Jardinero #Manitas">
+            <div class="categories-tags">
+              <span class="tag" *ngFor="let cat of availableCategories">#{{cat}}</span>
+            </div>
+          </div>
+
+          <div class="services-selection">
+            <div 
+              class="service-chip" 
+              *ngFor="let service of availableServices"
+              [class.selected]="isServiceSelected(service.name)"
+              (click)="toggleService(service.name)">
+              {{service.name}}
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Localización</label>
+            <input type="text" formControlName="localizacion" placeholder="Buscar ubicación">
+          </div>
+
+          <div class="map-container">
+            <div class="map-placeholder">
+              <!-- Aquí iría el mapa -->
+              <p>Mapa de Google Maps</p>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="navigation-buttons">
+        <button class="btn-atras" (click)="previousStep()">Atrás</button>
+        <button class="btn-siguiente" (click)="nextStep()" [disabled]="!isStepValid(2)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+    <!-- Paso 3: Consentimientos -->
+    <div class="step-content" *ngIf="currentStep === 3">
+      <div class="card">
+        <h2>Consentimientos</h2>
+
+        <form [formGroup]="registerForm" class="form-inputs">
+          <div class="consent-group">
+            <div class="consent-item">
+              <ion-checkbox formControlName="consent1"></ion-checkbox>
+              <div class="consent-text">
+                <p>Acepto bla bla bla bla bla bla <a href="#">+Informacion</a></p>
+              </div>
+            </div>
+
+            <div class="consent-item expandable">
+              <ion-checkbox formControlName="consent2"></ion-checkbox>
+              <div class="consent-text">
+                <p>Acepto bla bla bla bla bla bla</p>
+                <div class="expanded-content">
+                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                  <p class="more-info">Mas Informacion en la web, haz <a href="#">click aqui</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="navigation-buttons">
+        <button class="btn-atras" (click)="previousStep()">Atrás</button>
+        <button class="btn-siguiente" (click)="onSubmit()" [disabled]="!isStepValid(3)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
 </ion-content>

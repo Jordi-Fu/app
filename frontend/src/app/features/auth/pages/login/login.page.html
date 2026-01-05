@@ -1,15 +1,16 @@
-<div class="cuerpo">
-  <div class="titulo">
-    <span>Kurro</span>
-    <span>Iniciar sesion</span>
-    <span>Ingresa tus datos para continuar</span>
-  </div>
+<ion-content>
+  <div class="cuerpo">
+    <div class="titulo">
+      <span>Kurro</span>
+      <span>Iniciar Sesión</span>
+      <span>Ingresa tus datos para continuar</span>
+    </div>
   
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="inputs">
 
     <input 
       type="text" 
-      placeholder="Usuario, Telefono movil o email"
+      placeholder="Usuario, Teléfono móvil o email"
       formControlName="credential">
 
     <div class="password-wrapper">
@@ -31,13 +32,14 @@
       <img class="g-icon"
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/250px-Google_Favicon_2025.svg.png"
         alt="google logo">
-      Iniciar sesión con google
+      Iniciar sesión con Google
     </button>
     
-    <span class="register-link">¿No tienes un cuenta? <a (click)="viajarRegistro()" style="cursor: pointer;">Creala aqui</a></span>
+    <span class="register-link"><a (click)="viajarRegistro()" style="cursor: pointer;">¿No tienes una cuenta? Créala aquí</a></span>
     
     <div class="iniciar_sesion">
-      <button type="submit">Iniciar sesión</button>
+      <button type="submit">Iniciar Sesión</button>
     </div>
   </form>
-</div>
+  </div>
+</ion-content>
