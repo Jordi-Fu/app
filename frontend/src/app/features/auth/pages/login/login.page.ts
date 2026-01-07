@@ -55,9 +55,6 @@ export class LoginPage implements OnInit, OnDestroy {
 
     this.isLoading = true;
     
-    console.log('🚀 Iniciando login...');
-    console.log('📡 API URL:', this.authService['apiUrl']); // Log de la URL
-    
     // Mostrar loading
     const loading = await this.loadingController.create({
       message: 'Iniciando sesión...',
@@ -67,30 +64,20 @@ export class LoginPage implements OnInit, OnDestroy {
 
     const { credential, password } = this.loginForm.value;
     
-    console.log('📤 Enviando credenciales:', { credential });
-    
     this.authService.login({ credential, password })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: async (response) => {
-          console.log('✅ Respuesta recibida:', response);
           await loading.dismiss();
           this.isLoading = false;
           
           if (response.success) {
-            // Login exitoso
-            console.log('🎉 Login exitoso, navegando a /register');
-            this.router.navigate(['/register']);
+            this.router.navigate(['/home']);
           } else {
-            // Mostrar mensaje de error del servidor
-            console.error('❌ Login fallido:', response.message);
             await this.mostrarError(response.message);
           }
         },
         error: async (error) => {
-          console.error('💥 Error en login:', error);
-          console.error('Error completo:', JSON.stringify(error, null, 2));
-          
           await loading.dismiss();
           this.isLoading = false;
           

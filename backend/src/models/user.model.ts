@@ -1,176 +1,39 @@
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 import { User, SafeUser } from '../interfaces';
+import { userDatabase } from '../database/user.database';
 
 /**
  * Modelo de Usuario
- * Maneja la lógica de datos y persistencia de usuarios
+ * Maneja la lógica de negocio y validaciones
  */
 class UserModel {
-  private users: Map<string, User> = new Map();
-  
-  constructor() {
-    this.initializeDefaultUser();
-  }
-  
-  /**
-   * Inicializar usuario de prueba
-   */
-  private async initializeDefaultUser(): Promise<void> {
-    const hashedPassword = await bcrypt.hash('Admin123', 12);
-    const defaultUser: User = {
-      id: uuidv4(),
-      username: 'admin',
-      email: 'admin@ejemplo.com',
-      phone: '1234567890',
-      password: hashedPassword,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      failedLoginAttempts: 0,
-      lockUntil: null,
-      isActive: true,
-    };
-    
-    this.users.set(defaultUser.id, defaultUser);
-  }
   
   /**
    * Buscar usuario por credencial (username, email o phone)
    */
-  findByCredential(credential: string): User | undefined {
-    const normalizedCredential = credential.toLowerCase().trim();
-    
-    for (const user of this.users.values()) {
-      if (
-        user.username.toLowerCase() === normalizedCredential ||
-        user.email.toLowerCase() === normalizedCredential ||
-        user.phone === normalizedCredential
-      ) {
-        return user;
-      }
-    }
-    
-    return undefined;
+  async findByCredential(credential: string): Promise<User | undefined> {
+    return userDatabase.findByCredential(credential);
   }
   
   /**
    * Buscar usuario por ID
    */
-  findById(id: string): User | undefined {
-    return this.users.get(id);
-  }
-  
-  /**
-   * Buscar usuario por email
-   */
-  findByEmail(email: string): User | undefined {
-    const normalizedEmail = email.toLowerCase().trim();
-    
-    for (const user of this.users.values()) {
-      if (user.email.toLowerCase() === normalizedEmail) {
-        return user;
-      }
-    }
-    
-    return undefined;
-  }
-  
-  /**
-   * Buscar usuario por username
-   */
-  findByUsername(username: string): User | undefined {
-    const normalizedUsername = username.toLowerCase().trim();
-    
-    for (const user of this.users.values()) {
-      if (user.username.toLowerCase() === normalizedUsername) {
-        return user;
-      }
-    }
-    
-    return undefined;
-  }
-  
-  /**
-   * Crear nuevo usuario
-   */
-  async create(userData: {
-    username: string;
-    email: string;
-    phone: string;
-    password: string;
-  }): Promise<User> {
-    const hashedPassword = await bcrypt.hash(userData.password, 12);
-    
-    const newUser: User = {
-      id: uuidv4(),
-      username: userData.username.toLowerCase().trim(),
-      email: userData.email.toLowerCase().trim(),
-      phone: userData.phone.trim(),
-      password: hashedPassword,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      failedLoginAttempts: 0,
-      lockUntil: null,
-      isActive: true,
-    };
-    
-    this.users.set(newUser.id, newUser);
-    return newUser;
-  }
-  
-  /**
-   * Actualizar usuario
-   */
-  update(id: string, updates: Partial<User>): User | undefined {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    
-    const updatedUser = {
-      ...user,
-      ...updates,
-      updatedAt: new Date(),
-    };
-    
-    this.users.set(id, updatedUser);
-    return updatedUser;
-  }
-  
-  /**
-   * Eliminar usuario
-   */
-  delete(id: string): boolean {
-    return this.users.delete(id);
+  async findById(id: string): Promise<User | undefined> {
+    return userDatabase.findById(id);
   }
   
   /**
    * Incrementar intentos fallidos de login
    */
-  incrementFailedAttempts(id: string): void {
-    const user = this.users.get(id);
-    if (!user) return;
-    
-    const failedAttempts = user.failedLoginAttempts + 1;
-    let lockUntil = user.lockUntil;
-    
-    // Bloquear después de 5 intentos por 15 minutos
-    if (failedAttempts >= 5) {
-      lockUntil = new Date(Date.now() + 15 * 60 * 1000);
-    }
-    
-    this.update(id, {
-      failedLoginAttempts: failedAttempts,
-      lockUntil,
-    });
+  async incrementFailedAttempts(id: string): Promise<void> {
+    await userDatabase.incrementFailedAttempts(id);
   }
   
   /**
    * Resetear intentos fallidos
    */
-  resetFailedAttempts(id: string): void {
-    this.update(id, {
-      failedLoginAttempts: 0,
-      lockUntil: null,
-    });
+  async resetFailedAttempts(id: string): Promise<void> {
+    await userDatabase.resetFailedAttempts(id);
   }
   
   /**
@@ -192,14 +55,7 @@ class UserModel {
    * Convertir a usuario seguro (sin contraseña)
    */
   toSafeUser(user: User): SafeUser {
-    return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      phone: user.phone,
-      createdAt: user.createdAt,
-      isActive: user.isActive,
-    };
+    return userDatabase.toSafeUser(user);
   }
   
   /**

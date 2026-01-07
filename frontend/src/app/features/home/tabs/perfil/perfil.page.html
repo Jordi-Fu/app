@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="perfil-header">
+    <ion-avatar class="perfil-avatar">
+      <ion-icon name="person-circle-outline"></ion-icon>
+    </ion-avatar>
+    <h1 *ngIf="usuario">{{ usuario.username }}</h1>
+    <p *ngIf="usuario">{{ usuario.email }}</p>
+  </div>
+
+  <ion-card *ngIf="usuario" class="info-card">
+    <ion-card-content>
+      <div class="info-item">
+        <ion-icon name="mail-outline" color="primary"></ion-icon>
+        <div class="info-text">
+          <span class="label">Email</span>
+          <span class="value">{{ usuario.email }}</span>
+        </div>
+      </div>
+      
+      <div class="info-item" *ngIf="usuario.phone">
+        <ion-icon name="call-outline" color="primary"></ion-icon>
+        <div class="info-text">
+          <span class="label">Teléfono</span>
+          <span class="value">{{ usuario.phone }}</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list class="menu-list">
+    <ion-item button detail="true">
+      <ion-icon name="settings-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>Configuración</ion-label>
+    </ion-item>
+
+    <ion-item button detail="true">
+      <ion-icon name="shield-checkmark-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>Privacidad</ion-label>
+    </ion-item>
+
+    <ion-item button detail="true">
+      <ion-icon name="help-circle-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>Ayuda</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <div class="logout-section">
+    <ion-button 
+      expand="block" 
+      color="danger" 
+      fill="outline"
+      (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
+  </div>
+</ion-content>

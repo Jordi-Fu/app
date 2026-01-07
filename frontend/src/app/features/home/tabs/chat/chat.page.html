@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Chats</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list *ngIf="conversaciones.length > 0; else noChats">
+    <ion-item 
+      *ngFor="let chat of conversaciones" 
+      button 
+      detail="true"
+      class="chat-item">
+      <ion-avatar slot="start">
+        <img [src]="chat.avatar" [alt]="chat.usuario" />
+      </ion-avatar>
+      
+      <ion-label>
+        <h2>{{ chat.usuario }}</h2>
+        <p>{{ chat.ultimoMensaje }}</p>
+      </ion-label>
+      
+      <div slot="end" class="chat-end">
+        <ion-note>{{ chat.fecha }}</ion-note>
+        <ion-badge *ngIf="chat.noLeidos > 0" color="primary">
+          {{ chat.noLeidos }}
+        </ion-badge>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noChats>
+    <div class="empty-state">
+      <ion-icon name="chatbubbles-outline" color="medium"></ion-icon>
+      <h2>No tienes conversaciones</h2>
+      <p>Cuando contactes con un proveedor, aparecerán aquí</p>
+    </div>
+  </ng-template>
+</ion-content>

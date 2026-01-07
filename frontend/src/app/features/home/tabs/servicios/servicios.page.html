@@ -1,0 +1,83 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Servicios</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      placeholder="Buscar servicios..." 
+      (ionInput)="onSearch($event)"
+      animated="true">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <!-- Categorías rápidas -->
+    <div class="categorias">
+      <h2>Categorías</h2>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4">
+            <ion-chip color="primary">
+              <ion-label>Limpieza</ion-label>
+            </ion-chip>
+          </ion-col>
+          <ion-col size="4">
+            <ion-chip color="secondary">
+              <ion-label>Tecnología</ion-label>
+            </ion-chip>
+          </ion-col>
+          <ion-col size="4">
+            <ion-chip color="tertiary">
+              <ion-label>Belleza</ion-label>
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <!-- Lista de servicios -->
+    <div class="servicios-list">
+      <h2>Servicios destacados</h2>
+      
+      <ion-card *ngFor="let servicio of servicios" class="servicio-card">
+        <img [src]="servicio.imagen" [alt]="servicio.titulo" />
+        
+        <ion-card-header>
+          <ion-chip [color]="'primary'" outline="true">
+            <ion-label>{{ servicio.categoria }}</ion-label>
+          </ion-chip>
+          <ion-card-title>{{ servicio.titulo }}</ion-card-title>
+          <ion-card-subtitle>
+            <ion-icon name="person-outline"></ion-icon>
+            {{ servicio.proveedor }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="info-row">
+            <div class="location">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ servicio.ubicacion }}</span>
+            </div>
+            <div class="rating">
+              <ion-icon name="star-outline" color="warning"></ion-icon>
+              <span>{{ servicio.rating }}</span>
+            </div>
+          </div>
+          
+          <div class="price-action">
+            <div class="price">
+              <span class="amount">{{ servicio.precio }}€</span>
+              <span class="period">/hora</span>
+            </div>
+            <ion-button size="small" fill="solid">
+              Ver más
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

@@ -47,19 +47,14 @@ export class AuthService {
    * Login de usuario
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    console.log('🔐 AuthService.login() - URL:', `${this.apiUrl}/login`);
-    console.log('🔐 Credenciales:', credentials);
-    
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       timeout(10000), // 10 segundos timeout
       tap(response => {
-        console.log('📥 Respuesta del servidor:', response);
         if (response.success && response.tokens && response.user) {
           this.storeAuth(response.tokens, response.user);
         }
       }),
       catchError(error => {
-        console.error('❌ Error en AuthService.login():', error);
         
         if (error instanceof TimeoutError) {
           return throwError(() => ({
@@ -156,7 +151,7 @@ export class AuthService {
   /**
    * Limpiar autenticación
    */
-  private clearAuth(): void {
+  clearAuth(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

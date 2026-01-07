@@ -1,109 +1,167 @@
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+import { pool } from '../config/database.config';
 import { User, SafeUser } from '../interfaces';
 
 /**
- * Almacén temporal de usuarios (en producción usar base de datos)
- * Las contraseñas están hasheadas con bcrypt
+ * Acceso a datos de usuarios en PostgreSQL
  */
 class UserDatabase {
-  private users: Map<string, User> = new Map();
-  
-  constructor() {
-    // Inicializar con usuario de prueba (contraseña: Admin123)
-    this.initializeDefaultUser();
-  }
-  
-  private async initializeDefaultUser(): Promise<void> {
-    const hashedPassword = await bcrypt.hash('Admin123', 12);
-    const defaultUser: User = {
-      id: uuidv4(),
-      username: 'admin',
-      email: 'admin@ejemplo.com',
-      phone: '1234567890',
-      password: hashedPassword,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      failedLoginAttempts: 0,
-      lockUntil: null,
-      isActive: true,
-    };
-    
-    this.users.set(defaultUser.id, defaultUser);
-  }
   
   /**
    * Buscar usuario por credencial (username, email o phone)
    */
-  findByCredential(credential: string): User | undefined {
+  async findByCredential(credential: string): Promise<User | undefined> {
     const normalizedCredential = credential.toLowerCase().trim();
     
-    for (const user of this.users.values()) {
-      if (
-        user.username.toLowerCase() === normalizedCredential ||
-        user.email.toLowerCase() === normalizedCredential ||
-        user.phone === normalizedCredential
-      ) {
-        return user;
+    try {
+      const query = `
+        SELECT id, username, email, phone, password_hash as password, 
+               is_active as "isActive", failed_login_attempts as "failedLoginAttempts",
+               locked_until as "lockUntil", created_at as "createdAt", 
+               updated_at as "updatedAt"
+        FROM users 
+        WHERE LOWER(username) = $1 
+           OR LOWER(email) = $1 
+           OR phone = $1
+        LIMIT 1
+      `;
+      
+      const result = await pool.query(query, [normalizedCredential]);
+      
+      if (result.rows.length === 0) {
+        return undefined;
       }
+      
+      return result.rows[0] as User;
+    } catch (error) {
+      console.error('Error al buscar usuario por credencial:', error);
+      return undefined;
     }
-    
-    return undefined;
   }
   
   /**
    * Buscar usuario por ID
    */
-  findById(id: string): User | undefined {
-    return this.users.get(id);
+  async findById(id: string): Promise<User | undefined> {
+    try {
+      const query = `
+        SELECT id, username, email, phone, password_hash as password,
+               is_active as "isActive", failed_login_attempts as "failedLoginAttempts",
+               locked_until as "lockUntil", created_at as "createdAt",
+               updated_at as "updatedAt"
+        FROM users 
+        WHERE id = $1
+      `;
+      
+      const result = await pool.query(query, [id]);
+      
+      if (result.rows.length === 0) {
+        return undefined;
+      }
+      
+      return result.rows[0] as User;
+    } catch (error) {
+      console.error('Error al buscar usuario por ID:', error);
+      return undefined;
+    }
   }
   
   /**
    * Actualizar usuario
    */
-  update(id: string, updates: Partial<User>): User | undefined {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    
-    const updatedUser = {
-      ...user,
-      ...updates,
-      updatedAt: new Date(),
-    };
-    
-    this.users.set(id, updatedUser);
-    return updatedUser;
+  async update(id: string, updates: Partial<User>): Promise<User | undefined> {
+    try {
+      const fields: string[] = [];
+      const values: any[] = [];
+      let paramCounter = 1;
+      
+      // Mapeo de campos TypeScript a columnas PostgreSQL
+      const fieldMapping: Record<string, string> = {
+        isActive: 'is_active',
+        failedLoginAttempts: 'failed_login_attempts',
+        lockUntil: 'locked_until',
+        updatedAt: 'updated_at',
+      };
+      
+      for (const [key, value] of Object.entries(updates)) {
+        const dbColumn = fieldMapping[key] || key;
+        fields.push(`${dbColumn} = $${paramCounter}`);
+        values.push(value);
+        paramCounter++;
+      }
+      
+      // Agregar updated_at automáticamente
+      fields.push(`updated_at = CURRENT_TIMESTAMP`);
+      
+      if (fields.length === 0) {
+        return this.findById(id);
+      }
+      
+      values.push(id);
+      const query = `
+        UPDATE users 
+        SET ${fields.join(', ')}
+        WHERE id = $${paramCounter}
+        RETURNING id, username, email, phone, password_hash as password,
+                  is_active as "isActive", failed_login_attempts as "failedLoginAttempts",
+                  locked_until as "lockUntil", created_at as "createdAt",
+                  updated_at as "updatedAt"
+      `;
+      
+      const result = await pool.query(query, values);
+      
+      if (result.rows.length === 0) {
+        return undefined;
+      }
+      
+      return result.rows[0] as User;
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      return undefined;
+    }
   }
   
   /**
    * Incrementar intentos fallidos
    */
-  incrementFailedAttempts(id: string): void {
-    const user = this.users.get(id);
-    if (!user) return;
-    
-    const failedAttempts = user.failedLoginAttempts + 1;
-    let lockUntil = user.lockUntil;
-    
-    // Bloquear después de 5 intentos por 15 minutos
-    if (failedAttempts >= 5) {
-      lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+  async incrementFailedAttempts(id: string): Promise<void> {
+    try {
+      const query = `
+        UPDATE users 
+        SET failed_login_attempts = failed_login_attempts + 1,
+            locked_until = CASE 
+              WHEN failed_login_attempts + 1 >= 5 
+              THEN CURRENT_TIMESTAMP + INTERVAL '15 minutes'
+              ELSE locked_until
+            END,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `;
+      
+      await pool.query(query, [id]);
+    } catch (error) {
+      console.error('Error al incrementar intentos fallidos:', error);
     }
-    
-    this.update(id, {
-      failedLoginAttempts: failedAttempts,
-      lockUntil,
-    });
   }
   
   /**
    * Resetear intentos fallidos
    */
-  resetFailedAttempts(id: string): void {
-    this.update(id, {
-      failedLoginAttempts: 0,
-      lockUntil: null,
-    });
+  async resetFailedAttempts(id: string): Promise<void> {
+    try {
+      const query = `
+        UPDATE users 
+        SET failed_login_attempts = 0,
+            locked_until = NULL,
+            last_login = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `;
+      
+      await pool.query(query, [id]);
+    } catch (error) {
+      console.error('Error al resetear intentos fallidos:', error);
+    }
   }
   
   /**

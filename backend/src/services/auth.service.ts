@@ -20,7 +20,7 @@ class AuthService {
     const { credential, password } = loginData;
     
     // Buscar usuario por credencial
-    const user = userModel.findByCredential(credential);
+    const user = await userModel.findByCredential(credential);
     
     if (!user) {
       // Respuesta genérica para no revelar si el usuario existe
@@ -52,9 +52,9 @@ class AuthService {
     
     if (!isPasswordValid) {
       // Incrementar intentos fallidos
-      userModel.incrementFailedAttempts(user.id);
+      await userModel.incrementFailedAttempts(user.id);
       
-      const updatedUser = userModel.findById(user.id);
+      const updatedUser = await userModel.findById(user.id);
       const attemptsLeft = 5 - (updatedUser?.failedLoginAttempts || 0);
       
       return {
@@ -66,13 +66,13 @@ class AuthService {
     }
     
     // Login exitoso - resetear intentos
-    userModel.resetFailedAttempts(user.id);
+    await userModel.resetFailedAttempts(user.id);
     
     // Generar tokens
     const tokens = this.generateTokens(user.id, user.username, user.email);
     
     // Guardar refresh token
-    const refreshExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 días
+    const refreshExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
     tokenModel.store(tokens.refreshToken, user.id, refreshExpiry);
     
     return {
@@ -100,7 +100,7 @@ class AuthService {
       const decoded = jwt.verify(refreshToken, ENV.JWT_REFRESH_SECRET) as JwtPayload;
       
       // Buscar usuario
-      const user = userModel.findById(decoded.userId);
+      const user = await userModel.findById(decoded.userId);
       
       if (!user || !user.isActive) {
         tokenModel.delete(refreshToken);
@@ -170,8 +170,8 @@ class AuthService {
   /**
    * Obtener usuario actual
    */
-  getCurrentUser(userId: string): SafeUser | null {
-    const user = userModel.findById(userId);
+  async getCurrentUser(userId: string): Promise<SafeUser | null> {
+    const user = await userModel.findById(userId);
     if (!user) return null;
     return userModel.toSafeUser(user);
   }

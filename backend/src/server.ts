@@ -1,5 +1,6 @@
 import createApp from './app';
 import { ENV, validateEnv } from './config/env.config';
+import { testConnection, closePool } from './config/database.config';
 
 /**
  * Iniciar servidor
@@ -8,6 +9,12 @@ const startServer = async (): Promise<void> => {
   try {
     // Validar variables de entorno
     validateEnv();
+    
+    // Verificar conexión a la base de datos
+    const dbConnected = await testConnection();
+    if (!dbConnected) {
+      throw new Error('No se pudo conectar a la base de datos');
+    }
     
     const app = createApp();
     
@@ -19,17 +26,8 @@ const startServer = async (): Promise<void> => {
       console.log(`🔗 Local: http://localhost:${ENV.PORT}`);
       console.log(`📱 Red: http://192.168.26.207:${ENV.PORT}`);
       console.log(`🔒 CORS habilitado para: ${ENV.CORS_ORIGINS.join(', ')}`);
+      console.log(`💾 Base de datos: ${ENV.DB_NAME} en ${ENV.DB_HOST}:${ENV.DB_PORT}`);
       console.log('=========================================');
-      
-      if (ENV.isDevelopment) {
-        console.log('');
-        console.log('📝 Credenciales de prueba:');
-        console.log('   Usuario: admin');
-        console.log('   Email: admin@ejemplo.com');
-        console.log('   Teléfono: 1234567890');
-        console.log('   Contraseña: Admin123');
-        console.log('');
-      }
     });
   } catch (error) {
     console.error('❌ Error al iniciar el servidor:', error);
@@ -46,6 +44,19 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Promesa rechazada no manejada:', reason);
   process.exit(1);
+});
+
+// Cerrar conexiones al terminar
+process.on('SIGINT', async () => {
+  console.log('\n⚠️  Cerrando servidor...');
+  await closePool();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n⚠️  Cerrando servidor...');
+  await closePool();
+  process.exit(0);
 });
 
 // Iniciar
