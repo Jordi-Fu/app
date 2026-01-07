@@ -3,13 +3,36 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { IonContent, IonCheckbox } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [IonContent, IonCheckbox, CommonModule, FormsModule, ReactiveFormsModule]
+  imports: [IonContent, IonCheckbox, CommonModule, FormsModule, ReactiveFormsModule],
+  animations: [
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ 
+          opacity: 0, 
+          transform: 'translateX(30px)',
+          position: 'absolute'
+        }),
+        animate('350ms 100ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ 
+          opacity: 1, 
+          transform: 'translateX(0)'
+        }))
+      ]),
+      transition(':leave', [
+        style({ position: 'absolute' }),
+        animate('250ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ 
+          opacity: 0, 
+          transform: 'translateX(-30px)'
+        }))
+      ])
+    ])
+  ]
 })
 export class RegisterPage implements OnInit {
   currentStep = 1;
@@ -34,19 +57,16 @@ export class RegisterPage implements OnInit {
       // Paso 1: Datos Personales
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellidos: ['', [Validators.required, Validators.minLength(2)]],
-      telefono: ['', [Validators.required, Validators.pattern(/^\+?\d{9,15}$/)]],
+      telefono: ['', [Validators.required]],
+      
+      // Paso 2: Cuenta
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
       
-      // Paso 2: Servicios
-      categorias: ['', Validators.required],
-      servicios: this.fb.array([]),
-      localizacion: ['', Validators.required],
-      
-      // Paso 3: Consentimientos
-      consent1: [false, Validators.requiredTrue],
-      consent2: [false, Validators.requiredTrue]
+      // Paso 3: Perfil
+      bio: ['', [Validators.maxLength(500)]]
     });
   }
 
@@ -94,17 +114,15 @@ export class RegisterPage implements OnInit {
       case 1:
         return !!(this.registerForm.get('nombre')?.valid &&
                this.registerForm.get('apellidos')?.valid &&
-               this.registerForm.get('telefono')?.valid &&
+               this.registerForm.get('telefono')?.valid);
+      case 2:
+        return !!(this.registerForm.get('username')?.valid &&
                this.registerForm.get('email')?.valid &&
                this.registerForm.get('password')?.valid &&
-               this.registerForm.get('confirmPassword')?.valid);
-      case 2:
-        return !!(this.registerForm.get('categorias')?.valid &&
-               this.serviciosArray.length > 0 &&
-               this.registerForm.get('localizacion')?.valid);
+               this.registerForm.get('confirmPassword')?.valid &&
+               this.registerForm.get('password')?.value === this.registerForm.get('confirmPassword')?.value);
       case 3:
-        return !!(this.registerForm.get('consent1')?.valid &&
-               this.registerForm.get('consent2')?.valid);
+        return true; // Bio es opcional
       default:
         return false;
     }
