@@ -18,9 +18,9 @@ export class AppComponent implements OnInit {
     this.checkAuthState();
   }
   
-  private checkAuthState(): void {
-    const token = this.authService.getAccessToken();
-    const refreshToken = this.authService.getRefreshToken();
+  private async checkAuthState(): Promise<void> {
+    const token = await this.authService.getAccessToken();
+    const refreshToken = await this.authService.getRefreshToken();
     const currentUrl = this.router.url;
     
     if (token) {

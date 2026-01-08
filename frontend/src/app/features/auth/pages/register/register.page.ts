@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { IonContent, IonCheckbox, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, ActionSheetController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -11,7 +11,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [IonContent, IonCheckbox, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [IonContent, CommonModule, FormsModule, ReactiveFormsModule],
   animations: [
     trigger('slideInOut', [
       transition(':enter', [

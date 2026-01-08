@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of, timeout, TimeoutError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, of, timeout, TimeoutError, from } from 'rxjs';
 import { catchError, tap, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, SafeUser, LoginRequest, AuthTokens } from '../interfaces';
+import { StorageService } from './storage.service';
 
 const TOKEN_KEY = 'kurro_access_token';
 const REFRESH_TOKEN_KEY = 'kurro_refresh_token';
@@ -21,25 +22,28 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private storage: StorageService
+  ) {
     this.loadStoredAuth();
   }
 
   /**
    * Cargar autenticación almacenada
    */
-  private loadStoredAuth(): void {
-    const token = this.getAccessToken();
-    const userStr = localStorage.getItem(USER_KEY);
-    
-    if (token && userStr) {
-      try {
-        const user = JSON.parse(userStr);
+  private async loadStoredAuth(): Promise<void> {
+    try {
+      const token = await this.storage.get(TOKEN_KEY);
+      const user = await this.storage.getObject<SafeUser>(USER_KEY);
+      
+      if (token && user) {
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
-      } catch {
-        this.clearAuth();
       }
+    } catch (error) {
+      console.error('Error cargando autenticación:', error);
+      await this.clearAuth();
     }
   }
 
@@ -49,10 +53,14 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       timeout(10000), // 10 segundos timeout
-      tap(response => {
+      switchMap(response => {
         if (response.success && response.tokens && response.user) {
-          this.storeAuth(response.tokens, response.user);
+          // Convertir la promesa a Observable
+          return from(this.storeAuth(response.tokens, response.user)).pipe(
+            map(() => response)
+          );
         }
+        return of(response);
       }),
       catchError(error => {
         
@@ -73,24 +81,32 @@ export class AuthService {
    * Refrescar tokens
    */
   refreshToken(): Observable<AuthResponse> {
-    const refreshToken = this.getRefreshToken();
-    
-    if (!refreshToken) {
-      this.clearAuth();
-      return throwError(() => new Error('No refresh token available'));
-    }
-    
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
-      tap(response => {
-        if (response.success && response.tokens && response.user) {
-          this.storeAuth(response.tokens, response.user);
-        } else {
-          this.clearAuth();
+    return from(this.storage.get(REFRESH_TOKEN_KEY)).pipe(
+      switchMap(refreshToken => {
+        if (!refreshToken) {
+          return from(this.clearAuth()).pipe(
+            switchMap(() => throwError(() => new Error('No refresh token available')))
+          );
         }
-      }),
-      catchError(error => {
-        this.clearAuth();
-        return this.handleError(error);
+        
+        return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
+          switchMap(response => {
+            if (response.success && response.tokens && response.user) {
+              return from(this.storeAuth(response.tokens, response.user)).pipe(
+                map(() => response)
+              );
+            } else {
+              return from(this.clearAuth()).pipe(
+                map(() => response)
+              );
+            }
+          }),
+          catchError(error => {
+            return from(this.clearAuth()).pipe(
+              switchMap(() => this.handleError(error))
+            );
+          })
+        );
       })
     );
   }
@@ -99,13 +115,18 @@ export class AuthService {
    * Logout
    */
   logout(): Observable<AuthResponse> {
-    const refreshToken = this.getRefreshToken();
-    
-    return this.http.post<AuthResponse>(`${this.apiUrl}/logout`, { refreshToken }).pipe(
-      tap(() => this.clearAuth()),
-      catchError(error => {
-        this.clearAuth();
-        return of({ success: true, message: 'Sesión cerrada' });
+    return from(this.storage.get(REFRESH_TOKEN_KEY)).pipe(
+      switchMap(refreshToken => {
+        return this.http.post<AuthResponse>(`${this.apiUrl}/logout`, { refreshToken }).pipe(
+          switchMap(() => from(this.clearAuth()).pipe(
+            map(() => ({ success: true, message: 'Sesión cerrada' }))
+          )),
+          catchError(() => {
+            return from(this.clearAuth()).pipe(
+              map(() => ({ success: true, message: 'Sesión cerrada' }))
+            );
+          })
+        );
       })
     );
   }
@@ -125,12 +146,14 @@ export class AuthService {
    */
   getCurrentUser(): Observable<SafeUser | null> {
     return this.http.get<{ success: boolean; user: SafeUser }>(`${this.apiUrl}/me`).pipe(
-      map(response => response.success ? response.user : null),
-      tap(user => {
-        if (user) {
-          this.currentUserSubject.next(user);
-          localStorage.setItem(USER_KEY, JSON.stringify(user));
+      switchMap(response => {
+        if (response.success && response.user) {
+          return from(this.storage.setObject(USER_KEY, response.user)).pipe(
+            tap(() => this.currentUserSubject.next(response.user)),
+            map(() => response.user)
+          );
         }
+        return of(null);
       }),
       catchError(() => of(null))
     );
@@ -139,10 +162,10 @@ export class AuthService {
   /**
    * Almacenar autenticación
    */
-  private storeAuth(tokens: AuthTokens, user: SafeUser): void {
-    localStorage.setItem(TOKEN_KEY, tokens.accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  private async storeAuth(tokens: AuthTokens, user: SafeUser): Promise<void> {
+    await this.storage.set(TOKEN_KEY, tokens.accessToken);
+    await this.storage.set(REFRESH_TOKEN_KEY, tokens.refreshToken);
+    await this.storage.setObject(USER_KEY, user);
     
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
@@ -151,10 +174,10 @@ export class AuthService {
   /**
    * Limpiar autenticación
    */
-  clearAuth(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+  async clearAuth(): Promise<void> {
+    await this.storage.remove(TOKEN_KEY);
+    await this.storage.remove(REFRESH_TOKEN_KEY);
+    await this.storage.remove(USER_KEY);
     
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
@@ -163,15 +186,15 @@ export class AuthService {
   /**
    * Obtener access token
    */
-  getAccessToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+  getAccessToken(): Promise<string | null> {
+    return this.storage.get(TOKEN_KEY);
   }
 
   /**
    * Obtener refresh token
    */
-  getRefreshToken(): string | null {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  getRefreshToken(): Promise<string | null> {
+    return this.storage.get(REFRESH_TOKEN_KEY);
   }
 
   /**
