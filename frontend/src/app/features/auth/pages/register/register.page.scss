@@ -271,9 +271,12 @@ ion-content {
   align-items: center;
   justify-content: center;
 
-  &:hover {
-    background: #eeeeee;
+  &:active {
+    background: $primary-gradient;
+    color: white;
+    border-color: transparent;
   }
+
 }
 
 .navigation-buttons {
@@ -407,8 +410,10 @@ ion-content {
     border-color: #404040;
     color: #ffffff;
 
-    &:hover {
-      background: #333333;
+    &:active {
+      background: $primary-gradient;
+      color: white;
+      border-color: transparent;
     }
   }
 
