@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { IonContent, IonCheckbox } from '@ionic/angular/standalone';
+import { IonContent, IonCheckbox, ActionSheetController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-register',
@@ -39,6 +40,7 @@ export class RegisterPage implements OnInit {
   registerForm!: FormGroup;
   showPassword = false;
   showConfirmPassword = false;
+  profilePhoto: string | null = null;
   
   availableCategories = ['Electricista', 'Jardinero', 'Manitas'];
   availableServices = [
@@ -49,7 +51,8 @@ export class RegisterPage implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private actionSheetCtrl: ActionSheetController
   ) { }
 
   ngOnInit() {
@@ -80,6 +83,85 @@ export class RegisterPage implements OnInit {
 
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  formatPhoneNumber(event: any) {
+    let input = event.target.value.replace(/\D/g, '');
+    
+    if (input.length > 9) {
+      input = input.substring(0, 9);
+    }
+    
+    let formatted = '';
+    if (input.length > 0) {
+      formatted = input.substring(0, 3);
+      if (input.length >= 4) {
+        formatted += ' ' + input.substring(3, 5);
+      }
+      if (input.length >= 6) {
+        formatted += ' ' + input.substring(5, 7);
+      }
+      if (input.length >= 8) {
+        formatted += ' ' + input.substring(7, 9);
+      }
+    }
+    
+    this.registerForm.patchValue({ telefono: formatted }, { emitEvent: false });
+  }
+
+  async triggerFileInput() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Selecciona una opción',
+      buttons: [
+        {
+          text: 'Cámara',
+          icon: 'camera',
+          handler: () => {
+            this.takePicture(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Galería',
+          icon: 'images',
+          handler: () => {
+            this.takePicture(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  async takePicture(source: CameraSource) {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: source
+      });
+
+      this.profilePhoto = image.dataUrl || null;
+    } catch (error) {
+      console.error('Error al capturar imagen:', error);
+    }
+  }
+
+  onPhotoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.profilePhoto = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   toggleService(serviceName: string) {
