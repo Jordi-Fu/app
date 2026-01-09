@@ -7,13 +7,33 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  nombre: string;
+  apellidos: string;
+  telefono: string;
+  username: string;
+  email: string;
+  password: string;
+  bio?: string;
+}
+
 export interface SafeUser {
   id: string;
   username: string;
   email: string;
-  phone: string;
-  createdAt: Date;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  countryCode: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  userType: 'client' | 'provider' | 'both';
+  userRole: 'user' | 'provider' | 'admin' | 'moderator';
+  isVerified: boolean;
   isActive: boolean;
+  ratingAverage: number;
+  totalReviews: number;
+  createdAt: Date;
 }
 
 export interface AuthTokens {

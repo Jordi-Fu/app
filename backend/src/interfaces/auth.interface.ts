@@ -5,13 +5,26 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  phone: string;
-  password: string; // Hash de la contraseña
+  password: string; // Hash de la contraseña (password_hash en DB)
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  countryCode: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  userType: 'client' | 'provider' | 'both';
+  userRole: 'user' | 'provider' | 'admin' | 'moderator';
+  isVerified: boolean;
+  isActive: boolean;
+  isOnline: boolean;
+  lastSeen: Date | null;
+  ratingAverage: number;
+  totalReviews: number;
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
+  lastLogin: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  failedLoginAttempts: number;
-  lockUntil: Date | null;
-  isActive: boolean;
 }
 
 /**
@@ -21,9 +34,19 @@ export interface SafeUser {
   id: string;
   username: string;
   email: string;
-  phone: string;
-  createdAt: Date;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  countryCode: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  userType: 'client' | 'provider' | 'both';
+  userRole: 'user' | 'provider' | 'admin' | 'moderator';
+  isVerified: boolean;
   isActive: boolean;
+  ratingAverage: number;
+  totalReviews: number;
+  createdAt: Date;
 }
 
 /**
@@ -62,6 +85,19 @@ export interface AuthResponse {
 export interface LoginRequest {
   credential: string; // username, email o phone
   password: string;
+}
+
+/**
+ * Request de registro
+ */
+export interface RegisterRequest {
+  nombre: string;
+  apellidos: string;
+  telefono: string;
+  username: string;
+  email: string;
+  password: string;
+  bio?: string;
 }
 
 /**

@@ -7,12 +7,21 @@ const router = Router();
 
 /**
  * Rutas de autenticación
+ * POST /api/auth/register - Registro de usuario
  * POST /api/auth/login    - Login de usuario
  * POST /api/auth/refresh  - Renovar tokens
  * POST /api/auth/logout   - Cerrar sesión
  * GET  /api/auth/me       - Obtener usuario actual
  * GET  /api/auth/verify   - Verificar token
  */
+
+// Registro
+router.post(
+  '/register',
+  authValidators.register(),
+  handleValidationErrors,
+  authController.register.bind(authController)
+);
 
 // Login
 router.post(

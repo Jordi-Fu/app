@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of, timeout, TimeoutError, from } from 'rxjs';
 import { catchError, tap, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, SafeUser, LoginRequest, AuthTokens } from '../interfaces';
+import { AuthResponse, SafeUser, LoginRequest, RegisterRequest, AuthTokens } from '../interfaces';
 import { StorageService } from './storage.service';
 
 const TOKEN_KEY = 'kurro_access_token';
@@ -64,6 +64,35 @@ export class AuthService {
       }),
       catchError(error => {
         
+        if (error instanceof TimeoutError) {
+          return throwError(() => ({
+            status: 0,
+            message: 'Tiempo de espera agotado. El servidor no responde.',
+            error: 'timeout'
+          }));
+        }
+        
+        return this.handleError(error);
+      })
+    );
+  }
+
+  /**
+   * Registro de nuevo usuario
+   */
+  register(registerData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerData).pipe(
+      timeout(10000), // 10 segundos timeout
+      switchMap(response => {
+        if (response.success && response.tokens && response.user) {
+          // Convertir la promesa a Observable y guardar autenticación
+          return from(this.storeAuth(response.tokens, response.user)).pipe(
+            map(() => response)
+          );
+        }
+        return of(response);
+      }),
+      catchError(error => {
         if (error instanceof TimeoutError) {
           return throwError(() => ({
             status: 0,
@@ -209,6 +238,7 @@ export class AuthService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Error desconocido';
+    let errorDetails = error;
     
     if (error.error instanceof ErrorEvent) {
       // Error del cliente
@@ -216,10 +246,21 @@ export class AuthService {
     } else if (error.error?.message) {
       // Error del servidor
       errorMessage = error.error.message;
+      
+      // Si hay errores de validación, agregarlos
+      if (error.error.errors && Array.isArray(error.error.errors)) {
+        const validationMessages = error.error.errors
+          .map((e: any) => e.message || e.msg)
+          .join(', ');
+        errorMessage = `${errorMessage}: ${validationMessages}`;
+      }
     } else {
       switch (error.status) {
         case 0:
           errorMessage = 'No se puede conectar con el servidor';
+          break;
+        case 400:
+          errorMessage = 'Datos inválidos';
           break;
         case 401:
           errorMessage = 'Credenciales inválidas';
@@ -235,6 +276,11 @@ export class AuthService {
       }
     }
     
-    return throwError(() => new Error(errorMessage));
+    // Crear un error con toda la información
+    const errorObj = new Error(errorMessage);
+    (errorObj as any).error = errorDetails.error;
+    (errorObj as any).status = errorDetails.status;
+    
+    return throwError(() => errorObj);
   }
 }

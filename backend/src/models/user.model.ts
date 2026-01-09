@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { User, SafeUser } from '../interfaces';
+import { User, SafeUser, RegisterRequest } from '../interfaces';
 import { userDatabase } from '../database/user.database';
 
 /**
@@ -21,6 +21,34 @@ class UserModel {
   async findById(id: string): Promise<User | undefined> {
     return userDatabase.findById(id);
   }
+
+  /**
+   * Verificar si existe usuario por username
+   */
+  async existsByUsername(username: string): Promise<boolean> {
+    return userDatabase.existsByUsername(username);
+  }
+
+  /**
+   * Verificar si existe usuario por email
+   */
+  async existsByEmail(email: string): Promise<boolean> {
+    return userDatabase.existsByEmail(email);
+  }
+
+  /**
+   * Verificar si existe usuario por teléfono
+   */
+  async existsByPhone(phone: string): Promise<boolean> {
+    return userDatabase.existsByPhone(phone);
+  }
+
+  /**
+   * Crear un nuevo usuario
+   */
+  async create(userData: RegisterRequest): Promise<User | undefined> {
+    return userDatabase.create(userData);
+  }
   
   /**
    * Incrementar intentos fallidos de login
@@ -40,15 +68,15 @@ class UserModel {
    * Verificar si la cuenta está bloqueada
    */
   isLocked(user: User): boolean {
-    return user.lockUntil !== null && user.lockUntil > new Date();
+    return user.lockedUntil !== null && user.lockedUntil > new Date();
   }
   
   /**
    * Obtener tiempo restante de bloqueo en minutos
    */
   getLockTimeRemaining(user: User): number {
-    if (!user.lockUntil) return 0;
-    return Math.ceil((user.lockUntil.getTime() - Date.now()) / 60000);
+    if (!user.lockedUntil) return 0;
+    return Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
   }
   
   /**

@@ -32,6 +32,39 @@ class AuthController {
   }
 
   /**
+   * POST /api/auth/register
+   * Registro de usuario
+   */
+  async register(req: Request, res: Response): Promise<void> {
+    try {
+      const { nombre, apellidos, telefono, username, email, password, bio } = req.body;
+      
+      const result = await authService.register({
+        nombre,
+        apellidos,
+        telefono,
+        username,
+        email,
+        password,
+        bio,
+      });
+      
+      if (!result.success) {
+        res.status(400).json(result);
+        return;
+      }
+      
+      res.status(201).json(result);
+    } catch (error) {
+      console.error('[AUTH] Error en registro:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+      });
+    }
+  }
+
+  /**
    * POST /api/auth/refresh
    * Renovar tokens
    */

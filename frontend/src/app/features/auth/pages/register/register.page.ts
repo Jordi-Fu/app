@@ -1,17 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { IonContent, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, ActionSheetController, LoadingController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AuthService } from '../../../../core/services/auth.service';
+import { RegisterRequest } from '../../../../core/interfaces';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    IonContent, 
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule
+  ],
   animations: [
     trigger('slideInOut', [
       transition(':enter', [
@@ -41,18 +48,14 @@ export class RegisterPage implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   profilePhoto: string | null = null;
-  
-  availableCategories = ['Electricista', 'Jardinero', 'Manitas'];
-  availableServices = [
-    { name: 'Fontanero', category: 'services' },
-    { name: 'Electricista', category: 'services' },
-    { name: 'Profesor', category: 'services' }
-  ];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    private authService: AuthService,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
   ) { }
 
   ngOnInit() {
@@ -210,11 +213,76 @@ export class RegisterPage implements OnInit {
     }
   }
 
-  onSubmit() {
-    if (this.registerForm.valid) {
-      console.log('Registro completo:', this.registerForm.value);
-      // Lógica de registro
+  async onSubmit() {
+    if (!this.registerForm.valid) {
+      await this.showToast('Por favor, completa todos los campos correctamente', 'warning');
+      return;
     }
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Creando cuenta...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
+    // Limpiar el teléfono de espacios antes de enviar
+    const telefonoLimpio = this.registerForm.value.telefono.replace(/\s/g, '');
+
+    const registerData: RegisterRequest = {
+      nombre: this.registerForm.value.nombre.trim(),
+      apellidos: this.registerForm.value.apellidos.trim(),
+      telefono: telefonoLimpio,
+      username: this.registerForm.value.username.trim(),
+      email: this.registerForm.value.email.trim(),
+      password: this.registerForm.value.password,
+      bio: this.registerForm.value.bio?.trim() || undefined
+    };
+
+    console.log('Enviando datos de registro:', { ...registerData, password: '***' });
+
+    this.authService.register(registerData).subscribe({
+      next: async (response) => {
+        await loading.dismiss();
+        
+        if (response.success) {
+          await this.showToast('¡Cuenta creada exitosamente!', 'success');
+          // Redirigir al home o dashboard
+          this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        } else {
+          await this.showToast(response.message || 'Error al crear la cuenta', 'danger');
+          console.error('Error del servidor:', response);
+        }
+      },
+      error: async (error) => {
+        await loading.dismiss();
+        
+        // Mostrar mensaje de error más específico
+        let message = 'Error al conectar con el servidor';
+        
+        if (error.message) {
+          message = error.message;
+        } else if (error.error?.message) {
+          message = error.error.message;
+        } else if (error.error?.errors) {
+          // Si hay errores de validación específicos
+          const validationErrors = error.error.errors.map((e: any) => e.message).join(', ');
+          message = `Error de validación: ${validationErrors}`;
+        }
+        
+        await this.showToast(message, 'danger');
+        console.error('Error completo en registro:', error);
+      }
+    });
+  }
+
+  private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      color
+    });
+    await toast.present();
   }
 
   goToLogin() {

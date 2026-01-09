@@ -6,6 +6,7 @@ import {
   AuthTokens, 
   JwtPayload, 
   LoginRequest,
+  RegisterRequest,
   SafeUser 
 } from '../interfaces';
 
@@ -79,6 +80,62 @@ class AuthService {
       success: true,
       message: 'Login exitoso',
       user: userModel.toSafeUser(user),
+      tokens,
+    };
+  }
+
+  /**
+   * Registro de nuevo usuario
+   */
+  async register(registerData: RegisterRequest): Promise<AuthResponse> {
+    // Validar que el username no esté en uso
+    const usernameExists = await userModel.existsByUsername(registerData.username);
+    if (usernameExists) {
+      return {
+        success: false,
+        message: 'El nombre de usuario ya está en uso',
+      };
+    }
+
+    // Validar que el email no esté en uso
+    const emailExists = await userModel.existsByEmail(registerData.email);
+    if (emailExists) {
+      return {
+        success: false,
+        message: 'El email ya está registrado',
+      };
+    }
+
+    // Validar que el teléfono no esté en uso
+    const phoneExists = await userModel.existsByPhone(registerData.telefono);
+    if (phoneExists) {
+      return {
+        success: false,
+        message: 'El teléfono ya está registrado',
+      };
+    }
+
+    // Crear usuario
+    const newUser = await userModel.create(registerData);
+
+    if (!newUser) {
+      return {
+        success: false,
+        message: 'Error al crear el usuario. Intenta nuevamente.',
+      };
+    }
+
+    // Generar tokens automáticamente
+    const tokens = this.generateTokens(newUser.id, newUser.username, newUser.email);
+
+    // Guardar refresh token
+    const refreshExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
+    tokenModel.store(tokens.refreshToken, newUser.id, refreshExpiry);
+
+    return {
+      success: true,
+      message: 'Usuario registrado exitosamente',
+      user: userModel.toSafeUser(newUser),
       tokens,
     };
   }
