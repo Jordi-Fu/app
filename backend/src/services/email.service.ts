@@ -195,9 +195,7 @@ Si no solicitaste restablecer tu contraseña, puedes ignorar este email de forma
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      
-      console.log('[EMAIL] Código de recuperación enviado a:', email);
-      console.log('[EMAIL] Message ID:', info.messageId);
+    
       
       return true;
     } catch (error) {
