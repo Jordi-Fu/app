@@ -5,8 +5,8 @@ import { IonContent, ActionSheetController, LoadingController, ToastController }
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { AuthService } from '../../../../core/services/auth.service';
-import { RegisterRequest } from '../../../../core/interfaces';
+import { AuthService } from '../../../core/services/auth.service';
+import { RegisterRequest, AuthResponse } from '../../../core/interfaces';
 
 @Component({
   selector: 'app-register',
@@ -241,7 +241,7 @@ export class RegisterPage implements OnInit {
     console.log('Enviando datos de registro:', { ...registerData, password: '***' });
 
     this.authService.register(registerData).subscribe({
-      next: async (response) => {
+      next: async (response: AuthResponse) => {
         await loading.dismiss();
         
         if (response.success) {
@@ -253,7 +253,7 @@ export class RegisterPage implements OnInit {
           console.error('Error del servidor:', response);
         }
       },
-      error: async (error) => {
+      error: async (error: any) => {
         await loading.dismiss();
         
         // Mostrar mensaje de error más específico

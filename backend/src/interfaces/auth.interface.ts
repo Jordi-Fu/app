@@ -77,6 +77,8 @@ export interface AuthResponse {
   message: string;
   user?: SafeUser;
   tokens?: AuthTokens;
+  resetToken?: string; // Token para restablecer contraseña
+  debug?: any; // Información de debug (solo desarrollo)
 }
 
 /**

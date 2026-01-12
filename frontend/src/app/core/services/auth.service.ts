@@ -234,6 +234,66 @@ export class AuthService {
   }
 
   /**
+   * Solicitar restablecimiento de contraseña
+   */
+  requestPasswordReset(email: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/forgot-password`, { email }).pipe(
+      timeout(10000),
+      catchError(error => {
+        if (error instanceof TimeoutError) {
+          return throwError(() => ({
+            status: 0,
+            message: 'Tiempo de espera agotado. El servidor no responde.',
+            error: 'timeout'
+          }));
+        }
+        return this.handleError(error);
+      })
+    );
+  }
+
+  /**
+   * Verificar código de restablecimiento
+   */
+  verifyResetCode(email: string, code: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/verify-reset-code`, { email, code }).pipe(
+      timeout(10000),
+      catchError(error => {
+        if (error instanceof TimeoutError) {
+          return throwError(() => ({
+            status: 0,
+            message: 'Tiempo de espera agotado. El servidor no responde.',
+            error: 'timeout'
+          }));
+        }
+        return this.handleError(error);
+      })
+    );
+  }
+
+  /**
+   * Restablecer contraseña con token
+   */
+  resetPassword(resetToken: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/reset-password`, { 
+      resetToken, 
+      newPassword 
+    }).pipe(
+      timeout(10000),
+      catchError(error => {
+        if (error instanceof TimeoutError) {
+          return throwError(() => ({
+            status: 0,
+            message: 'Tiempo de espera agotado. El servidor no responde.',
+            error: 'timeout'
+          }));
+        }
+        return this.handleError(error);
+      })
+    );
+  }
+
+  /**
    * Manejar errores HTTP
    */
   private handleError(error: HttpErrorResponse): Observable<never> {

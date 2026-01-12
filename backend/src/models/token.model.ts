@@ -48,6 +48,13 @@ class TokenModel {
     
     return deletedCount;
   }
+
+  /**
+   * Revocar todos los tokens de un usuario (alias para deleteAllByUserId)
+   */
+  revokeAllByUserId(userId: string): number {
+    return this.deleteAllByUserId(userId);
+  }
   
   /**
    * Obtener todos los tokens de un usuario

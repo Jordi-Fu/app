@@ -105,4 +105,57 @@ export const authValidators = {
       .withMessage('La biografía no puede exceder 500 caracteres')
       .escape(),
   ],
-};
+  /**
+   * Validación para solicitar reset de contraseña
+   */
+  forgotPassword: (): ValidationChain[] => [
+    body('email')
+      .trim()
+      .notEmpty()
+      .withMessage('El email es requerido')
+      .isEmail()
+      .withMessage('El email no es válido')
+      .normalizeEmail(),
+  ],
+
+  /**
+   * Validación para verificar código de reset
+   */
+  verifyResetCode: (): ValidationChain[] => [
+    body('email')
+      .trim()
+      .notEmpty()
+      .withMessage('El email es requerido')
+      .isEmail()
+      .withMessage('El email no es válido')
+      .normalizeEmail(),
+    
+    body('code')
+      .trim()
+      .notEmpty()
+      .withMessage('El código es requerido')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('El código debe tener 6 dígitos')
+      .isNumeric()
+      .withMessage('El código debe ser numérico'),
+  ],
+
+  /**
+   * Validación para restablecer contraseña
+   */
+  resetPassword: (): ValidationChain[] => [
+    body('resetToken')
+      .trim()
+      .notEmpty()
+      .withMessage('El token es requerido')
+      .isLength({ min: 32 })
+      .withMessage('Token inválido'),
+    
+    body('newPassword')
+      .notEmpty()
+      .withMessage('La nueva contraseña es requerida')
+      .isLength({ min: 6, max: 128 })
+      .withMessage('La contraseña debe tener al menos 6 caracteres')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+      .withMessage('La contraseña debe contener al menos una mayúscula, una minúscula y un número'),
+  ],};

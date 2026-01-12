@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/env.config';
-import { userModel, tokenModel } from '../models';
+import { userModel, tokenModel, passwordResetModel } from '../models';
+import { emailService } from './email.service';
 import { 
   AuthResponse, 
   AuthTokens, 
@@ -231,6 +232,120 @@ class AuthService {
     const user = await userModel.findById(userId);
     if (!user) return null;
     return userModel.toSafeUser(user);
+  }
+
+  /**
+   * Solicitar recuperación de contraseña
+   */
+  async requestPasswordReset(email: string): Promise<AuthResponse> {
+    // Buscar usuario por email
+    const user = await userModel.findByCredential(email);
+
+    // Por seguridad, siempre retornamos éxito aunque el usuario no exista
+    // Esto previene que se pueda verificar qué emails están registrados
+    if (!user) {
+      return {
+        success: true,
+        message: 'Si el email existe, recibirás un código de verificación',
+      };
+    }
+
+    // Generar código de reset
+    const { code, expiresAt } = passwordResetModel.createResetCode(email);
+
+    // Enviar email con el código
+    try {
+      const emailSent = await emailService.sendPasswordResetCode(email, code);
+      
+      if (!emailSent) {
+        console.error('[PASSWORD RESET] Error al enviar email');
+        // En caso de error al enviar, mostramos el código en consola en desarrollo
+        if (ENV.isDevelopment) {
+          console.log(`[PASSWORD RESET] Código para ${email}: ${code}`);
+          console.log(`[PASSWORD RESET] Expira: ${expiresAt}`);
+        }
+      }
+    } catch (error) {
+      console.error('[PASSWORD RESET] Error al enviar email:', error);
+      // En desarrollo, mostramos el código en consola si falla el email
+      if (ENV.isDevelopment) {
+        console.log(`[PASSWORD RESET] Código para ${email}: ${code}`);
+        console.log(`[PASSWORD RESET] Expira: ${expiresAt}`);
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Código de verificación enviado a tu email',
+      // En desarrollo, devolvemos el código como fallback
+      debug: ENV.isDevelopment ? { code } : undefined,
+    };
+  }
+
+  /**
+   * Verificar código de recuperación
+   */
+  async verifyResetCode(email: string, code: string): Promise<AuthResponse> {
+    const result = passwordResetModel.verifyCode(email, code);
+
+    if (!result.valid) {
+      return {
+        success: false,
+        message: result.message || 'Código inválido',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Código verificado correctamente',
+      resetToken: result.resetToken,
+    };
+  }
+
+  /**
+   * Restablecer contraseña con token
+   */
+  async resetPassword(resetToken: string, newPassword: string): Promise<AuthResponse> {
+    // Validar token
+    const tokenValidation = passwordResetModel.validateResetToken(resetToken);
+
+    if (!tokenValidation.valid || !tokenValidation.email) {
+      return {
+        success: false,
+        message: tokenValidation.message || 'Token inválido',
+      };
+    }
+
+    // Buscar usuario
+    const user = await userModel.findByCredential(tokenValidation.email);
+
+    if (!user) {
+      return {
+        success: false,
+        message: 'Usuario no encontrado',
+      };
+    }
+
+    // Actualizar contraseña
+    const updated = await userModel.updatePassword(user.id, newPassword);
+
+    if (!updated) {
+      return {
+        success: false,
+        message: 'Error al actualizar la contraseña',
+      };
+    }
+
+    // Consumir token (ya no se puede usar de nuevo)
+    passwordResetModel.consumeResetToken(resetToken);
+
+    // Invalidar todos los tokens de sesión actuales
+    tokenModel.revokeAllByUserId(user.id);
+
+    return {
+      success: true,
+      message: 'Contraseña actualizada exitosamente',
+    };
   }
   
   /**

@@ -94,6 +94,14 @@ class UserModel {
   }
   
   /**
+   * Actualizar contraseña de usuario
+   */
+  async updatePassword(userId: string, newPassword: string): Promise<boolean> {
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    return userDatabase.updatePassword(userId, hashedPassword);
+  }
+
+  /**
    * Hashear contraseña
    */
   async hashPassword(password: string): Promise<string> {

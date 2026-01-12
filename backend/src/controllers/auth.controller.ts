@@ -160,6 +160,76 @@ class AuthController {
       user: req.user,
     });
   }
+
+  /**
+   * POST /api/auth/forgot-password
+   * Solicitar recuperación de contraseña
+   */
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+      
+      const result = await authService.requestPasswordReset(email);
+      
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('[AUTH] Error en forgot-password:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/verify-reset-code
+   * Verificar código de recuperación
+   */
+  async verifyResetCode(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, code } = req.body;
+      
+      const result = await authService.verifyResetCode(email, code);
+      
+      if (!result.success) {
+        res.status(400).json(result);
+        return;
+      }
+      
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('[AUTH] Error en verify-reset-code:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Restablecer contraseña
+   */
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { resetToken, newPassword } = req.body;
+      
+      const result = await authService.resetPassword(resetToken, newPassword);
+      
+      if (!result.success) {
+        res.status(400).json(result);
+        return;
+      }
+      
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('[AUTH] Error en reset-password:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+      });
+    }
+  }
 }
 
 export const authController = new AuthController();

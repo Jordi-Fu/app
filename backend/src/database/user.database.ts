@@ -298,6 +298,26 @@ class UserDatabase {
       console.error('Error al resetear intentos fallidos:', error);
     }
   }
+
+  /**
+   * Actualizar contraseña de usuario
+   */
+  async updatePassword(userId: string, hashedPassword: string): Promise<boolean> {
+    try {
+      const query = `
+        UPDATE users 
+        SET password_hash = $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+      `;
+      
+      const result = await pool.query(query, [hashedPassword, userId]);
+      return result.rowCount !== null && result.rowCount > 0;
+    } catch (error) {
+      console.error('Error al actualizar contraseña:', error);
+      return false;
+    }
+  }
   
   /**
    * Convertir a usuario seguro (sin contraseña)

@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, IonContent } from '@ionic/angular/standalone';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -119,5 +119,7 @@ export class LoginPage implements OnInit, OnDestroy {
     viajarRegistro() {
     this.router.navigate(['/register']);
   }
-
+  forgotPassword() {
+    this.router.navigate(['/forgot-password']);
+  }
 }
