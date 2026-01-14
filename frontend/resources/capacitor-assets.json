@@ -1,0 +1,76 @@
+{
+  "resources": {
+    "android": {
+      "icon": {
+        "sources": ["resources/kurro.png"],
+        "targets": {
+          "mdpi": {
+            "width": 48,
+            "height": 48
+          },
+          "hdpi": {
+            "width": 72,
+            "height": 72
+          },
+          "xhdpi": {
+            "width": 96,
+            "height": 96
+          },
+          "xxhdpi": {
+            "width": 144,
+            "height": 144
+          },
+          "xxxhdpi": {
+            "width": 192,
+            "height": 192
+          }
+        }
+      },
+      "splash": {
+        "sources": ["resources/splash.png"],
+        "targets": {
+          "land-mdpi": {
+            "width": 480,
+            "height": 320
+          },
+          "land-hdpi": {
+            "width": 800,
+            "height": 480
+          },
+          "land-xhdpi": {
+            "width": 1280,
+            "height": 720
+          },
+          "land-xxhdpi": {
+            "width": 1600,
+            "height": 960
+          },
+          "land-xxxhdpi": {
+            "width": 1920,
+            "height": 1280
+          },
+          "port-mdpi": {
+            "width": 320,
+            "height": 480
+          },
+          "port-hdpi": {
+            "width": 480,
+            "height": 800
+          },
+          "port-xhdpi": {
+            "width": 720,
+            "height": 1280
+          },
+          "port-xxhdpi": {
+            "width": 960,
+            "height": 1600
+          },
+          "port-xxxhdpi": {
+            "width": 1280,
+            "height": 1920
+          }
+        }
+      }
+    }
+  }
+}

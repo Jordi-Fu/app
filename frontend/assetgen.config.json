@@ -1,0 +1,42 @@
+{
+  "android": {
+    "icon": {
+      "sources": [
+        {
+          "src": "resources/kurro.png",
+          "width": 1024,
+          "height": 1024,
+          "fit": "cover",
+          "background": "#00d4aa"
+        }
+      ]
+    },
+    "adaptiveIcon": {
+      "foreground": {
+        "sources": [
+          {
+            "src": "resources/kurro.png",
+            "width": 1024,
+            "height": 1024,
+            "fit": "cover"
+          }
+        ]
+      },
+      "background": {
+        "color": "#00d4aa"
+      }
+    },
+    "splash": {
+      "sources": [
+        {
+          "src": "resources/kurro.png",
+          "width": 512,
+          "height": 512,
+          "fit": "contain"
+        }
+      ],
+      "backgroundColor": "#ffffff",
+      "darkBackgroundColor": "#1a1a1a"
+    }
+  }
+}
