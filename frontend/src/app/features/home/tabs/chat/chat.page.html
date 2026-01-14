@@ -1,10 +1,7 @@
 <ion-content>
   <div class="chat-container">
-    <div class="chat-card">
-      
-
       <div class="chat-content" *ngIf="conversaciones.length > 0; else noChats">
-        <div class="chat-item" *ngFor="let chat of conversaciones">
+        <div class="chat-item" *ngFor="let chat of conversaciones" (click)="abrirConversacion(chat)">
           <div class="chat-avatar">
             <img [src]="chat.avatar" [alt]="chat.usuario" />
           </div>
@@ -32,6 +29,5 @@
           <p>Cuando contactes con un proveedor, aparecerán aquí</p>
         </div>
       </ng-template>
-    </div>
   </div>
 </ion-content>

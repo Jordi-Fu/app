@@ -15,6 +15,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/chat/chat.page').then(m => m.ChatPage)
       },
       {
+        path: 'conversacion/:id',
+        loadComponent: () => import('./conversacion/conversacion.page').then(m => m.ConversacionPage)
+      },
+      {
         path: 'perfil',
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },

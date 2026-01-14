@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home/chat" (click)="volver()"></ion-back-button>
+    </ion-buttons>
+    
+    <div class="header-content">
+      <div class="contact-avatar">
+        <img [src]="contacto?.avatar" [alt]="contacto?.usuario" />
+      </div>
+      <div class="contact-info">
+        <ion-title>{{ contacto?.usuario }}</ion-title>
+        <span class="status">En línea</span>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="conversacion-container">
+    <div class="messages-wrapper" #messagesContainer>
+      <div class="mensaje" 
+           *ngFor="let mensaje of mensajes" 
+           [ngClass]="{'mensaje-propio': mensaje.esPropio, 'mensaje-otro': !mensaje.esPropio}">
+        <div class="mensaje-bubble">
+          <p class="mensaje-texto">{{ mensaje.texto }}</p>
+          <span class="mensaje-fecha">{{ formatearFecha(mensaje.fecha) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          placeholder="Escribe un mensaje..."
+          [(ngModel)]="nuevoMensaje"
+          (keyup.enter)="enviarMensaje()"
+          class="mensaje-input">
+        <button 
+          class="btn-enviar" 
+          (click)="enviarMensaje()"
+          [disabled]="!nuevoMensaje.trim()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

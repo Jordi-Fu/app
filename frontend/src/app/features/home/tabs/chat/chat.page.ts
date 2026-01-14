@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
@@ -14,6 +15,8 @@ import { IonContent } from '@ionic/angular/standalone';
 })
 export class ChatPage implements OnInit {
   conversaciones: any[] = [];
+
+  constructor(private router: Router) {}
 
   ngOnInit() {
     // Mock data
@@ -43,5 +46,9 @@ export class ChatPage implements OnInit {
         noLeidos: 0
       }
     ];
+  }
+
+  abrirConversacion(chat: any) {
+    this.router.navigate(['/home/conversacion', chat.id]);
   }
 }
