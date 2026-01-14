@@ -1,30 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent,
-  IonSearchbar,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
-  IonChip,
-  IonLabel,
-  IonIcon,
-  IonButton,
-  IonGrid,
-  IonRow,
-  IonCol
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { 
-  locationOutline, 
-  starOutline,
-  heartOutline
-} from 'ionicons/icons';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-servicios',
@@ -33,35 +9,13 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonSearchbar,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    IonChip,
-    IonLabel,
-    IonIcon,
-    IonButton,
-    IonGrid,
-    IonRow,
-    IonCol
+    IonContent
   ]
 })
 export class ServiciosPage implements OnInit {
   servicios: any[] = [];
 
-  constructor() {
-    addIcons({
-      'location-outline': locationOutline,
-      'star-outline': starOutline,
-      'heart-outline': heartOutline
-    });
-  }
+  constructor() {}
 
   ngOnInit() {
     // Mock data - aquí conectarás con el backend más tarde

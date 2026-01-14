@@ -1,18 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonAvatar,
-  IonBadge,
-  IonNote,
-  IonIcon
-} from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-chat',
@@ -21,17 +9,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonAvatar,
-    IonBadge,
-    IonNote,
-    IonIcon
+    IonContent
   ]
 })
 export class ChatPage implements OnInit {

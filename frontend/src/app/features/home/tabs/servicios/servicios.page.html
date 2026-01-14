@@ -1,83 +1,82 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>Servicios</ion-title>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar 
-      placeholder="Buscar servicios..." 
-      (ionInput)="onSearch($event)"
-      animated="true">
-    </ion-searchbar>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <div class="servicios-container">
+    <div class="servicios-card">
 
-<ion-content [fullscreen]="true">
-  <div class="container">
-    <!-- Categorías rápidas -->
-    <div class="categorias">
-      <h2>Categorías</h2>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="4">
-            <ion-chip color="primary">
-              <ion-label>Limpieza</ion-label>
-            </ion-chip>
-          </ion-col>
-          <ion-col size="4">
-            <ion-chip color="secondary">
-              <ion-label>Tecnología</ion-label>
-            </ion-chip>
-          </ion-col>
-          <ion-col size="4">
-            <ion-chip color="tertiary">
-              <ion-label>Belleza</ion-label>
-            </ion-chip>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
+      <!-- Barra de búsqueda -->
+      <div class="search-bar">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Buscar servicios..." 
+          (input)="onSearch($event)">
+      </div>
 
-    <!-- Lista de servicios -->
-    <div class="servicios-list">
-      <h2>Servicios destacados</h2>
-      
-      <ion-card *ngFor="let servicio of servicios" class="servicio-card">
-        <img [src]="servicio.imagen" [alt]="servicio.titulo" />
+      <!-- Categorías -->
+      <div class="categorias-section">
+        <h3 class="section-title">Categorías</h3>
+        <div class="categorias-grid">
+          <div class="categoria-chip categoria-primary">
+            <span>Limpieza</span>
+          </div>
+          <div class="categoria-chip categoria-secondary">
+            <span>Tecnología</span>
+          </div>
+          <div class="categoria-chip categoria-tertiary">
+            <span>Belleza</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de servicios -->
+      <div class="servicios-section">
+        <h3 class="section-title">Servicios destacados</h3>
         
-        <ion-card-header>
-          <ion-chip [color]="'primary'" outline="true">
-            <ion-label>{{ servicio.categoria }}</ion-label>
-          </ion-chip>
-          <ion-card-title>{{ servicio.titulo }}</ion-card-title>
-          <ion-card-subtitle>
-            <ion-icon name="person-outline"></ion-icon>
-            {{ servicio.proveedor }}
-          </ion-card-subtitle>
-        </ion-card-header>
-
-        <ion-card-content>
-          <div class="info-row">
-            <div class="location">
-              <ion-icon name="location-outline"></ion-icon>
-              <span>{{ servicio.ubicacion }}</span>
-            </div>
-            <div class="rating">
-              <ion-icon name="star-outline" color="warning"></ion-icon>
-              <span>{{ servicio.rating }}</span>
-            </div>
+        <div class="servicio-card" *ngFor="let servicio of servicios">
+          <div class="servicio-image">
+            <img [src]="servicio.imagen" [alt]="servicio.titulo" />
+            <div class="servicio-categoria">{{ servicio.categoria }}</div>
           </div>
           
-          <div class="price-action">
-            <div class="price">
-              <span class="amount">{{ servicio.precio }}€</span>
-              <span class="period">/hora</span>
+          <div class="servicio-content">
+            <h4 class="servicio-titulo">{{ servicio.titulo }}</h4>
+            
+            <div class="servicio-proveedor">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>{{ servicio.proveedor }}</span>
             </div>
-            <ion-button size="small" fill="solid">
-              Ver más
-            </ion-button>
+            
+            <div class="servicio-info">
+              <div class="ubicacion">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>{{ servicio.ubicacion }}</span>
+              </div>
+              <div class="rating">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>{{ servicio.rating }}</span>
+              </div>
+            </div>
+            
+            <div class="servicio-footer">
+              <div class="precio">
+                <span class="precio-amount">{{ servicio.precio }}€</span>
+                <span class="precio-period">/hora</span>
+              </div>
+              <button class="btn-ver-mas">Ver más</button>
+            </div>
           </div>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </div>
     </div>
   </div>
 </ion-content>

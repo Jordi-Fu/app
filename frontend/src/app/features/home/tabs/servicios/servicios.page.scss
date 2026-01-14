@@ -1,110 +1,363 @@
-.container {
-  padding: 16px;
-  padding-bottom: 80px;
+@use '../../../../../theme/variables' as *;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.categorias {
-  margin-bottom: 24px;
+ion-content {
+  --background: #f5f5f5;
+}
 
-  h2 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--ion-color-dark);
+.servicios-container {
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  font-family: $font-family;
+  background-color: #f5f5f5;
+}
+
+.servicios-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+}
+
+.titulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+
+  .brand {
+    font-weight: bold;
+    font-size: 36px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
   }
 
-  ion-chip {
+  .heading {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #999999;
+  }
+}
+
+.search-bar {
+  position: relative;
+  margin-bottom: 30px;
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: #999999;
+    pointer-events: none;
+  }
+
+  input {
     width: 100%;
-    justify-content: center;
-    margin: 4px 0;
+    height: 48px;
+    border-radius: 24px;
+    background-color: #f5f5f5;
+    color: #000000;
+    border: 1px solid #e0e0e0;
+    padding: 0 20px 0 45px;
+    font-size: 14px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #999999;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #13B5B5;
+    }
   }
 }
 
-.servicios-list {
-  h2 {
-    font-size: 18px;
+.categorias-section {
+  margin-bottom: 30px;
+
+  .section-title {
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 16px;
-    color: var(--ion-color-dark);
-  }
-}
-
-.servicio-card {
-  margin-bottom: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  img {
-    height: 200px;
-    object-fit: cover;
+    color: #000000;
+    margin: 0 0 16px 0;
   }
 
-  ion-card-header {
-    padding-bottom: 8px;
+  .categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
 
-    ion-chip {
-      margin-top: -8px;
-      margin-bottom: 8px;
-    }
-
-    ion-card-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    ion-card-subtitle {
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .categoria-chip {
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
       font-size: 14px;
-      color: var(--ion-color-medium);
+      font-weight: 500;
+      color: white;
 
-      ion-icon {
-        font-size: 16px;
+      &.categoria-primary {
+        background: $primary-gradient;
+      }
+
+      &.categoria-secondary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      &.categoria-tertiary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
     }
   }
+}
 
-  ion-card-content {
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+.servicios-section {
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 20px 0;
+  }
 
-      .location,
-      .rating {
+  .servicio-card {
+    background-color: #f5f5f5;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: #13B5B5;
+    }
+
+    .servicio-image {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .servicio-categoria {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: $primary-gradient;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .servicio-content {
+      padding: 20px;
+
+      .servicio-titulo {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000000;
+        margin: 0 0 12px 0;
+      }
+
+      .servicio-proveedor {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: #666666;
         font-size: 14px;
-        color: var(--ion-color-medium);
 
-        ion-icon {
-          font-size: 16px;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      .servicio-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e0e0e0;
+
+        .ubicacion,
+        .rating {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 14px;
+          color: #666666;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+
+      .servicio-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .precio {
+          .precio-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #13B5B5;
+          }
+
+          .precio-period {
+            font-size: 14px;
+            color: #999999;
+            margin-left: 4px;
+          }
+        }
+
+        .btn-ver-mas {
+          padding: 10px 24px;
+          border-radius: 20px;
+          background: $primary-gradient;
+          border: none;
+          color: white;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: opacity 0.3s;
+
+          &:hover {
+            opacity: 0.9;
+          }
+
+          &:active {
+            opacity: 0.8;
+          }
         }
       }
     }
+  }
+}
 
-    .price-action {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 12px;
-      border-top: 1px solid var(--ion-color-light-shade);
+// Modo oscuro
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: #1a1a1a;
+  }
 
-      .price {
-        .amount {
-          font-size: 24px;
-          font-weight: 700;
-          color: var(--ion-color-primary);
+  .servicios-container {
+    background-color: #1a1a1a;
+  }
+
+  .servicios-card {
+    background: #2a2a2a;
+  }
+
+  .titulo {
+    .heading {
+      color: #ffffff;
+    }
+
+    .subtitle {
+      color: #b3b3b3;
+    }
+  }
+
+  .search-bar {
+    input {
+      background-color: #1a1a1a;
+      color: #ffffff;
+      border-color: #404040;
+
+      &::placeholder {
+        color: #808080;
+      }
+    }
+
+    .search-icon {
+      color: #808080;
+    }
+  }
+
+  .categorias-section,
+  .servicios-section {
+    .section-title {
+      color: #ffffff;
+    }
+  }
+
+  .servicios-section {
+    .servicio-card {
+      background-color: #1a1a1a;
+      border-color: #404040;
+
+      &:hover {
+        background-color: #333333;
+      }
+
+      .servicio-content {
+        .servicio-titulo {
+          color: #ffffff;
         }
 
-        .period {
-          font-size: 14px;
-          color: var(--ion-color-medium);
-          margin-left: 4px;
+        .servicio-proveedor {
+          color: #b3b3b3;
+        }
+
+        .servicio-info {
+          border-bottom-color: #404040;
+
+          .ubicacion,
+          .rating {
+            color: #b3b3b3;
+          }
+        }
+
+        .servicio-footer {
+          .precio {
+            .precio-period {
+              color: #808080;
+            }
+          }
         }
       }
     }
