@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { AuthService, ThemeService } from './core/services';
+import { AuthService } from './core/services';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,12 +11,10 @@ import { Router } from '@angular/router';
 export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
-    private router: Router,
-    private themeService: ThemeService  // Inicializa el servicio de tema
+    private router: Router
   ) {}
   
   ngOnInit(): void {
-    // El ThemeService se inicializa automáticamente en su constructor
     this.checkAuthState();
   }
   

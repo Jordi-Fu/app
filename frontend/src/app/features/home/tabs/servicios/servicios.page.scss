@@ -400,183 +400,98 @@ ion-content {
   }
 }
 
-// Modo oscuro manual (controlado por clase .dark)
-body.dark {
+// Modo oscuro automático
+@media (prefers-color-scheme: dark) {
   ion-content {
-    --background: var(--ion-background-color);
+    --background: #1a1a1a;
   }
 
   .servicios-container {
-    background-color: var(--ion-background-color);
+    background-color: #1a1a1a;
   }
 
   .titulo {
     .heading {
-      color: var(--ion-text-color);
+      color: #ffffff;
     }
 
     .subtitle {
-      color: var(--gray-text);
+      color: #b3b3b3;
     }
   }
 
   .search-bar {
     input {
-      background-color: var(--input-bg);
-      color: var(--input-text);
-      border-color: var(--input-border);
+      background-color: #2a2a2a;
+      color: #ffffff;
+      border-color: #404040;
 
       &::placeholder {
-        color: var(--gray-text);
+        color: #808080;
       }
     }
 
     .search-icon {
-      color: var(--gray-text);
+      color: #808080;
     }
   }
 
   .categorias-section,
   .servicios-section {
-    .section-title,
+    .section-title {
+      color: #ffffff;
+    }
+
     .results-count {
-      color: var(--ion-text-color);
+      color: #b3b3b3;
     }
   }
 
   .servicios-section {
     .loading-container p,
     .no-results p {
-      color: var(--gray-text);
+      color: #b3b3b3;
     }
 
     .servicio-card {
-      background-color: var(--card-bg);
-      border-color: var(--card-border);
+      background-color: #2a2a2a;
+      border-color: #404040;
 
       &:hover {
-        box-shadow: 0 4px 12px var(--shadow-color);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        border-color: #13B5B5;
       }
 
       .servicio-content {
         .servicio-titulo {
-          color: var(--ion-text-color);
+          color: #ffffff;
         }
 
         .servicio-proveedor {
           .proveedor-info {
             .proveedor-nombre {
-              color: var(--ion-text-color);
+              color: #ffffff;
             }
 
             .proveedor-stats {
-              color: var(--gray-text);
+              color: #b3b3b3;
             }
           }
         }
 
         .servicio-info {
-          border-bottom-color: var(--divider-color);
+          border-bottom-color: #404040;
 
           .ubicacion,
           .rating {
-            color: var(--gray-text);
+            color: #b3b3b3;
           }
         }
 
         .servicio-footer {
           .precio {
             .precio-period {
-              color: var(--gray-text);
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Modo oscuro automático (respaldo)
-@media (prefers-color-scheme: dark) {
-  body:not(.dark):not(.light) {
-    ion-content {
-      --background: var(--ion-background-color);
-    }
-
-    .servicios-container {
-      background-color: var(--ion-background-color);
-    }
-
-    .titulo {
-      .heading {
-        color: var(--ion-text-color);
-      }
-
-      .subtitle {
-        color: var(--gray-text);
-      }
-    }
-
-    .search-bar {
-      input {
-        background-color: var(--input-bg);
-        color: var(--input-text);
-        border-color: var(--input-border);
-
-        &::placeholder {
-          color: var(--gray-text);
-        }
-      }
-
-      .search-icon {
-        color: var(--gray-text);
-      }
-    }
-
-    .categorias-section,
-    .servicios-section {
-      .section-title,
-      .results-count {
-        color: var(--ion-text-color);
-      }
-    }
-
-    .servicios-section {
-      .servicio-card {
-        background-color: var(--card-bg);
-        border-color: var(--card-border);
-
-        .servicio-content {
-          .servicio-titulo {
-            color: var(--ion-text-color);
-          }
-
-          .servicio-proveedor {
-            .proveedor-info {
-              .proveedor-nombre {
-                color: var(--ion-text-color);
-              }
-
-              .proveedor-stats {
-                color: var(--gray-text);
-              }
-            }
-          }
-
-          .servicio-info {
-            border-bottom-color: var(--divider-color);
-
-            .ubicacion,
-            .rating {
-              color: var(--gray-text);
-            }
-          }
-
-          .servicio-footer {
-            .precio {
-              .precio-period {
-                color: var(--gray-text);
-              }
+              color: #808080;
             }
           }
         }

@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, IonToggle } from '@ionic/angular/standalone';
-import { FormsModule } from '@angular/forms';
+import { IonContent } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-perfil',
@@ -13,18 +11,14 @@ import { ThemeService } from '../../../../core/services/theme.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonContent,
-    IonToggle,
-    FormsModule
+    IonContent
   ]
 })
 export class PerfilPage implements OnInit {
   usuario: any = null;
-  darkMode: boolean = false;
 
   constructor(
     private authService: AuthService,
-    private themeService: ThemeService,
     private router: Router
   ) {}
 
@@ -32,14 +26,6 @@ export class PerfilPage implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
     });
-
-    this.themeService.darkMode$.subscribe(isDark => {
-      this.darkMode = isDark;
-    });
-  }
-
-  async toggleDarkMode() {
-    await this.themeService.toggleDarkMode();
   }
 
   cerrarSesion() {

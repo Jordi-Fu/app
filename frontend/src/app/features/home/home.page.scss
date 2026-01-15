@@ -1,12 +1,12 @@
 ion-tab-bar {
-  --background: var(--ion-color-light);
-  border-top: 1px solid var(--ion-color-light-shade);
+  --background: #ffffff;
+  border-top: 1px solid #e0e0e0;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 ion-tab-button {
-  --color: var(--ion-color-medium);
-  --color-selected: var(--ion-color-primary);
+  --color: #808080;
+  --color-selected: #13B5B5;
   
   ion-icon {
     font-size: 24px;
@@ -22,6 +22,26 @@ ion-tab-button {
 ion-tab-button.tab-selected {
   ion-icon,
   ion-label {
-    color: var(--ion-color-primary);
+    color: #13B5B5;
+  }
+}
+
+// Modo oscuro para tab bar
+@media (prefers-color-scheme: dark) {
+  ion-tab-bar {
+    --background: #1a1a1a;
+    border-top: 1px solid #404040;
+  }
+
+  ion-tab-button {
+    --color: #808080;
+    --color-selected: #13B5B5;
+  }
+
+  ion-tab-button.tab-selected {
+    ion-icon,
+    ion-label {
+      color: #13B5B5;
+    }
   }
 }

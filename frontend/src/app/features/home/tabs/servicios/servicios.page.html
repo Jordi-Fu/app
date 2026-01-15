@@ -45,12 +45,7 @@
 
       <!-- Lista de servicios -->
       <div class="servicios-section" *ngIf="!isLoading">
-        <div class="section-header">
-          <h3 class="section-title">
-            {{ categoriaSeleccionada ? 'Servicios filtrados' : 'Servicios disponibles' }}
-          </h3>
-          <span class="results-count">{{ serviciosFiltrados.length }} servicios</span>
-        </div>
+        
         
         <!-- No hay resultados -->
         <div *ngIf="serviciosFiltrados.length === 0" class="no-results">
@@ -136,17 +131,10 @@
 
             <div class="servicio-meta">
               <div class="meta-item" *ngIf="servicio.duration_minutes">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
+                
                 {{ servicio.duration_minutes }} min
               </div>
               <div class="meta-item">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
                 {{ getLocationText(servicio) }}
               </div>
             </div>

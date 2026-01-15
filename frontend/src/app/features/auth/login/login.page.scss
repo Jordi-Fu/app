@@ -234,129 +234,64 @@ ion-content {
   }
 }
 
-// Modo oscuro manual (controlado por clase .dark)
-body.dark {
+// Modo oscuro
+@media (prefers-color-scheme: dark) {
   ion-content {
-    --background: var(--ion-background-color);
+    --background: #1a1a1a;
   }
 
   .login-container {
-    background-color: var(--ion-background-color);
+    background-color: #1a1a1a;
   }
 
   .login-card {
-    background: var(--card-bg);
-    box-shadow: 0 4px 20px var(--shadow-color);
+    background: #2a2a2a;
   }
 
   .titulo {
     .heading {
-      color: var(--ion-text-color);
+      color: #ffffff;
     }
 
     .subtitle {
-      color: var(--gray-text);
+      color: #b3b3b3;
     }
   }
 
   .input-group {
     input {
-      background-color: var(--input-bg);
-      color: var(--input-text);
-      border-color: var(--input-border);
+      background-color: #1a1a1a;
+      color: #ffffff;
+      border-color: #404040;
 
       &::placeholder {
-        color: var(--gray-text);
+        color: #808080;
       }
     }
 
     .input-icon,
     .eye-icon {
-      color: var(--gray-text);
+      color: #808080;
     }
   }
 
   .separator {
     &::before,
     &::after {
-      border-bottom-color: var(--divider-color);
+      border-bottom-color: #404040;
     }
     
     span {
-      color: var(--gray-text);
+      color: #808080;
     }
   }
 
   .google-btn-circle {
-    background: var(--google-btn-bg);
-    border-color: var(--google-btn-border);
+    background: #1a1a1a;
+    border-color: #404040;
   }
 
   .register-link {
-    color: var(--ion-text-color);
-  }
-}
-
-// Modo oscuro automático (respaldo)
-@media (prefers-color-scheme: dark) {
-  body:not(.dark):not(.light) {
-    ion-content {
-      --background: var(--ion-background-color);
-    }
-
-    .login-container {
-      background-color: var(--ion-background-color);
-    }
-
-    .login-card {
-      background: var(--card-bg);
-      box-shadow: 0 4px 20px var(--shadow-color);
-    }
-
-    .titulo {
-      .heading {
-        color: var(--ion-text-color);
-      }
-
-      .subtitle {
-        color: var(--gray-text);
-      }
-    }
-
-    .input-group {
-      input {
-        background-color: var(--input-bg);
-        color: var(--input-text);
-        border-color: var(--input-border);
-
-        &::placeholder {
-          color: var(--gray-text);
-        }
-      }
-
-      .input-icon {
-        color: var(--gray-text);
-      }
-    }
-
-    .separator {
-      &::before,
-      &::after {
-        border-bottom-color: var(--divider-color);
-      }
-      
-      span {
-        color: var(--gray-text);
-      }
-    }
-
-    .google-btn-circle {
-      background: var(--google-btn-bg);
-      border-color: var(--google-btn-border);
-    }
-
-    .register-link {
-      color: var(--ion-text-color);
-    }
+    color: #ffffff;
   }
 }

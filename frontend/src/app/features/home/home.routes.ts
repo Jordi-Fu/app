@@ -20,7 +20,7 @@ export const routes: Routes = [
       },
       {
         path: 'conversacion/:id',
-        loadComponent: () => import('./conversacion/conversacion.page').then(m => m.ConversacionPage)
+        loadComponent: () => import('./tabs/chat/conversacion/conversacion.page').then(m => m.ConversacionPage)
       },
       {
         path: 'perfil',

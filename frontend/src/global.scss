@@ -26,6 +26,22 @@
 @import "@ionic/angular/css/flex-utils.css";
 
 /**
+ * Safe Area Insets
+ * -----------------------------------------------------
+ * Asegurar que el contenido no se oculte detrás del notch o la barra de estado
+ */
+ion-app {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+ion-content {
+  --padding-top: env(safe-area-inset-top);
+}
+
+/**
  * Ionic Dark Mode
  * -----------------------------------------------------
  * For more info, please see:

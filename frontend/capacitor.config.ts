@@ -15,6 +15,19 @@ const config: CapacitorConfig = {
   android: {
     // Permitir tráfico HTTP no seguro (solo desarrollo)
     allowMixedContent: true
+  },
+  plugins: {
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#ffffff',
+      overlaysWebView: false
+    },
+    SplashScreen: {
+      launchShowDuration: 0,
+      backgroundColor: '#ffffff',
+      androidScaleType: 'CENTER_CROP',
+      showSpinner: false
+    }
   }
 };
 
