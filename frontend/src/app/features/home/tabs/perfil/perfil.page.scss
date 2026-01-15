@@ -169,6 +169,21 @@ ion-content {
       border-color: #13B5B5;
     }
 
+    &.toggle-item {
+      cursor: default;
+      &:hover {
+        background-color: #f5f5f5;
+        border-color: #e0e0e0;
+      }
+    }
+
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
     .menu-icon {
       width: 24px;
       height: 24px;
@@ -187,6 +202,12 @@ ion-content {
       height: 20px;
       color: #999999;
       flex-shrink: 0;
+    }
+
+    ion-toggle {
+      --handle-width: 26px;
+      --handle-height: 26px;
+      --handle-spacing: 4px;
     }
   }
 }
@@ -221,8 +242,8 @@ ion-content {
   }
 }
 
-// Modo oscuro
-@media (prefers-color-scheme: dark) {
+// Modo oscuro manual (controlado por clase .dark)
+body.dark {
   ion-content {
     --background: #1a1a1a;
   }
@@ -232,64 +253,146 @@ ion-content {
   }
 
   .perfil-card {
-    background: #2a2a2a;
+    background: var(--card-bg);
+    box-shadow: 0 4px 20px var(--shadow-color);
   }
 
   .titulo {
     .heading {
-      color: #ffffff;
+      color: var(--ion-text-color);
     }
 
     .subtitle {
-      color: #b3b3b3;
+      color: var(--gray-text);
     }
   }
 
   .perfil-header {
-    border-bottom-color: #404040;
+    border-bottom-color: var(--divider-color);
 
     .perfil-username {
-      color: #ffffff;
+      color: var(--ion-text-color);
     }
 
     .perfil-email {
-      color: #b3b3b3;
+      color: var(--gray-text);
     }
   }
 
   .info-section {
-    border-bottom-color: #404040;
+    border-bottom-color: var(--divider-color);
 
     .info-item {
-      background-color: #1a1a1a;
-      border-color: #404040;
+      background-color: var(--input-bg);
+      border-color: var(--input-border);
 
       .info-value {
-        color: #ffffff;
+        color: var(--ion-text-color);
       }
 
       .info-label {
-        color: #808080;
+        color: var(--gray-text);
       }
     }
   }
 
   .menu-list {
     .menu-item {
-      background-color: #1a1a1a;
-      border-color: #404040;
+      background-color: var(--input-bg);
+      border-color: var(--input-border);
 
       &:hover {
         background-color: #333333;
       }
 
+      &.toggle-item:hover {
+        background-color: var(--input-bg);
+      }
+
       .menu-label {
-        color: #ffffff;
+        color: var(--ion-text-color);
       }
 
       .menu-icon,
       .menu-arrow {
-        color: #808080;
+        color: var(--gray-text);
+      }
+    }
+  }
+}
+
+// Modo oscuro automático (respaldo)
+@media (prefers-color-scheme: dark) {
+  body:not(.dark):not(.light) {
+    ion-content {
+      --background: #1a1a1a;
+    }
+
+    .perfil-container {
+      background-color: #1a1a1a;
+    }
+
+    .perfil-card {
+      background: var(--card-bg);
+      box-shadow: 0 4px 20px var(--shadow-color);
+    }
+
+    .titulo {
+      .heading {
+        color: var(--ion-text-color);
+      }
+
+      .subtitle {
+        color: var(--gray-text);
+      }
+    }
+
+    .perfil-header {
+      border-bottom-color: var(--divider-color);
+
+      .perfil-username {
+        color: var(--ion-text-color);
+      }
+
+      .perfil-email {
+        color: var(--gray-text);
+      }
+    }
+
+    .info-section {
+      border-bottom-color: var(--divider-color);
+
+      .info-item {
+        background-color: var(--input-bg);
+        border-color: var(--input-border);
+
+        .info-value {
+          color: var(--ion-text-color);
+        }
+
+        .info-label {
+          color: var(--gray-text);
+        }
+      }
+    }
+
+    .menu-list {
+      .menu-item {
+        background-color: var(--input-bg);
+        border-color: var(--input-border);
+
+        &:hover {
+          background-color: #333333;
+        }
+
+        .menu-label {
+          color: var(--ion-text-color);
+        }
+
+        .menu-icon,
+        .menu-arrow {
+          color: var(--gray-text);
+        }
       }
     }
   }

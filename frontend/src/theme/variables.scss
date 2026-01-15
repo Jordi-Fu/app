@@ -46,9 +46,58 @@ $font-family: 'inter', sans-serif;
   --google-btn-border: #e0e0e0;
 }
 
-/** Modo Oscuro Automático **/
+/** Modo Oscuro Manual (controlado por clase .dark en body) **/
+body.dark {
+  /** Colores base de Ionic **/
+  --ion-background-color: #1a1a1a;
+  --ion-text-color: #ffffff;
+  --ion-color-step-50: #1e1e1e;
+  --ion-color-step-100: #2a2a2a;
+  --ion-color-step-150: #363636;
+  --ion-color-step-200: #414141;
+  --ion-color-step-250: #4d4d4d;
+  --ion-color-step-300: #595959;
+  --ion-color-step-350: #656565;
+  --ion-color-step-400: #717171;
+  --ion-color-step-450: #7d7d7d;
+  --ion-color-step-500: #898989;
+  --ion-color-step-550: #949494;
+  --ion-color-step-600: #a0a0a0;
+  --ion-color-step-650: #acacac;
+  --ion-color-step-700: #b8b8b8;
+  --ion-color-step-750: #c4c4c4;
+  --ion-color-step-800: #d0d0d0;
+  --ion-color-step-850: #dbdbdb;
+  --ion-color-step-900: #e7e7e7;
+  --ion-color-step-950: #f3f3f3;
+
+  /** Variables personalizadas para modo oscuro **/
+  --gray-text: rgb(180, 180, 180);
+  --input-bg: #2a2a2a;
+  --input-text: #ffffff;
+  --input-border: #404040;
+  --google-btn-bg: #2a2a2a;
+  --google-btn-text: #ffffff;
+  --google-btn-border: #404040;
+  
+  /** Variables para cards y contenedores **/
+  --card-bg: #252525;
+  --card-border: #3a3a3a;
+  --divider-color: #3a3a3a;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+:root {
+  /** Variables para cards y contenedores (modo claro) **/
+  --card-bg: #ffffff;
+  --card-border: #e0e0e0;
+  --divider-color: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/** Modo Oscuro Automático (respaldo) **/
 @media (prefers-color-scheme: dark) {
-  body {
+  body:not(.dark):not(.light) {
     /** Colores base de Ionic **/
     --ion-background-color: #1a1a1a;
     --ion-text-color: #ffffff;
@@ -80,5 +129,9 @@ $font-family: 'inter', sans-serif;
     --google-btn-bg: #2a2a2a;
     --google-btn-text: #ffffff;
     --google-btn-border: #404040;
+    --card-bg: #252525;
+    --card-border: #3a3a3a;
+    --divider-color: #3a3a3a;
+    --shadow-color: rgba(0, 0, 0, 0.4);
   }
 }

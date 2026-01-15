@@ -35,3 +35,47 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 /* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+/**
+ * Estilos globales para modo oscuro manual
+ */
+body.dark {
+  // Aplicar estilos globales de modo oscuro a todos los componentes Ionic
+  ion-card {
+    --background: var(--card-bg);
+    --color: var(--ion-text-color);
+  }
+
+  ion-item {
+    --background: var(--card-bg);
+    --color: var(--ion-text-color);
+    --border-color: var(--divider-color);
+  }
+
+  ion-input,
+  ion-textarea {
+    --background: var(--input-bg);
+    --color: var(--input-text);
+    --placeholder-color: var(--gray-text);
+  }
+
+  ion-list {
+    background: var(--ion-background-color);
+  }
+
+  ion-toolbar {
+    --background: var(--card-bg);
+    --color: var(--ion-text-color);
+  }
+
+  ion-tab-bar {
+    --background: var(--card-bg);
+    --color: var(--gray-text);
+  }
+
+  ion-modal,
+  ion-popover {
+    --background: var(--card-bg);
+    --color: var(--ion-text-color);
+  }
+}

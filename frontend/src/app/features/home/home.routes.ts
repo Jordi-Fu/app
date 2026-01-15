@@ -11,6 +11,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/servicios/servicios.page').then(m => m.ServiciosPage)
       },
       {
+        path: 'servicios/:id',
+        loadComponent: () => import('./tabs/servicios/servicios-detalle/servicio-detalle.page').then(m => m.ServicioDetallePage)
+      },
+      {
         path: 'chat',
         loadComponent: () => import('./tabs/chat/chat.page').then(m => m.ChatPage)
       },

@@ -1,0 +1,276 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home/servicios"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle del Servicio</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="shareService()">
+        <ion-icon name="share-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="toggleFavorite()">
+        <ion-icon name="heart-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando servicio...</p>
+  </div>
+
+  <!-- Contenido del servicio -->
+  <div *ngIf="!isLoading && servicio" class="servicio-detalle">
+    
+    <!-- Galería de imágenes -->
+    <div class="image-gallery">
+      <div class="main-image">
+        <img 
+          [src]="servicio.images && servicio.images.length > 0 ? servicio.images[selectedImageIndex].image_url : 'https://via.placeholder.com/800x400'" 
+          [alt]="servicio.title"
+        />
+        <div class="image-badges">
+          <ion-badge *ngIf="servicio.is_featured" color="warning">
+            <ion-icon name="star"></ion-icon> Destacado
+          </ion-badge>
+          <ion-badge *ngIf="servicio.is_verified" color="success">
+            <ion-icon name="checkmark-circle-outline"></ion-icon> Verificado
+          </ion-badge>
+        </div>
+      </div>
+      
+      <div class="image-thumbnails" *ngIf="servicio.images && servicio.images.length > 1">
+        <div 
+          *ngFor="let image of servicio.images; let i = index"
+          class="thumbnail"
+          [class.active]="i === selectedImageIndex"
+          (click)="selectImage(i)">
+          <img [src]="image.thumbnail_url || image.image_url" [alt]="image.caption || servicio.title" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Información principal -->
+    <div class="main-info">
+      <div class="header">
+        <h1>{{ servicio.title }}</h1>
+        <div class="category-chip" [style.background-color]="servicio.category?.color">
+          {{ servicio.category?.icon_url }} {{ servicio.category?.name }}
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="rating">
+          <ion-icon 
+            *ngFor="let star of getStarsArray()" 
+            [name]="star <= (servicio.rating_average || 0) ? 'star' : 'star-outline'"
+            [class.filled]="star <= (servicio.rating_average || 0)">
+          </ion-icon>
+          <span class="rating-text">{{ servicio.rating_average || 0 }} ({{ servicio.total_reviews }} reseñas)</span>
+        </div>
+        <div class="views">
+          👁️ {{ servicio.views_count }} vistas
+        </div>
+        <div class="bookings">
+          📅 {{ servicio.bookings_count }} reservas
+        </div>
+      </div>
+
+      <!-- Precio y acciones -->
+      <div class="price-section">
+        <div class="price">
+          <span class="price-label">Precio</span>
+          <span class="price-value">{{ getPriceText() }}</span>
+        </div>
+        <ion-button expand="block" color="primary" size="large" (click)="bookService()">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          Reservar ahora
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Información del proveedor -->
+    <ion-card class="provider-card" (click)="goToProvider()">
+      <ion-card-header>
+        <div class="provider-header">
+          <ion-avatar>
+            <img 
+              [src]="servicio.provider?.avatar_url || 'https://ui-avatars.com/api/?name=' + servicio.provider?.first_name + '+' + servicio.provider?.last_name" 
+              [alt]="servicio.provider?.first_name"
+            />
+          </ion-avatar>
+          <div class="provider-info">
+            <h3>
+              {{ servicio.provider?.first_name }} {{ servicio.provider?.last_name }}
+              <ion-icon *ngIf="servicio.provider?.is_verified" name="checkmark-circle" color="success" class="verified-icon"></ion-icon>
+            </h3>
+            <p>@{{ servicio.provider?.username }}</p>
+            <div class="provider-rating">
+              <ion-icon name="star"></ion-icon>
+              <span>{{ servicio.provider?.rating_average }} ({{ servicio.provider?.total_reviews }} reseñas)</span>
+            </div>
+          </div>
+          <ion-button fill="outline" (click)="contactProvider(); $event.stopPropagation()">
+            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+            Contactar
+          </ion-button>
+        </div>
+      </ion-card-header>
+      <ion-card-content *ngIf="servicio.provider">
+        <div class="provider-stats">
+          <div class="stat">
+            <span class="stat-label">Tiempo de respuesta</span>
+            <span class="stat-value">{{ servicio.provider.response_time_minutes }} min</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Tasa de respuesta</span>
+            <span class="stat-value">{{ servicio.provider.response_rate }}%</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Descripción -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Descripción</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="description">{{ servicio.description }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Detalles del servicio -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Detalles</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="details-list">
+          <div class="detail-item">
+            <ion-icon name="location-outline"></ion-icon>
+            <div class="detail-content">
+              <span class="detail-label">Ubicación</span>
+              <span class="detail-value">{{ getLocationText() }}</span>
+              <span class="detail-subvalue" *ngIf="servicio.city">{{ servicio.city }}, {{ servicio.state }}</span>
+            </div>
+          </div>
+          
+          <div class="detail-item" *ngIf="servicio.duration_minutes">
+            <ion-icon name="time-outline"></ion-icon>
+            <div class="detail-content">
+              <span class="detail-label">Duración</span>
+              <span class="detail-value">{{ getDurationText() }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="servicio.service_radius_km">
+            <ion-icon name="location-outline"></ion-icon>
+            <div class="detail-content">
+              <span class="detail-label">Radio de servicio</span>
+              <span class="detail-value">{{ servicio.service_radius_km }} km</span>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Qué incluye / No incluye -->
+    <ion-card *ngIf="servicio.what_included || servicio.what_not_included">
+      <ion-card-header>
+        <ion-card-title>Qué incluye y qué no</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="includes-section" *ngIf="servicio.what_included">
+          <h4>✅ Incluye:</h4>
+          <p>{{ servicio.what_included }}</p>
+        </div>
+        <div class="includes-section" *ngIf="servicio.what_not_included">
+          <h4>❌ No incluye:</h4>
+          <p>{{ servicio.what_not_included }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Requisitos -->
+    <ion-card *ngIf="servicio.requirements">
+      <ion-card-header>
+        <ion-card-title>Requisitos</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ servicio.requirements }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Disponibilidad -->
+    <ion-card *ngIf="servicio.availability && servicio.availability.length > 0">
+      <ion-card-header>
+        <ion-card-title>Disponibilidad</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="availability-list">
+          <div 
+            *ngFor="let avail of servicio.availability" 
+            class="availability-item"
+            [class.unavailable]="!avail.is_available">
+            <span class="day">{{ getAvailabilityText(avail.day_of_week) }}</span>
+            <span class="hours" *ngIf="avail.is_available">
+              {{ avail.start_time }} - {{ avail.end_time }}
+            </span>
+            <span class="hours unavailable-text" *ngIf="!avail.is_available">No disponible</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Política de cancelación -->
+    <ion-card *ngIf="servicio.cancellation_policy">
+      <ion-card-header>
+        <ion-card-title>Política de cancelación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ servicio.cancellation_policy }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- FAQs -->
+    <ion-card *ngIf="servicio.faqs && servicio.faqs.length > 0">
+      <ion-card-header>
+        <ion-card-title>Preguntas frecuentes</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="faq-list">
+          <div *ngFor="let faq of servicio.faqs" class="faq-item">
+            <h4 class="faq-question">{{ faq.question }}</h4>
+            <p class="faq-answer">{{ faq.answer }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Tags -->
+    <ion-card *ngIf="servicio.tags && servicio.tags.length > 0">
+      <ion-card-content>
+        <div class="tags">
+          <ion-chip *ngFor="let tag of servicio.tags" outline>
+            <ion-label>{{ tag.name }}</ion-label>
+          </ion-chip>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Botón de reserva fijo al fondo -->
+    <div class="bottom-cta">
+      <div class="cta-price">
+        <span class="cta-price-value">{{ getPriceText() }}</span>
+      </div>
+      <ion-button expand="block" color="primary" size="large" (click)="bookService()">
+        Reservar servicio
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
