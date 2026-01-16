@@ -379,6 +379,131 @@ class ServiceService {
       throw error;
     }
   }
+
+  /**
+   * Toggle favorito: agregar o eliminar de favoritos
+   */
+  async toggleFavorite(userId: string, serviceId: string) {
+    try {
+      // Verificar si ya existe el favorito
+      const checkQuery = `
+        SELECT id FROM favorites
+        WHERE user_id = $1 AND service_id = $2
+      `;
+      const checkResult = await pool.query(checkQuery, [userId, serviceId]);
+      
+      if (checkResult.rows.length > 0) {
+        // Ya existe, eliminarlo
+        const deleteQuery = `
+          DELETE FROM favorites
+          WHERE user_id = $1 AND service_id = $2
+        `;
+        await pool.query(deleteQuery, [userId, serviceId]);
+        
+        return { isFavorite: false, message: 'Eliminado de favoritos' };
+      } else {
+        // No existe, agregarlo
+        const insertQuery = `
+          INSERT INTO favorites (user_id, service_id)
+          VALUES ($1, $2)
+          RETURNING id
+        `;
+        await pool.query(insertQuery, [userId, serviceId]);
+        
+        return { isFavorite: true, message: 'Agregado a favoritos' };
+      }
+    } catch (error) {
+      console.error('[SERVICE_SERVICE] Error en toggleFavorite:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verificar si un servicio está en favoritos
+   */
+  async isFavorite(userId: string, serviceId: string): Promise<boolean> {
+    try {
+      const query = `
+        SELECT id FROM favorites
+        WHERE user_id = $1 AND service_id = $2
+      `;
+      const result = await pool.query(query, [userId, serviceId]);
+      return result.rows.length > 0;
+    } catch (error) {
+      console.error('[SERVICE_SERVICE] Error en isFavorite:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener servicios favoritos de un usuario
+   */
+  async getFavoriteServices(userId: string) {
+    try {
+      const query = `
+        SELECT 
+          s.*,
+          f.created_at as favorited_at,
+          -- Datos del proveedor
+          json_build_object(
+            'id', u.id,
+            'username', u.username,
+            'first_name', u.first_name,
+            'last_name', u.last_name,
+            'avatar_url', u.avatar_url,
+            'rating_average', u.rating_average,
+            'total_reviews', u.total_reviews,
+            'response_time_minutes', u.response_time_minutes,
+            'response_rate', u.response_rate,
+            'is_verified', u.is_verified
+          ) as provider,
+          -- Datos de la categoría
+          json_build_object(
+            'id', c.id,
+            'name', c.name,
+            'slug', c.slug,
+            'description', c.description,
+            'icon_url', c.icon_url,
+            'color', c.color,
+            'is_active', c.is_active
+          ) as category,
+          -- Imágenes del servicio
+          COALESCE(
+            (
+              SELECT json_agg(
+                json_build_object(
+                  'id', si.id,
+                  'service_id', si.service_id,
+                  'image_url', si.image_url,
+                  'thumbnail_url', si.thumbnail_url,
+                  'caption', si.caption,
+                  'is_primary', si.is_primary,
+                  'order_index', si.order_index
+                )
+                ORDER BY si.order_index
+              )
+              FROM service_images si
+              WHERE si.service_id = s.id
+            ),
+            '[]'::json
+          ) as images
+        FROM favorites f
+        INNER JOIN services s ON f.service_id = s.id
+        LEFT JOIN users u ON s.provider_id = u.id
+        LEFT JOIN categories c ON s.category_id = c.id
+        WHERE f.user_id = $1
+          AND s.is_active = true
+          AND s.deleted_at IS NULL
+        ORDER BY f.created_at DESC
+      `;
+      
+      const result = await pool.query(query, [userId]);
+      return result.rows;
+    } catch (error) {
+      console.error('[SERVICE_SERVICE] Error en getFavoriteServices:', error);
+      throw error;
+    }
+  }
 }
 
 export const serviceService = new ServiceService();

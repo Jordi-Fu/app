@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar >
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home/servicios"></ion-back-button>
     </ion-buttons>
@@ -9,7 +9,11 @@
         <ion-icon name="share-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button (click)="toggleFavorite()">
-        <ion-icon name="heart-outline" slot="icon-only"></ion-icon>
+        <ion-icon 
+          [name]="isFavorite ? 'heart' : 'heart-outline'" 
+          [color]="isFavorite ? 'danger' : ''"
+          slot="icon-only">
+        </ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -74,21 +78,14 @@
         <div class="views">
           👁️ {{ servicio.views_count }} vistas
         </div>
-        <div class="bookings">
-          📅 {{ servicio.bookings_count }} reservas
-        </div>
       </div>
 
-      <!-- Precio y acciones -->
+      <!-- Precio -->
       <div class="price-section">
         <div class="price">
           <span class="price-label">Precio</span>
           <span class="price-value">{{ getPriceText() }}</span>
         </div>
-        <ion-button expand="block" color="primary" size="large" (click)="bookService()">
-          <ion-icon name="calendar-outline" slot="start"></ion-icon>
-          Reservar ahora
-        </ion-button>
       </div>
     </div>
 
@@ -261,16 +258,6 @@
         </div>
       </ion-card-content>
     </ion-card>
-
-    <!-- Botón de reserva fijo al fondo -->
-    <div class="bottom-cta">
-      <div class="cta-price">
-        <span class="cta-price-value">{{ getPriceText() }}</span>
-      </div>
-      <ion-button expand="block" color="primary" size="large" (click)="bookService()">
-        Reservar servicio
-      </ion-button>
-    </div>
 
   </div>
 </ion-content>

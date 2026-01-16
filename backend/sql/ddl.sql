@@ -15,29 +15,17 @@ CREATE TYPE price_type_enum AS ENUM ('fixed', 'hourly', 'negotiable');
 -- Tipos de ubicación de servicio
 CREATE TYPE location_type_enum AS ENUM ('remote', 'at_client', 'at_provider', 'flexible');
 
--- Estados de reserva
-CREATE TYPE booking_status_enum AS ENUM ('pending', 'accepted', 'rejected', 'in_progress', 'completed', 'cancelled');
-
--- Estados de pago
-CREATE TYPE payment_status_enum AS ENUM ('pending', 'paid', 'refunded');
-
 -- Tipos de mensaje
 CREATE TYPE message_type_enum AS ENUM ('text', 'image', 'file', 'location', 'audio', 'video');
 
 -- Tipos de notificación
-CREATE TYPE notification_type_enum AS ENUM ('booking', 'message', 'review', 'system', 'payment', 'promotion');
+CREATE TYPE notification_type_enum AS ENUM ('message', 'review', 'system', 'promotion');
 
 -- Tipos de reporte
 CREATE TYPE report_type_enum AS ENUM ('spam', 'inappropriate', 'fraud', 'harassment', 'fake_profile', 'other');
 
 -- Estados de reporte
 CREATE TYPE report_status_enum AS ENUM ('pending', 'under_review', 'resolved', 'dismissed');
-
--- Métodos de pago
-CREATE TYPE payment_method_enum AS ENUM ('credit_card', 'debit_card', 'paypal', 'transfer', 'cash', 'wallet');
-
--- Estados de transacción
-CREATE TYPE transaction_status_enum AS ENUM ('pending', 'completed', 'failed', 'refunded', 'cancelled');
 
 -- Tipos de verificación
 CREATE TYPE verification_type_enum AS ENUM ('email', 'phone', 'identity', 'address', 'business', 'professional');
@@ -78,15 +66,11 @@ CREATE TABLE users (
   rating_average DECIMAL(3,2) DEFAULT 0.00 CHECK (rating_average >= 0 AND rating_average <= 5),
   total_reviews INTEGER DEFAULT 0,
   total_services INTEGER DEFAULT 0,
-  total_bookings INTEGER DEFAULT 0,
-  completed_bookings INTEGER DEFAULT 0,
   response_time_minutes INTEGER DEFAULT 0,
   response_rate DECIMAL(5,2) DEFAULT 0.00,
   language VARCHAR(10) DEFAULT 'es',
   timezone VARCHAR(50) DEFAULT 'UTC',
   currency VARCHAR(3) DEFAULT 'USD',
-  stripe_customer_id VARCHAR(255),
-  stripe_account_id VARCHAR(255),
   fcm_token TEXT, -- Para notificaciones push
   email_notifications BOOLEAN DEFAULT true,
   push_notifications BOOLEAN DEFAULT true,
@@ -187,7 +171,6 @@ CREATE TABLE services (
   is_verified BOOLEAN DEFAULT false,
   views_count INTEGER DEFAULT 0,
   favorites_count INTEGER DEFAULT 0,
-  bookings_count INTEGER DEFAULT 0,
   rating_average DECIMAL(3,2) DEFAULT 0.00 CHECK (rating_average >= 0 AND rating_average <= 5),
   total_reviews INTEGER DEFAULT 0,
   response_time_hours INTEGER,
@@ -269,59 +252,11 @@ CREATE INDEX idx_exceptions_service ON service_exceptions(service_id);
 CREATE INDEX idx_exceptions_date ON service_exceptions(exception_date);
 
 -- ============================================
--- TABLA: bookings (Reservas/Contrataciones)
--- ============================================
-
-CREATE TABLE bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  booking_number VARCHAR(20) UNIQUE NOT NULL, -- Número de referencia
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE RESTRICT,
-  client_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  provider_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  status booking_status_enum DEFAULT 'pending',
-  scheduled_date DATE NOT NULL,
-  scheduled_time TIME NOT NULL,
-  end_date DATE,
-  end_time TIME,
-  duration_minutes INTEGER,
-  total_price DECIMAL(10,2) NOT NULL,
-  service_fee DECIMAL(10,2), -- Comisión de la plataforma
-  discount_amount DECIMAL(10,2) DEFAULT 0,
-  final_price DECIMAL(10,2) NOT NULL,
-  currency VARCHAR(3) DEFAULT 'USD',
-  payment_status payment_status_enum DEFAULT 'pending',
-  location_address TEXT,
-  location_lat DECIMAL(10,8),
-  location_lng DECIMAL(11,8),
-  client_notes TEXT,
-  provider_notes TEXT,
-  cancellation_reason TEXT,
-  cancelled_by UUID REFERENCES users(id),
-  cancelled_at TIMESTAMP,
-  accepted_at TIMESTAMP,
-  started_at TIMESTAMP,
-  completed_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Índices para bookings
-CREATE INDEX idx_bookings_number ON bookings(booking_number);
-CREATE INDEX idx_bookings_service ON bookings(service_id);
-CREATE INDEX idx_bookings_client ON bookings(client_id);
-CREATE INDEX idx_bookings_provider ON bookings(provider_id);
-CREATE INDEX idx_bookings_status ON bookings(status);
-CREATE INDEX idx_bookings_payment ON bookings(payment_status);
-CREATE INDEX idx_bookings_date ON bookings(scheduled_date);
-CREATE INDEX idx_bookings_created ON bookings(created_at DESC);
-
--- ============================================
 -- TABLA: reviews (Valoraciones y Reseñas)
 -- ============================================
 
 CREATE TABLE reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
   service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
   reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   reviewed_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -338,11 +273,10 @@ CREATE TABLE reviews (
   helpful_count INTEGER DEFAULT 0, -- Votos de "útil"
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(booking_id, reviewer_id)
+  UNIQUE(service_id, reviewer_id)
 );
 
 -- Índices para reviews
-CREATE INDEX idx_reviews_booking ON reviews(booking_id);
 CREATE INDEX idx_reviews_service ON reviews(service_id);
 CREATE INDEX idx_reviews_reviewer ON reviews(reviewer_id);
 CREATE INDEX idx_reviews_reviewed ON reviews(reviewed_user_id);
@@ -373,7 +307,6 @@ CREATE TABLE conversations (
   participant_1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   participant_2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   service_id UUID REFERENCES services(id) ON DELETE SET NULL,
-  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
   last_message_text TEXT,
   last_message_at TIMESTAMP,
   last_message_sender_id UUID REFERENCES users(id),
@@ -390,7 +323,6 @@ CREATE TABLE conversations (
 CREATE INDEX idx_conversations_p1 ON conversations(participant_1_id);
 CREATE INDEX idx_conversations_p2 ON conversations(participant_2_id);
 CREATE INDEX idx_conversations_service ON conversations(service_id);
-CREATE INDEX idx_conversations_booking ON conversations(booking_id);
 CREATE INDEX idx_conversations_last_message ON conversations(last_message_at DESC);
 
 -- ============================================
@@ -453,7 +385,7 @@ CREATE TABLE notifications (
   content TEXT NOT NULL,
   image_url VARCHAR(500),
   related_id UUID,
-  related_type VARCHAR(50), -- 'booking', 'message', 'review', etc.
+  related_type VARCHAR(50), -- 'message', 'review', 'service', etc.
   is_read BOOLEAN DEFAULT false,
   read_at TIMESTAMP,
   action_url VARCHAR(500),
@@ -496,42 +428,6 @@ CREATE INDEX idx_reports_reporter ON reports(reporter_id);
 CREATE INDEX idx_reports_reported_user ON reports(reported_user_id);
 CREATE INDEX idx_reports_status ON reports(status);
 CREATE INDEX idx_reports_type ON reports(report_type);
-
--- ============================================
--- TABLA: payments (Pagos)
--- ============================================
-
-CREATE TABLE payments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  payment_number VARCHAR(20) UNIQUE NOT NULL,
-  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE RESTRICT,
-  payer_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-  receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-  amount DECIMAL(10,2) NOT NULL,
-  currency VARCHAR(3) DEFAULT 'USD',
-  payment_method payment_method_enum NOT NULL,
-  transaction_id VARCHAR(255), -- ID de la pasarela de pago
-  external_payment_id VARCHAR(255), -- ID externo (Stripe, PayPal, etc.)
-  status transaction_status_enum DEFAULT 'pending',
-  payment_date TIMESTAMP,
-  refund_date TIMESTAMP,
-  refund_amount DECIMAL(10,2),
-  refund_reason TEXT,
-  platform_fee DECIMAL(10,2),
-  provider_amount DECIMAL(10,2), -- Monto que recibe el proveedor
-  payment_details JSONB, -- Detalles adicionales en JSON
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Índices para payments
-CREATE INDEX idx_payments_number ON payments(payment_number);
-CREATE INDEX idx_payments_booking ON payments(booking_id);
-CREATE INDEX idx_payments_payer ON payments(payer_id);
-CREATE INDEX idx_payments_receiver ON payments(receiver_id);
-CREATE INDEX idx_payments_status ON payments(status);
-CREATE INDEX idx_payments_date ON payments(payment_date);
 
 -- ============================================
 -- TABLA: user_verifications (Verificaciones)
@@ -645,24 +541,6 @@ CREATE INDEX idx_promocodes_active ON promocodes(is_active);
 CREATE INDEX idx_promocodes_valid ON promocodes(valid_from, valid_until);
 
 -- ============================================
--- TABLA: promocode_usage (Uso de Códigos)
--- ============================================
-
-CREATE TABLE promocode_usage (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  promocode_id UUID NOT NULL REFERENCES promocodes(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-  discount_amount DECIMAL(10,2) NOT NULL,
-  used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Índices para promocode_usage
-CREATE INDEX idx_promocode_usage_code ON promocode_usage(promocode_id);
-CREATE INDEX idx_promocode_usage_user ON promocode_usage(user_id);
-CREATE INDEX idx_promocode_usage_booking ON promocode_usage(booking_id);
-
--- ============================================
 -- TABLA: user_followers (Seguidores)
 -- ============================================
 
@@ -758,21 +636,6 @@ CREATE INDEX idx_blocked_blocker ON blocked_users(blocker_id);
 CREATE INDEX idx_blocked_blocked ON blocked_users(blocked_id);
 
 -- ============================================
--- TABLA: app_settings (Configuración de la App)
--- ============================================
-
-CREATE TABLE app_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  key VARCHAR(100) UNIQUE NOT NULL,
-  value TEXT NOT NULL,
-  data_type VARCHAR(20) DEFAULT 'string', -- 'string', 'number', 'boolean', 'json'
-  description TEXT,
-  is_public BOOLEAN DEFAULT false, -- Si es visible para clientes
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ============================================
 -- TABLA: audit_logs (Logs de Auditoría)
 -- ============================================
 
@@ -817,16 +680,10 @@ CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
 CREATE TRIGGER update_services_updated_at BEFORE UPDATE ON services
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON bookings
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_user_verifications_updated_at BEFORE UPDATE ON user_verifications
@@ -906,36 +763,6 @@ CREATE TRIGGER update_favorites_count_trigger
 AFTER INSERT OR DELETE ON favorites
 FOR EACH ROW EXECUTE FUNCTION update_favorites_count();
 
--- Función para generar booking_number
-CREATE OR REPLACE FUNCTION generate_booking_number()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.booking_number = 'BK' || TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDD') || LPAD(nextval('booking_number_seq')::TEXT, 6, '0');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE SEQUENCE booking_number_seq;
-
-CREATE TRIGGER generate_booking_number_trigger
-BEFORE INSERT ON bookings
-FOR EACH ROW EXECUTE FUNCTION generate_booking_number();
-
--- Función para generar payment_number
-CREATE OR REPLACE FUNCTION generate_payment_number()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.payment_number = 'PAY' || TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDD') || LPAD(nextval('payment_number_seq')::TEXT, 6, '0');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE SEQUENCE payment_number_seq;
-
-CREATE TRIGGER generate_payment_number_trigger
-BEFORE INSERT ON payments
-FOR EACH ROW EXECUTE FUNCTION generate_payment_number();
-
 -- ============================================
 -- VISTAS ÚTILES
 -- ============================================
@@ -958,39 +785,9 @@ JOIN users u ON s.provider_id = u.id
 JOIN categories c ON s.category_id = c.id
 WHERE s.deleted_at IS NULL;
 
--- Vista de bookings completos
-CREATE VIEW bookings_complete AS
-SELECT 
-  b.*,
-  s.title as service_title,
-  s.price_type as service_price_type,
-  c_user.username as client_username,
-  c_user.email as client_email,
-  c_user.phone as client_phone,
-  c_user.avatar_url as client_avatar,
-  p_user.username as provider_username,
-  p_user.email as provider_email,
-  p_user.phone as provider_phone,
-  p_user.avatar_url as provider_avatar
-FROM bookings b
-JOIN services s ON b.service_id = s.id
-JOIN users c_user ON b.client_id = c_user.id
-JOIN users p_user ON b.provider_id = p_user.id;
-
 -- ============================================
 -- DATOS INICIALES
 -- ============================================
-
--- Insertar configuraciones iniciales
-INSERT INTO app_settings (key, value, data_type, description, is_public) VALUES
-('platform_commission_percentage', '15', 'number', 'Porcentaje de comisión de la plataforma', false),
-('min_service_price', '10', 'number', 'Precio mínimo de servicio', true),
-('max_service_price', '10000', 'number', 'Precio máximo de servicio', true),
-('booking_cancellation_hours', '24', 'number', 'Horas antes para cancelar sin penalización', true),
-('app_name', 'ServicesApp', 'string', 'Nombre de la aplicación', true),
-('support_email', 'support@servicesapp.com', 'string', 'Email de soporte', true),
-('currency_default', 'USD', 'string', 'Moneda por defecto', true),
-('language_default', 'es', 'string', 'Idioma por defecto', true);
 
 -- Insertar categorías principales
 INSERT INTO categories (name, slug, description, color, is_active, order_index) VALUES
@@ -1075,6 +872,209 @@ INSERT INTO users (
   false,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'proveedor1@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'juan_electricista',
+  'Juan',
+  'García',
+  '5551234568',
+  '+52',
+  'https://ui-avatars.com/api/?name=Juan+Garcia&background=FF5722&color=fff&size=200',
+  'Electricista profesional con 10 años de experiencia. Trabajos residenciales y comerciales.',
+  '1985-03-20',
+  'Masculino',
+  'provider',
+  'provider',
+  true,
+  true,
+  false,
+  4.8,
+  45,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  false,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'proveedor2@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'maria_limpieza',
+  'María',
+  'López',
+  '5551234569',
+  '+52',
+  'https://ui-avatars.com/api/?name=Maria+Lopez&background=9C27B0&color=fff&size=200',
+  'Servicio de limpieza profesional. Casas, oficinas y espacios comerciales.',
+  '1990-07-15',
+  'Femenino',
+  'provider',
+  'provider',
+  true,
+  true,
+  true,
+  4.9,
+  78,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  true,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'proveedor3@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'carlos_plomero',
+  'Carlos',
+  'Ramírez',
+  '5551234570',
+  '+52',
+  'https://ui-avatars.com/api/?name=Carlos+Ramirez&background=2196F3&color=fff&size=200',
+  'Plomería residencial y comercial. Reparaciones, instalaciones y mantenimiento.',
+  '1982-11-08',
+  'Masculino',
+  'provider',
+  'provider',
+  true,
+  true,
+  false,
+  4.7,
+  92,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  false,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'cliente1@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'ana_cliente',
+  'Ana',
+  'Martínez',
+  '5551234571',
+  '+52',
+  'https://ui-avatars.com/api/?name=Ana+Martinez&background=E91E63&color=fff&size=200',
+  'Me encanta contratar servicios locales de calidad.',
+  '1995-05-12',
+  'Femenino',
+  'client',
+  'user',
+  true,
+  true,
+  true,
+  0,
+  0,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  false,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'cliente2@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'pedro_cliente',
+  'Pedro',
+  'Sánchez',
+  '5551234572',
+  '+52',
+  'https://ui-avatars.com/api/?name=Pedro+Sanchez&background=FFC107&color=fff&size=200',
+  'Usuario activo de la plataforma.',
+  '1988-09-25',
+  'Masculino',
+  'client',
+  'user',
+  false,
+  true,
+  false,
+  0,
+  0,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  false,
+  false,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'proveedorboth@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'sofia_profesional',
+  'Sofía',
+  'Torres',
+  '5551234573',
+  '+52',
+  'https://ui-avatars.com/api/?name=Sofia+Torres&background=00BCD4&color=fff&size=200',
+  'Profesora particular de inglés y matemáticas. También contrato servicios frecuentemente.',
+  '1992-02-18',
+  'Femenino',
+  'both',
+  'provider',
+  true,
+  true,
+  true,
+  4.85,
+  34,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  true,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+),
+(
+  gen_random_uuid(),
+  'moderador@test.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'moderador_sistema',
+  'Laura',
+  'Fernández',
+  '5551234574',
+  '+52',
+  'https://ui-avatars.com/api/?name=Laura+Fernandez&background=8BC34A&color=fff&size=200',
+  'Moderadora del sistema. Encargada de revisar reportes y mantener la calidad.',
+  '1987-06-30',
+  'Femenino',
+  'both',
+  'moderator',
+  true,
+  true,
+  false,
+  0,
+  0,
+  'es',
+  'America/Mexico_City',
+  'MXN',
+  true,
+  true,
+  false,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
 );
 
 -- ============================================
@@ -1083,11 +1083,9 @@ INSERT INTO users (
 
 COMMENT ON TABLE users IS 'Tabla principal de usuarios de la plataforma';
 COMMENT ON TABLE services IS 'Servicios publicados por los proveedores';
-COMMENT ON TABLE bookings IS 'Reservas y contrataciones de servicios';
 COMMENT ON TABLE reviews IS 'Valoraciones y reseñas de servicios';
 COMMENT ON TABLE conversations IS 'Conversaciones de chat entre usuarios';
 COMMENT ON TABLE messages IS 'Mensajes individuales en las conversaciones';
-COMMENT ON TABLE payments IS 'Registro de transacciones financieras';
 COMMENT ON TABLE notifications IS 'Sistema de notificaciones push e in-app';
 
 -- ============================================

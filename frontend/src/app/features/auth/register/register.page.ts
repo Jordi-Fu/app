@@ -247,7 +247,7 @@ export class RegisterPage implements OnInit {
         if (response.success) {
           await this.showToast('¡Cuenta creada exitosamente!', 'success');
           // Redirigir al home o dashboard
-          this.router.navigate(['/tabs/home'], { replaceUrl: true });
+          this.router.navigate(['/login'], { replaceUrl: true });
         } else {
           await this.showToast(response.message || 'Error al crear la cuenta', 'danger');
           console.error('Error del servidor:', response);

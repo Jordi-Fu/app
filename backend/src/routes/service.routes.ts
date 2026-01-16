@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { serviceController } from '../controllers/service.controller';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -11,5 +12,10 @@ router.get('/:id', serviceController.getServiceById.bind(serviceController));
 
 // Incrementar vistas (público)
 router.post('/:id/view', serviceController.incrementViews.bind(serviceController));
+
+// Rutas protegidas - requieren autenticación
+router.post('/:id/favorite', authMiddleware, serviceController.toggleFavorite.bind(serviceController));
+router.get('/:id/is-favorite', authMiddleware, serviceController.checkIsFavorite.bind(serviceController));
+router.get('/user/favorites', authMiddleware, serviceController.getFavoriteServices.bind(serviceController));
 
 export default router;

@@ -176,6 +176,102 @@ class ServiceController {
       });
     }
   }
+
+  /**
+   * POST /api/services/:id/favorite
+   * Toggle favorito (agregar o eliminar)
+   */
+  async toggleFavorite(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: serviceId } = req.params;
+      const userId = (req as any).user?.userId; // Asumiendo que el middleware de autenticación agrega el userId
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Usuario no autenticado',
+        });
+        return;
+      }
+
+      const result = await serviceService.toggleFavorite(userId, serviceId);
+      
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en toggleFavorite:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al actualizar favoritos',
+      });
+    }
+  }
+
+  /**
+   * GET /api/services/:id/is-favorite
+   * Verificar si un servicio está en favoritos
+   */
+  async checkIsFavorite(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: serviceId } = req.params;
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(200).json({
+          success: true,
+          isFavorite: false,
+        });
+        return;
+      }
+
+      const isFavorite = await serviceService.isFavorite(userId, serviceId);
+      
+      res.status(200).json({
+        success: true,
+        isFavorite,
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en checkIsFavorite:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al verificar favorito',
+      });
+    }
+  }
+
+  /**
+   * GET /api/services/favorites
+   * Obtener servicios favoritos del usuario
+   */
+  async getFavoriteServices(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Usuario no autenticado',
+        });
+        return;
+      }
+
+      const favorites = await serviceService.getFavoriteServices(userId);
+      
+      res.status(200).json({
+        success: true,
+        data: favorites,
+        total: favorites.length,
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en getFavoriteServices:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener servicios favoritos',
+      });
+    }
+  }
 }
 
 export const serviceController = new ServiceController();

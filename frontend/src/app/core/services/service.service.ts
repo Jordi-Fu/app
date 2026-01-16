@@ -80,17 +80,28 @@ export class ServiceService {
   /**
    * Marcar/desmarcar servicio como favorito
    */
-  toggleFavorite(serviceId: string): Observable<{ isFavorite: boolean }> {
-    return this.http.post<{ isFavorite: boolean }>(
+  toggleFavorite(serviceId: string): Observable<{ success: boolean; isFavorite: boolean; message: string }> {
+    return this.http.post<{ success: boolean; isFavorite: boolean; message: string }>(
       `${this.apiUrl}/${serviceId}/favorite`, 
       {}
     );
   }
 
   /**
+   * Verificar si un servicio está en favoritos
+   */
+  checkIsFavorite(serviceId: string): Observable<{ success: boolean; isFavorite: boolean }> {
+    return this.http.get<{ success: boolean; isFavorite: boolean }>(
+      `${this.apiUrl}/${serviceId}/is-favorite`
+    );
+  }
+
+  /**
    * Obtener servicios favoritos del usuario
    */
-  getFavoriteServices(): Observable<Service[]> {
-    return this.http.get<Service[]>(`${this.apiUrl}/favorites`);
+  getFavoriteServices(): Observable<{ success: boolean; data: Service[]; total: number }> {
+    return this.http.get<{ success: boolean; data: Service[]; total: number }>(
+      `${this.apiUrl}/user/favorites`
+    );
   }
 }

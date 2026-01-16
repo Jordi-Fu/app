@@ -12,8 +12,27 @@
   }
 }
 
+// Header buttons
+ion-toolbar {
+  margin-top: 20px;
+  ion-buttons[slot="end"] {
+    ion-button {
+      ion-icon {
+        font-size: 1.5rem;
+        transition: all 0.2s ease;
+      }
+      
+      &:active {
+        ion-icon {
+          transform: scale(0.9);
+        }
+      }
+    }
+  }
+}
+
 .servicio-detalle {
-  padding-bottom: 100px; // Espacio para el botón fijo
+  padding-bottom: 1rem;
 }
 
 // Galería de imágenes
@@ -391,33 +410,120 @@ ion-card {
   }
 }
 
-// CTA fijo en la parte inferior
-.bottom-cta {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  background: white;
-  border-top: 1px solid var(--ion-color-light-shade);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  z-index: 10;
-  
-  .cta-price {
-    display: flex;
-    flex-direction: column;
+// Modo oscuro
+@media (prefers-color-scheme: dark) {
+  .main-info {
+    .header {
+      h1 {
+        color: var(--ion-color-light);
+      }
+    }
     
-    .cta-price-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--ion-color-primary);
+    .stats {
+      .rating {
+        .rating-text {
+          color: var(--ion-color-light);
+        }
+      }
+      
+      .views,
+      .bookings {
+        color: var(--ion-color-step-600);
+      }
+    }
+  }
+
+  .price-section {
+    .price {
+      background: var(--ion-color-step-100);
+    }
+  }
+
+  .provider-card {
+    .provider-header {
+      .provider-info {
+        h3 {
+          color: var(--ion-color-light);
+        }
+        
+        .provider-rating {
+          span {
+            color: var(--ion-color-light);
+          }
+        }
+      }
+    }
+    
+    .provider-stats {
+      .stat {
+        .stat-value {
+          color: var(--ion-color-light);
+        }
+      }
+    }
+  }
+
+  ion-card {
+    ion-card-title {
+      color: var(--ion-color-light);
+    }
+    
+    .description {
+      color: var(--ion-color-step-600);
+    }
+  }
+
+  .details-list {
+    .detail-item {
+      .detail-content {
+        .detail-value {
+          color: var(--ion-color-light);
+        }
+      }
+    }
+  }
+
+  .includes-section {
+    h4 {
+      color: var(--ion-color-light);
+    }
+    
+    p {
+      color: var(--ion-color-step-600);
+    }
+  }
+
+  .availability-list {
+    .availability-item {
+      background: var(--ion-color-step-100);
+      
+      .day {
+        color: var(--ion-color-light);
+      }
+      
+      .hours {
+        color: var(--ion-color-step-600);
+      }
+    }
+  }
+
+  .faq-list {
+    .faq-item {
+      .faq-question {
+        color: var(--ion-color-light);
+      }
+      
+      .faq-answer {
+        color: var(--ion-color-step-600);
+      }
     }
   }
   
-  ion-button {
-    flex: 1;
-    margin: 0;
+  .tags {
+    ion-chip {
+      ion-label {
+        color: var(--ion-color-light);
+      }
+    }
   }
 }
