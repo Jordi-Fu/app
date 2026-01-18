@@ -33,14 +33,14 @@
     <div class="image-gallery">
       <div class="main-image">
         <img 
-          [src]="servicio.images && servicio.images.length > 0 ? servicio.images[selectedImageIndex].image_url : 'https://via.placeholder.com/800x400'" 
-          [alt]="servicio.title"
+          [src]="servicio.images && servicio.images.length > 0 ? servicio.images[selectedImageIndex].url_imagen : 'https://via.placeholder.com/800x400'" 
+          [alt]="servicio.titulo"
         />
         <div class="image-badges">
-          <ion-badge *ngIf="servicio.is_featured" color="warning">
+          <ion-badge *ngIf="servicio.es_destacado" color="warning">
             <ion-icon name="star"></ion-icon> Destacado
           </ion-badge>
-          <ion-badge *ngIf="servicio.is_verified" color="success">
+          <ion-badge *ngIf="servicio.esta_verificado" color="success">
             <ion-icon name="checkmark-circle-outline"></ion-icon> Verificado
           </ion-badge>
         </div>
@@ -52,7 +52,7 @@
           class="thumbnail"
           [class.active]="i === selectedImageIndex"
           (click)="selectImage(i)">
-          <img [src]="image.thumbnail_url || image.image_url" [alt]="image.caption || servicio.title" />
+          <img [src]="image.url_miniatura || image.url_imagen" [alt]="image.pie_de_foto || servicio.titulo" />
         </div>
       </div>
     </div>
@@ -60,9 +60,9 @@
     <!-- Información principal -->
     <div class="main-info">
       <div class="header">
-        <h1>{{ servicio.title }}</h1>
+        <h1>{{ servicio.titulo }}</h1>
         <div class="category-chip" [style.background-color]="servicio.category?.color">
-          {{ servicio.category?.icon_url }} {{ servicio.category?.name }}
+          {{ servicio.category?.url_icono }} {{ servicio.category?.nombre }}
         </div>
       </div>
 
@@ -70,13 +70,13 @@
         <div class="rating">
           <ion-icon 
             *ngFor="let star of getStarsArray()" 
-            [name]="star <= (servicio.rating_average || 0) ? 'star' : 'star-outline'"
-            [class.filled]="star <= (servicio.rating_average || 0)">
+            [name]="star <= (servicio.promedio_calificacion || 0) ? 'star' : 'star-outline'"
+            [class.filled]="star <= (servicio.promedio_calificacion || 0)">
           </ion-icon>
-          <span class="rating-text">{{ servicio.rating_average || 0 }} ({{ servicio.total_reviews }} reseñas)</span>
+          <span class="rating-text">{{ servicio.promedio_calificacion || 0 }} ({{ servicio.total_resenas }} reseñas)</span>
         </div>
         <div class="views">
-          👁️ {{ servicio.views_count }} vistas
+          👁️ {{ servicio.vistas }} vistas
         </div>
       </div>
 
@@ -84,7 +84,7 @@
       <div class="price-section">
         <div class="price">
           <span class="price-label">Precio</span>
-          <span class="price-value">{{ getPriceText() }}</span>
+          <span class="price-value">{{ servicio.precio }} {{servicio.moneda}}</span>
         </div>
       </div>
     </div>
@@ -95,36 +95,36 @@
         <div class="provider-header">
           <ion-avatar>
             <img 
-              [src]="servicio.provider?.avatar_url || 'https://ui-avatars.com/api/?name=' + servicio.provider?.first_name + '+' + servicio.provider?.last_name" 
-              [alt]="servicio.provider?.first_name"
+              [src]="servicio.provider?.url_avatar || 'https://ui-avatars.com/api/?name=' + servicio.provider?.nombre + '+' + servicio.provider?.apellido" 
+              [alt]="servicio.provider?.nombre"
             />
           </ion-avatar>
           <div class="provider-info">
             <h3>
-              {{ servicio.provider?.first_name }} {{ servicio.provider?.last_name }}
-              <ion-icon *ngIf="servicio.provider?.is_verified" name="checkmark-circle" color="success" class="verified-icon"></ion-icon>
+              {{ servicio.provider?.nombre }} {{ servicio.provider?.apellido }}
+              <ion-icon *ngIf="servicio.provider?.esta_verificado" name="checkmark-circle" color="success" class="verified-icon"></ion-icon>
             </h3>
-            <p>@{{ servicio.provider?.username }}</p>
+            <p>@{{ servicio.provider?.usuario }}</p>
             <div class="provider-rating">
               <ion-icon name="star"></ion-icon>
-              <span>{{ servicio.provider?.rating_average }} ({{ servicio.provider?.total_reviews }} reseñas)</span>
+              <span>{{ servicio.provider?.promedio_calificacion }} ({{ servicio.provider?.total_resenas }} reseñas)</span>
             </div>
           </div>
-          <ion-button fill="outline" (click)="contactProvider(); $event.stopPropagation()">
-            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-            Contactar
-          </ion-button>
+          <button class="chat-button" (click)="contactProvider(); $event.stopPropagation()">
+            <ion-icon name="chatbubble-outline"></ion-icon>
+            Chat
+          </button>
         </div>
       </ion-card-header>
       <ion-card-content *ngIf="servicio.provider">
         <div class="provider-stats">
           <div class="stat">
             <span class="stat-label">Tiempo de respuesta</span>
-            <span class="stat-value">{{ servicio.provider.response_time_minutes }} min</span>
+            <span class="stat-value">{{ servicio.provider.tiempo_respuesta_minutos }} min</span>
           </div>
           <div class="stat">
             <span class="stat-label">Tasa de respuesta</span>
-            <span class="stat-value">{{ servicio.provider.response_rate }}%</span>
+            <span class="stat-value">{{ servicio.provider.porcentaje_respuesta }}%</span>
           </div>
         </div>
       </ion-card-content>
@@ -136,7 +136,7 @@
         <ion-card-title>Descripción</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p class="description">{{ servicio.description }}</p>
+        <p class="description">{{ servicio.descripcion }}</p>
       </ion-card-content>
     </ion-card>
 
@@ -152,11 +152,11 @@
             <div class="detail-content">
               <span class="detail-label">Ubicación</span>
               <span class="detail-value">{{ getLocationText() }}</span>
-              <span class="detail-subvalue" *ngIf="servicio.city">{{ servicio.city }}, {{ servicio.state }}</span>
+              <span class="detail-subvalue" *ngIf="servicio.ciudad">{{ servicio.ciudad }}, {{ servicio.estado }}</span>
             </div>
           </div>
           
-          <div class="detail-item" *ngIf="servicio.duration_minutes">
+          <div class="detail-item" *ngIf="servicio.duracion_minutos">
             <ion-icon name="time-outline"></ion-icon>
             <div class="detail-content">
               <span class="detail-label">Duración</span>
@@ -164,11 +164,11 @@
             </div>
           </div>
 
-          <div class="detail-item" *ngIf="servicio.service_radius_km">
+          <div class="detail-item" *ngIf="servicio.radio_servicio_km">
             <ion-icon name="location-outline"></ion-icon>
             <div class="detail-content">
               <span class="detail-label">Radio de servicio</span>
-              <span class="detail-value">{{ servicio.service_radius_km }} km</span>
+              <span class="detail-value">{{ servicio.radio_servicio_km }} km</span>
             </div>
           </div>
         </div>
@@ -176,29 +176,29 @@
     </ion-card>
 
     <!-- Qué incluye / No incluye -->
-    <ion-card *ngIf="servicio.what_included || servicio.what_not_included">
+    <ion-card *ngIf="servicio.que_incluye || servicio.que_no_incluye">
       <ion-card-header>
         <ion-card-title>Qué incluye y qué no</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <div class="includes-section" *ngIf="servicio.what_included">
+        <div class="includes-section" *ngIf="servicio.que_incluye">
           <h4>✅ Incluye:</h4>
-          <p>{{ servicio.what_included }}</p>
+          <p>{{ servicio.que_incluye }}</p>
         </div>
-        <div class="includes-section" *ngIf="servicio.what_not_included">
+        <div class="includes-section" *ngIf="servicio.que_no_incluye">
           <h4>❌ No incluye:</h4>
-          <p>{{ servicio.what_not_included }}</p>
+          <p>{{ servicio.que_no_incluye }}</p>
         </div>
       </ion-card-content>
     </ion-card>
 
     <!-- Requisitos -->
-    <ion-card *ngIf="servicio.requirements">
+    <ion-card *ngIf="servicio.requisitos">
       <ion-card-header>
         <ion-card-title>Requisitos</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p>{{ servicio.requirements }}</p>
+        <p>{{ servicio.requisitos }}</p>
       </ion-card-content>
     </ion-card>
 
@@ -212,24 +212,24 @@
           <div 
             *ngFor="let avail of servicio.availability" 
             class="availability-item"
-            [class.unavailable]="!avail.is_available">
-            <span class="day">{{ getAvailabilityText(avail.day_of_week) }}</span>
-            <span class="hours" *ngIf="avail.is_available">
-              {{ avail.start_time }} - {{ avail.end_time }}
+            [class.unavailable]="!avail.esta_disponible">
+            <span class="day">{{ getAvailabilityText(avail.dia_semana) }}</span>
+            <span class="hours" *ngIf="avail.esta_disponible">
+              {{ avail.hora_inicio }} - {{ avail.hora_fin }}
             </span>
-            <span class="hours unavailable-text" *ngIf="!avail.is_available">No disponible</span>
+            <span class="hours unavailable-text" *ngIf="!avail.esta_disponible">No disponible</span>
           </div>
         </div>
       </ion-card-content>
     </ion-card>
 
     <!-- Política de cancelación -->
-    <ion-card *ngIf="servicio.cancellation_policy">
+    <ion-card *ngIf="servicio.politica_cancelacion">
       <ion-card-header>
         <ion-card-title>Política de cancelación</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p>{{ servicio.cancellation_policy }}</p>
+        <p>{{ servicio.politica_cancelacion }}</p>
       </ion-card-content>
     </ion-card>
 
@@ -241,8 +241,8 @@
       <ion-card-content>
         <div class="faq-list">
           <div *ngFor="let faq of servicio.faqs" class="faq-item">
-            <h4 class="faq-question">{{ faq.question }}</h4>
-            <p class="faq-answer">{{ faq.answer }}</p>
+            <h4 class="faq-question">{{ faq.pregunta }}</h4>
+            <p class="faq-answer">{{ faq.respuesta }}</p>
           </div>
         </div>
       </ion-card-content>
@@ -253,7 +253,7 @@
       <ion-card-content>
         <div class="tags">
           <ion-chip *ngFor="let tag of servicio.tags" outline>
-            <ion-label>{{ tag.name }}</ion-label>
+            <ion-label>{{ tag.nombre }}</ion-label>
           </ion-chip>
         </div>
       </ion-card-content>

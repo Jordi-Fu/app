@@ -13,102 +13,102 @@ export enum LocationType {
 
 export interface ServiceImage {
   id: string;
-  service_id: string;
-  image_url: string;
-  thumbnail_url?: string;
-  caption?: string;
-  is_primary: boolean;
-  order_index: number;
-  created_at: string;
+  servicio_id: string;
+  url_imagen: string;
+  url_miniatura?: string;
+  pie_de_foto?: string;
+  es_principal: boolean;
+  indice_orden: number;
+  creado_en: string;
 }
 
 export interface ServiceProvider {
   id: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-  bio?: string;
-  rating_average: number;
-  total_reviews: number;
-  total_services?: number;
-  response_time_minutes: number;
-  response_rate: number;
-  is_verified?: boolean;
-  created_at?: string;
+  usuario: string;
+  nombre: string;
+  apellido: string;
+  url_avatar?: string;
+  biografia?: string;
+  promedio_calificacion: number;
+  total_resenas: number;
+  total_servicios?: number;
+  tiempo_respuesta_minutos: number;
+  porcentaje_respuesta: number;
+  esta_verificado?: boolean;
+  creado_en?: string;
 }
 
 export interface Category {
   id: string;
-  name: string;
+  nombre: string;
   slug: string;
-  description?: string;
-  icon_url?: string;
+  descripcion?: string;
+  url_icono?: string;
   color?: string;
-  parent_id?: string;
-  order_index?: number;
-  is_active: boolean;
-  service_count?: number;
+  padre_id?: string;
+  indice_orden?: number;
+  esta_activo: boolean;
+  conteo_servicios?: number;
 }
 
 export interface ServiceAvailability {
   id: string;
-  day_of_week: number; // 0=Domingo, 6=Sábado
-  start_time: string;
-  end_time: string;
-  is_available: boolean;
+  dia_semana: number; // 0=Domingo, 6=Sábado
+  hora_inicio: string;
+  hora_fin: string;
+  esta_disponible: boolean;
 }
 
 export interface ServiceFAQ {
   id: string;
-  question: string;
-  answer: string;
-  order_index: number;
+  pregunta: string;
+  respuesta: string;
+  indice_orden: number;
 }
 
 export interface ServiceTag {
   id: string;
-  name: string;
+  nombre: string;
   slug: string;
 }
 
 export interface Service {
   id: string;
-  provider_id: string;
-  category_id: string;
-  title: string;
-  description: string;
-  short_description?: string;
-  price_type: PriceType;
-  price?: number;
-  price_max?: number;
-  currency: string;
-  duration_minutes?: number;
-  location_type: LocationType;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  postal_code?: string;
-  latitude?: number;
-  longitude?: number;
-  service_radius_km?: number;
-  is_active: boolean;
-  is_featured: boolean;
-  is_verified: boolean;
-  views_count: number;
-  favorites_count: number;
-  bookings_count: number;
-  rating_average: number;
-  total_reviews: number;
-  response_time_hours?: number;
-  cancellation_policy?: string;
-  requirements?: string;
-  what_included?: string;
-  what_not_included?: string;
-  video_url?: string;
-  created_at: string;
-  updated_at: string;
+  proveedor_id: string;
+  categoria_id: string;
+  titulo: string;
+  descripcion: string;
+  descripcion_corta?: string;
+  tipo_precio: PriceType;
+  precio?: number;
+  precio_maximo?: number;
+  moneda: string;
+  duracion_minutos?: number;
+  tipo_ubicacion: LocationType;
+  direccion?: string;
+  ciudad?: string;
+  estado?: string;
+  pais?: string;
+  codigo_postal?: string;
+  latitud?: number;
+  longitud?: number;
+  radio_servicio_km?: number;
+  esta_activo: boolean;
+  es_destacado: boolean;
+  esta_verificado: boolean;
+  vistas: number;
+  conteo_favoritos: number;
+  conteo_reservas: number;
+  promedio_calificacion: number;
+  total_resenas: number;
+  tiempo_respuesta_horas?: number;
+  politica_cancelacion?: string;
+  requisitos?: string;
+  que_incluye?: string;
+  que_no_incluye?: string;
+  url_video?: string;
+  creado_en: string;
+  actualizado_en: string;
   // Relaciones
   provider?: ServiceProvider;
   category?: Category;
@@ -119,16 +119,16 @@ export interface Service {
 }
 
 export interface ServiceFilters {
-  category_id?: string;
-  city?: string;
-  state?: string;
-  price_min?: number;
-  price_max?: number;
-  location_type?: LocationType;
-  rating_min?: number;
-  search?: string;
-  page?: number;
-  limit?: number;
+  categoria_id?: string;
+  ciudad?: string;
+  estado?: string;
+  precio_minimo?: number;
+  precio_maximo?: number;
+  tipo_ubicacion?: LocationType;
+  calificacion_minima?: number;
+  busqueda?: string;
+  pagina?: number;
+  limite?: number;
 }
 
 export interface ServicesResponse {

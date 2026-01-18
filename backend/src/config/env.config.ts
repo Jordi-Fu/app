@@ -11,10 +11,10 @@ export const ENV = {
   
   // Database
   DB_HOST: process.env.DB_HOST || 'localhost',
-  DB_PORT: parseInt(process.env.DB_PORT || '5432', 10),
+  DB_PORT: parseInt(process.env.DB_PORT || '5433', 10),
   DB_NAME: process.env.DB_NAME || 'kurro',
   DB_USER: process.env.DB_USER || 'postgres',
-  DB_PASSWORD: process.env.DB_PASSWORD || 'postgres',
+  DB_PASSWORD: process.env.DB_PASSWORD || '123',
   
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || 'default_secret_change_in_production',

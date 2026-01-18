@@ -19,7 +19,38 @@ ion-content {
   flex-direction: column;
   align-items: center;
   font-family: $font-family;
-  background-color: #f5f5f5;
+}
+
+.search-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  width: 100%;
+  align-items: center;
+}
+
+.add-button {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  img {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) saturate(100%) invert(64%) sepia(35%) saturate(1035%) hue-rotate(126deg) brightness(95%) contrast(85%);
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .titulo {
@@ -53,7 +84,7 @@ ion-content {
 
 .search-bar {
   position: relative;
-  margin-bottom: 30px;
+  flex: 1;
 
   .search-icon {
     position: absolute;
@@ -103,7 +134,7 @@ ion-content {
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding: 8px 0;
     -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
@@ -123,12 +154,16 @@ ion-content {
       transition: all 0.3s;
       font-size: 14px;
       font-weight: 500;
-      color: white;
+      color: #666666;
       white-space: nowrap;
       flex-shrink: 0;
-      background: $primary-gradient;
+      background: #e0e0e0;
+      border: 1px solid #d0d0d0;
 
       &.active {
+        background: $primary-gradient;
+        color: white;
+        border: none;
         box-shadow: 0 4px 12px rgba(19, 181, 181, 0.3);
         transform: scale(1.05);
       }
@@ -406,9 +441,7 @@ ion-content {
     --background: #1a1a1a;
   }
 
-  .servicios-container {
-    background-color: #1a1a1a;
-  }
+
 
   .titulo {
     .heading {
@@ -448,6 +481,7 @@ ion-content {
   }
 
   .servicios-section {
+
     .loading-container p,
     .no-results p {
       color: #b3b3b3;

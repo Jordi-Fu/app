@@ -1,1075 +1,856 @@
+﻿-- ============================================
+-- CREACIÃ“N DE EXTENSIONES
+-- ============================================
+
 -- Habilitar UUID
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ============================================
--- CREACIÓN DE TIPOS ENUM
+-- CREACIÃ“N DE TIPOS ENUM
 -- ============================================
 
--- Tipos de usuario
-CREATE TYPE user_type_enum AS ENUM ('client', 'provider', 'both');
 
 -- Tipos de precio
-CREATE TYPE price_type_enum AS ENUM ('fixed', 'hourly', 'negotiable');
-
--- Tipos de ubicación de servicio
-CREATE TYPE location_type_enum AS ENUM ('remote', 'at_client', 'at_provider', 'flexible');
+CREATE TYPE tipo_precio_enum AS ENUM ('fijo', 'por_hora');
 
 -- Tipos de mensaje
-CREATE TYPE message_type_enum AS ENUM ('text', 'image', 'file', 'location', 'audio', 'video');
+CREATE TYPE tipo_mensaje_enum AS ENUM ('texto', 'imagen', 'archivo', 'ubicacion', 'audio', 'video');
 
--- Tipos de notificación
-CREATE TYPE notification_type_enum AS ENUM ('message', 'review', 'system', 'promotion');
+-- Tipos de notificaciÃ³n
+CREATE TYPE tipo_notificacion_enum AS ENUM ('mensaje', 'valoracion', 'sistema', 'promocion');
 
 -- Tipos de reporte
-CREATE TYPE report_type_enum AS ENUM ('spam', 'inappropriate', 'fraud', 'harassment', 'fake_profile', 'other');
+CREATE TYPE tipo_reporte_enum AS ENUM ('spam', 'inapropiado', 'fraude', 'acoso', 'perfil_falso', 'otro');
 
 -- Estados de reporte
-CREATE TYPE report_status_enum AS ENUM ('pending', 'under_review', 'resolved', 'dismissed');
+CREATE TYPE estado_reporte_enum AS ENUM ('pendiente', 'en_revision', 'resuelto', 'descartado');
 
--- Tipos de verificación
-CREATE TYPE verification_type_enum AS ENUM ('email', 'phone', 'identity', 'address', 'business', 'professional');
+-- Tipos de verificaciÃ³n
+CREATE TYPE tipo_verificacion_enum AS ENUM ('email', 'telefono');
 
--- Estados de verificación
-CREATE TYPE verification_status_enum AS ENUM ('pending', 'approved', 'rejected', 'expired');
+-- Estados de verificaciÃ³n
+CREATE TYPE estado_verificacion_enum AS ENUM ('pendiente', 'aprobado', 'rechazado', 'expirado');
 
 -- Tipos de descuento
-CREATE TYPE discount_type_enum AS ENUM ('percentage', 'fixed');
+CREATE TYPE tipo_descuento_enum AS ENUM ('porcentaje', 'fijo');
 
--- Roles de usuario
-CREATE TYPE user_role_enum AS ENUM ('user', 'provider', 'admin', 'moderator');
 
 -- ============================================
 -- TABLA: users (Usuarios)
 -- ============================================
 
-CREATE TABLE users (
+CREATE TABLE usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  username VARCHAR(100) UNIQUE NOT NULL,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  phone VARCHAR(20),
-  country_code VARCHAR(5) DEFAULT '+1',
-  avatar_url VARCHAR(500),
-  cover_image_url VARCHAR(500),
-  bio TEXT,
-  date_of_birth DATE,
-  gender VARCHAR(20),
-  user_type user_type_enum DEFAULT 'client',
-  user_role user_role_enum DEFAULT 'user',
-  is_verified BOOLEAN DEFAULT false,
-  is_active BOOLEAN DEFAULT true,
-  is_online BOOLEAN DEFAULT false,
-  last_seen TIMESTAMP,
-  rating_average DECIMAL(3,2) DEFAULT 0.00 CHECK (rating_average >= 0 AND rating_average <= 5),
-  total_reviews INTEGER DEFAULT 0,
-  total_services INTEGER DEFAULT 0,
-  response_time_minutes INTEGER DEFAULT 0,
-  response_rate DECIMAL(5,2) DEFAULT 0.00,
-  language VARCHAR(10) DEFAULT 'es',
-  timezone VARCHAR(50) DEFAULT 'UTC',
-  currency VARCHAR(3) DEFAULT 'USD',
-  fcm_token TEXT, -- Para notificaciones push
-  email_notifications BOOLEAN DEFAULT true,
-  push_notifications BOOLEAN DEFAULT true,
-  sms_notifications BOOLEAN DEFAULT false,
-  failed_login_attempts INTEGER DEFAULT 0,
-  locked_until TIMESTAMP,
-  last_login TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP
+  correo VARCHAR(255) UNIQUE NOT NULL,
+  hash_password VARCHAR(255) NOT NULL,
+  usuario VARCHAR(100) UNIQUE NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  telefono VARCHAR(20),
+  codigo_pais VARCHAR(5) DEFAULT '+34',
+  url_avatar VARCHAR(500),
+  biografia TEXT,
+  fecha_nacimiento DATE,
+  esta_verificado BOOLEAN DEFAULT false,
+  esta_activo BOOLEAN DEFAULT true,
+  esta_en_linea BOOLEAN DEFAULT false,
+  ultima_actividad TIMESTAMP,
+  promedio_calificacion DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio_calificacion >= 0 AND promedio_calificacion <= 5),
+  total_resenas INTEGER DEFAULT 0,
+  total_servicios INTEGER DEFAULT 0,
+  tiempo_respuesta_minutos INTEGER DEFAULT 0,
+  porcentaje_respuesta DECIMAL(5,2) DEFAULT 0.00,
+  idioma VARCHAR(10) DEFAULT 'es',
+  zona_horaria VARCHAR(50) DEFAULT 'UTC',
+  moneda VARCHAR(3) DEFAULT 'EUR',
+  stripe_cliente_id VARCHAR(255),
+  stripe_cuenta_id VARCHAR(255),
+  token_fcm TEXT, -- Para notificaciones push
+  notificaciones_email BOOLEAN DEFAULT true,
+  notificaciones_push BOOLEAN DEFAULT true,
+  notificaciones_sms BOOLEAN DEFAULT false,
+  intentos_fallidos_login INTEGER DEFAULT 0,
+  bloqueado_hasta TIMESTAMP,
+  ultimo_login TIMESTAMP,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  eliminado_en TIMESTAMP
 );
 
--- Índices para users
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_phone ON users(phone);
-CREATE INDEX idx_users_type ON users(user_type);
-CREATE INDEX idx_users_role ON users(user_role);
-CREATE INDEX idx_users_rating ON users(rating_average DESC);
-CREATE INDEX idx_users_active ON users(is_active);
-CREATE INDEX idx_users_created ON users(created_at DESC);
+-- Ãndices para usuarios
+CREATE INDEX idx_usuarios_correo ON usuarios(correo);
+CREATE INDEX idx_usuarios_usuario ON usuarios(usuario);
+CREATE INDEX idx_usuarios_telefono ON usuarios(telefono);
+CREATE INDEX idx_usuarios_promedio ON usuarios(promedio_calificacion DESC);
+CREATE INDEX idx_usuarios_activo ON usuarios(esta_activo);
+CREATE INDEX idx_usuarios_creado ON usuarios(creado_en DESC);
 
 -- ============================================
 -- TABLA: user_addresses (Direcciones de Usuario)
 -- ============================================
 
-CREATE TABLE user_addresses (
+CREATE TABLE direcciones_usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  label VARCHAR(50) NOT NULL, -- 'home', 'work', 'other'
-  address_line1 VARCHAR(255) NOT NULL,
-  address_line2 VARCHAR(255),
-  city VARCHAR(100) NOT NULL,
-  state VARCHAR(100) NOT NULL,
-  postal_code VARCHAR(20),
-  country VARCHAR(100) NOT NULL DEFAULT 'Mexico',
-  latitude DECIMAL(10,8),
-  longitude DECIMAL(11,8),
-  is_default BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  etiqueta VARCHAR(50) NOT NULL, -- 'home', 'work', 'other'
+  direccion_linea1 VARCHAR(255) NOT NULL,
+  direccion_linea2 VARCHAR(255),
+  ciudad VARCHAR(100) NOT NULL,
+  estado VARCHAR(100) NOT NULL,
+  codigo_postal VARCHAR(20),
+  pais VARCHAR(100) NOT NULL DEFAULT 'EspaÃ±a',
+  latitud DECIMAL(10,8),
+  longitud DECIMAL(11,8),
+  predeterminada BOOLEAN DEFAULT false,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_user_addresses_user ON user_addresses(user_id);
-CREATE INDEX idx_user_addresses_location ON user_addresses(latitude, longitude);
+CREATE INDEX idx_direcciones_usuarios_usuario ON direcciones_usuarios(usuario_id);
+CREATE INDEX idx_direcciones_usuarios_ubicacion ON direcciones_usuarios(latitud, longitud);
 
 -- ============================================
--- TABLA: categories (Categorías de Servicios)
+-- TABLA: categories (CategorÃ­as de Servicios)
 -- ============================================
 
-CREATE TABLE categories (
+CREATE TABLE categorias (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(100) NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
   slug VARCHAR(100) UNIQUE NOT NULL,
-  description TEXT,
-  icon_url VARCHAR(500),
-  color VARCHAR(7), -- Código hexadecimal de color
-  parent_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-  is_active BOOLEAN DEFAULT true,
-  order_index INTEGER DEFAULT 0,
-  services_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  descripcion TEXT,
+  url_icono VARCHAR(500),
+  color VARCHAR(7), -- CÃ³digo hexadecimal de color
+  padre_id UUID REFERENCES categorias(id) ON DELETE SET NULL,
+  esta_activo BOOLEAN DEFAULT true,
+  indice_orden INTEGER DEFAULT 0,
+  conteo_servicios INTEGER DEFAULT 0,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_categories_slug ON categories(slug);
-CREATE INDEX idx_categories_parent ON categories(parent_id);
-CREATE INDEX idx_categories_active ON categories(is_active);
-CREATE INDEX idx_categories_order ON categories(order_index);
+CREATE INDEX idx_categorias_slug ON categorias(slug);
+CREATE INDEX idx_categorias_padre ON categorias(padre_id);
+CREATE INDEX idx_categorias_activo ON categorias(esta_activo);
+CREATE INDEX idx_categorias_indice_orden ON categorias(indice_orden);
 
 -- ============================================
 -- TABLA: services (Servicios Publicados)
 -- ============================================
 
-CREATE TABLE services (
+CREATE TABLE servicios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  provider_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  category_id UUID NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
-  title VARCHAR(200) NOT NULL,
-  description TEXT NOT NULL,
-  short_description VARCHAR(500),
-  price_type price_type_enum NOT NULL,
-  price DECIMAL(10,2),
-  price_max DECIMAL(10,2), -- Para rangos de precio
-  currency VARCHAR(3) DEFAULT 'USD',
-  duration_minutes INTEGER,
-  location_type location_type_enum NOT NULL,
-  address TEXT,
-  city VARCHAR(100),
-  state VARCHAR(100),
-  country VARCHAR(100),
-  postal_code VARCHAR(20),
-  latitude DECIMAL(10,8),
-  longitude DECIMAL(11,8),
-  service_radius_km INTEGER, -- Radio de servicio en km
-  is_active BOOLEAN DEFAULT true,
-  is_featured BOOLEAN DEFAULT false,
-  is_verified BOOLEAN DEFAULT false,
-  views_count INTEGER DEFAULT 0,
-  favorites_count INTEGER DEFAULT 0,
-  rating_average DECIMAL(3,2) DEFAULT 0.00 CHECK (rating_average >= 0 AND rating_average <= 5),
-  total_reviews INTEGER DEFAULT 0,
-  response_time_hours INTEGER,
-  cancellation_policy TEXT,
-  requirements TEXT, -- Requisitos para el cliente
-  what_included TEXT, -- Qué incluye el servicio
-  what_not_included TEXT, -- Qué no incluye
-  video_url VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP
+  proveedor_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  categoria_id UUID NOT NULL REFERENCES categorias(id) ON DELETE RESTRICT,
+  titulo VARCHAR(200) NOT NULL,
+  descripcion TEXT NOT NULL,
+  tipo_precio tipo_precio_enum NOT NULL,
+  precio DECIMAL(10,2),
+  moneda VARCHAR(3) DEFAULT 'EUR',
+  tipo_ubicacion VARCHAR(50) NOT NULL,
+  direccion TEXT,
+  ciudad VARCHAR(100),
+  estado VARCHAR(100),
+  pais VARCHAR(100),
+  codigo_postal VARCHAR(20),
+  latitud DECIMAL(10,8),
+  longitud DECIMAL(11,8),
+  esta_activo BOOLEAN DEFAULT true,
+  es_destacado BOOLEAN DEFAULT false,
+  esta_verificado BOOLEAN DEFAULT false,
+  vistas INTEGER DEFAULT 0,
+  conteo_favoritos INTEGER DEFAULT 0,
+  promedio_calificacion DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio_calificacion >= 0 AND promedio_calificacion <= 5),
+  total_resenas INTEGER DEFAULT 0,
+  tiempo_respuesta_horas INTEGER,
+  politica_cancelacion TEXT,
+  incluye TEXT, -- QuÃ© incluye el servicio
+  no_incluye TEXT, -- QuÃ© no incluye
+  url_video VARCHAR(500),
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  eliminado_en TIMESTAMP
 );
 
--- Índices para services
-CREATE INDEX idx_services_provider ON services(provider_id);
-CREATE INDEX idx_services_category ON services(category_id);
-CREATE INDEX idx_services_location ON services(city, state);
-CREATE INDEX idx_services_coordinates ON services(latitude, longitude);
-CREATE INDEX idx_services_rating ON services(rating_average DESC);
-CREATE INDEX idx_services_active ON services(is_active);
-CREATE INDEX idx_services_featured ON services(is_featured);
-CREATE INDEX idx_services_price ON services(price);
-CREATE INDEX idx_services_created ON services(created_at DESC);
+-- Ãndices para servicios
+CREATE INDEX idx_servicios_proveedor ON servicios(proveedor_id);
+CREATE INDEX idx_servicios_categoria ON servicios(categoria_id);
+CREATE INDEX idx_servicios_ubicacion ON servicios(ciudad, estado);
+CREATE INDEX idx_servicios_coordenadas ON servicios(latitud, longitud);
+CREATE INDEX idx_servicios_promedio ON servicios(promedio_calificacion DESC);
+CREATE INDEX idx_servicios_activo ON servicios(esta_activo);
+CREATE INDEX idx_servicios_destacado ON servicios(es_destacado);
+CREATE INDEX idx_servicios_precio ON servicios(precio);
+CREATE INDEX idx_servicios_creado ON servicios(creado_en DESC);
 
 -- ============================================
--- TABLA: service_images (Imágenes de Servicios)
+-- TABLA: service_images (ImÃ¡genes de Servicios)
 -- ============================================
 
-CREATE TABLE service_images (
+CREATE TABLE imagenes_servicios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  image_url VARCHAR(500) NOT NULL,
-  thumbnail_url VARCHAR(500),
-  caption TEXT,
-  is_primary BOOLEAN DEFAULT false,
-  order_index INTEGER DEFAULT 0,
-  width INTEGER,
-  height INTEGER,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  url_imagen VARCHAR(500) NOT NULL,
+  url_miniatura VARCHAR(500),
+  pie_de_foto TEXT,
+  es_principal BOOLEAN DEFAULT false,
+  indice_orden INTEGER DEFAULT 0,
+  ancho INTEGER,
+  alto INTEGER,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_service_images_service ON service_images(service_id);
-CREATE INDEX idx_service_images_primary ON service_images(is_primary);
+CREATE INDEX idx_imagenes_servicios_servicio ON imagenes_servicios(servicio_id);
+CREATE INDEX idx_imagenes_servicios_principal ON imagenes_servicios(es_principal);
 
 -- ============================================
 -- TABLA: service_availability (Disponibilidad)
 -- ============================================
 
-CREATE TABLE service_availability (
+CREATE TABLE disponibilidad_servicios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6), -- 0=Domingo, 6=Sábado
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  dia_semana INTEGER NOT NULL CHECK (dia_semana BETWEEN 0 AND 6), -- 0=Domingo, 6=SÃ¡bado
+  hora_inicio TIME NOT NULL,
+  hora_fin TIME NOT NULL,
+  esta_disponible BOOLEAN DEFAULT true,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_availability_service ON service_availability(service_id);
-CREATE INDEX idx_availability_day ON service_availability(day_of_week);
+CREATE INDEX idx_disponibilidad_servicio ON disponibilidad_servicios(servicio_id);
+CREATE INDEX idx_disponibilidad_dia ON disponibilidad_servicios(dia_semana);
 
 -- ============================================
 -- TABLA: service_exceptions (Excepciones de Disponibilidad)
 -- ============================================
 
-CREATE TABLE service_exceptions (
+
+CREATE TABLE excepciones_servicios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  exception_date DATE NOT NULL,
-  is_available BOOLEAN DEFAULT false,
-  start_time TIME,
-  end_time TIME,
-  reason TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  fecha_excepcion DATE NOT NULL,
+  esta_disponible BOOLEAN DEFAULT false,
+  hora_inicio TIME,
+  hora_fin TIME,
+  motivo TEXT,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_exceptions_service ON service_exceptions(service_id);
-CREATE INDEX idx_exceptions_date ON service_exceptions(exception_date);
+CREATE INDEX idx_excepciones_servicio ON excepciones_servicios(servicio_id);
+CREATE INDEX idx_excepciones_fecha ON excepciones_servicios(fecha_excepcion);
+
+
+
 
 -- ============================================
--- TABLA: reviews (Valoraciones y Reseñas)
+-- TABLA: reviews (Valoraciones y ReseÃ±as)
 -- ============================================
 
-CREATE TABLE reviews (
+CREATE TABLE resenas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  reviewed_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
-  title VARCHAR(200),
-  comment TEXT,
-  pros TEXT,
-  cons TEXT,
-  is_anonymous BOOLEAN DEFAULT false,
-  response TEXT, -- Respuesta del proveedor
-  response_date TIMESTAMP,
-  is_verified BOOLEAN DEFAULT false,
-  is_featured BOOLEAN DEFAULT false,
-  helpful_count INTEGER DEFAULT 0, -- Votos de "útil"
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(service_id, reviewer_id)
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  revisor_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  usuario_valorado_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  calificacion INTEGER NOT NULL CHECK (calificacion BETWEEN 1 AND 5),
+  titulo VARCHAR(200),
+  comentario TEXT,
+  ventajas TEXT,
+  desventajas TEXT,
+  es_anonimo BOOLEAN DEFAULT false,
+  respuesta TEXT,
+  fecha_respuesta TIMESTAMP,
+  es_destacada BOOLEAN DEFAULT false,
+  votos_utiles INTEGER DEFAULT 0,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(servicio_id, revisor_id)
 );
 
--- Índices para reviews
-CREATE INDEX idx_reviews_service ON reviews(service_id);
-CREATE INDEX idx_reviews_reviewer ON reviews(reviewer_id);
-CREATE INDEX idx_reviews_reviewed ON reviews(reviewed_user_id);
-CREATE INDEX idx_reviews_rating ON reviews(rating);
-CREATE INDEX idx_reviews_created ON reviews(created_at DESC);
-
--- ============================================
--- TABLA: review_images (Imágenes de Reseñas)
--- ============================================
-
-CREATE TABLE review_images (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  review_id UUID NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
-  image_url VARCHAR(500) NOT NULL,
-  thumbnail_url VARCHAR(500),
-  order_index INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_review_images_review ON review_images(review_id);
+-- Ãndices para reseÃ±as
+CREATE INDEX idx_resenas_servicio ON resenas(servicio_id);
+CREATE INDEX idx_resenas_revisor ON resenas(revisor_id);
+CREATE INDEX idx_resenas_usuario_valorado ON resenas(usuario_valorado_id);
+CREATE INDEX idx_resenas_calificacion ON resenas(calificacion);
+CREATE INDEX idx_resenas_creado ON resenas(creado_en DESC);
 
 -- ============================================
 -- TABLA: conversations (Conversaciones de Chat)
 -- ============================================
 
-CREATE TABLE conversations (
+CREATE TABLE conversaciones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  participant_1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  participant_2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  service_id UUID REFERENCES services(id) ON DELETE SET NULL,
-  last_message_text TEXT,
-  last_message_at TIMESTAMP,
-  last_message_sender_id UUID REFERENCES users(id),
-  unread_count_p1 INTEGER DEFAULT 0,
-  unread_count_p2 INTEGER DEFAULT 0,
-  is_archived_p1 BOOLEAN DEFAULT false,
-  is_archived_p2 BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(participant_1_id, participant_2_id, service_id)
+  participante_1_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  participante_2_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  servicio_id UUID REFERENCES servicios(id) ON DELETE SET NULL,
+  texto_ultimo_mensaje TEXT,
+  ultimo_mensaje_en TIMESTAMP,
+  ultimo_mensaje_remitente_id UUID REFERENCES usuarios(id),
+  no_leidos_p1 INTEGER DEFAULT 0,
+  no_leidos_p2 INTEGER DEFAULT 0,
+  esta_archivado_p1 BOOLEAN DEFAULT false,
+  esta_archivado_p2 BOOLEAN DEFAULT false,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(participante_1_id, participante_2_id, servicio_id)
 );
 
--- Índices para conversations
-CREATE INDEX idx_conversations_p1 ON conversations(participant_1_id);
-CREATE INDEX idx_conversations_p2 ON conversations(participant_2_id);
-CREATE INDEX idx_conversations_service ON conversations(service_id);
-CREATE INDEX idx_conversations_last_message ON conversations(last_message_at DESC);
+-- Ãndices para conversaciones
+CREATE INDEX idx_conversaciones_p1 ON conversaciones(participante_1_id);
+CREATE INDEX idx_conversaciones_p2 ON conversaciones(participante_2_id);
+CREATE INDEX idx_conversaciones_servicio ON conversaciones(servicio_id);
+CREATE INDEX idx_conversaciones_ultimo_mensaje ON conversaciones(ultimo_mensaje_en DESC);
 
 -- ============================================
 -- TABLA: messages (Mensajes)
 -- ============================================
 
-CREATE TABLE messages (
+
+CREATE TABLE mensajes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
-  sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  message_type message_type_enum DEFAULT 'text',
-  content TEXT,
-  media_url VARCHAR(500),
-  media_thumbnail_url VARCHAR(500),
-  media_duration INTEGER, -- Para audio/video en segundos
-  media_size INTEGER, -- Tamaño en bytes
-  file_name VARCHAR(255),
-  latitude DECIMAL(10,8), -- Para ubicaciones compartidas
-  longitude DECIMAL(11,8),
-  is_read BOOLEAN DEFAULT false,
-  read_at TIMESTAMP,
-  is_edited BOOLEAN DEFAULT false,
-  edited_at TIMESTAMP,
-  is_deleted BOOLEAN DEFAULT false,
-  deleted_at TIMESTAMP,
-  reply_to_message_id UUID REFERENCES messages(id) ON DELETE SET NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  conversacion_id UUID NOT NULL REFERENCES conversaciones(id) ON DELETE CASCADE,
+  remitente_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  tipo_mensaje tipo_mensaje_enum DEFAULT 'texto',
+  contenido TEXT,
+  url_media VARCHAR(500),
+  url_miniatura_media VARCHAR(500),
+  nombre_archivo VARCHAR(255),
+  latitud DECIMAL(10,8), -- Para ubicaciones compartidas
+  longitud DECIMAL(11,8),
+  esta_leido BOOLEAN DEFAULT false,
+  leido_en TIMESTAMP,
+  esta_editado BOOLEAN DEFAULT false,
+  editado_en TIMESTAMP,
+  esta_eliminado BOOLEAN DEFAULT false,
+  eliminado_en TIMESTAMP,
+  respuesta_a_mensaje_id UUID REFERENCES mensajes(id) ON DELETE SET NULL,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para messages
-CREATE INDEX idx_messages_conversation ON messages(conversation_id);
-CREATE INDEX idx_messages_sender ON messages(sender_id);
-CREATE INDEX idx_messages_created ON messages(created_at DESC);
-CREATE INDEX idx_messages_unread ON messages(is_read);
+-- Ãndices para mensajes
+CREATE INDEX idx_mensajes_conversacion ON mensajes(conversacion_id);
+CREATE INDEX idx_mensajes_remitente ON mensajes(remitente_id);
+CREATE INDEX idx_mensajes_creado ON mensajes(creado_en DESC);
+CREATE INDEX idx_mensajes_leido ON mensajes(esta_leido);
+
 
 -- ============================================
--- TABLA: favorites (Servicios Favoritos)
+-- TABLA: favoritos (Servicios Favoritos)
 -- ============================================
 
-CREATE TABLE favorites (
+CREATE TABLE favoritos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_id, service_id)
+  usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(usuario_id, servicio_id)
 );
 
-CREATE INDEX idx_favorites_user ON favorites(user_id);
-CREATE INDEX idx_favorites_service ON favorites(service_id);
+CREATE INDEX idx_favoritos_usuario ON favoritos(usuario_id);
+CREATE INDEX idx_favoritos_servicio ON favoritos(servicio_id);
 
 -- ============================================
--- TABLA: notifications (Notificaciones)
+-- TABLA: notificaciones (Notificaciones)
 -- ============================================
 
-CREATE TABLE notifications (
+CREATE TABLE notificaciones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type notification_type_enum NOT NULL,
-  title VARCHAR(200) NOT NULL,
-  content TEXT NOT NULL,
-  image_url VARCHAR(500),
-  related_id UUID,
-  related_type VARCHAR(50), -- 'message', 'review', 'service', etc.
-  is_read BOOLEAN DEFAULT false,
-  read_at TIMESTAMP,
-  action_url VARCHAR(500),
-  action_label VARCHAR(100),
-  is_push_sent BOOLEAN DEFAULT false,
-  push_sent_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  tipo tipo_notificacion_enum NOT NULL,
+  titulo VARCHAR(200) NOT NULL,
+  contenido TEXT NOT NULL,
+  url_imagen VARCHAR(500),
+  id_relacionado UUID,
+  tipo_relacionado VARCHAR(50), -- 'reserva', 'mensaje', 'resena', etc.
+  esta_leido BOOLEAN DEFAULT false,
+  leido_en TIMESTAMP,
+  url_accion VARCHAR(500),
+  etiqueta_accion VARCHAR(100),
+  push_enviado BOOLEAN DEFAULT false,
+  push_enviado_en TIMESTAMP,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para notifications
-CREATE INDEX idx_notifications_user ON notifications(user_id);
-CREATE INDEX idx_notifications_read ON notifications(is_read);
-CREATE INDEX idx_notifications_created ON notifications(created_at DESC);
-CREATE INDEX idx_notifications_type ON notifications(type);
+-- Ãndices para notificaciones
+CREATE INDEX idx_notificaciones_usuario ON notificaciones(usuario_id);
+CREATE INDEX idx_notificaciones_leido ON notificaciones(esta_leido);
+CREATE INDEX idx_notificaciones_creado ON notificaciones(creado_en DESC);
+CREATE INDEX idx_notificaciones_tipo ON notificaciones(tipo);
 
 -- ============================================
--- TABLA: reports (Reportes/Denuncias)
+-- TABLA: reportes (Reportes/Denuncias)
 -- ============================================
 
-CREATE TABLE reports (
+CREATE TABLE reportes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  reported_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  reported_service_id UUID REFERENCES services(id) ON DELETE CASCADE,
-  reported_review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,
-  reported_message_id UUID REFERENCES messages(id) ON DELETE CASCADE,
-  report_type report_type_enum NOT NULL,
-  description TEXT NOT NULL,
-  evidence_urls TEXT[], -- Array de URLs de evidencia
-  status report_status_enum DEFAULT 'pending',
-  admin_notes TEXT,
-  resolved_by UUID REFERENCES users(id),
-  resolved_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  reportador_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  usuario_reportado_id UUID REFERENCES usuarios(id) ON DELETE CASCADE,
+  servicio_reportado_id UUID REFERENCES servicios(id) ON DELETE CASCADE,
+  resena_reportada_id UUID REFERENCES resenas(id) ON DELETE CASCADE,
+  mensaje_reportado_id UUID REFERENCES mensajes(id) ON DELETE CASCADE,
+  tipo_reporte tipo_reporte_enum NOT NULL,
+  descripcion TEXT NOT NULL,
+  urls_evidencia TEXT[], -- Array de URLs de evidencia
+  estado estado_reporte_enum DEFAULT 'pendiente',
+  notas_admin TEXT,
+  resuelto_por UUID REFERENCES usuarios(id),
+  resuelto_en TIMESTAMP,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para reports
-CREATE INDEX idx_reports_reporter ON reports(reporter_id);
-CREATE INDEX idx_reports_reported_user ON reports(reported_user_id);
-CREATE INDEX idx_reports_status ON reports(status);
-CREATE INDEX idx_reports_type ON reports(report_type);
+-- Ãndices para reportes
+CREATE INDEX idx_reportes_reportador ON reportes(reportador_id);
+CREATE INDEX idx_reportes_usuario_reportado ON reportes(usuario_reportado_id);
+CREATE INDEX idx_reportes_estado ON reportes(estado);
+CREATE INDEX idx_reportes_tipo ON reportes(tipo_reporte);
 
 -- ============================================
--- TABLA: user_verifications (Verificaciones)
+-- TABLA: verificaciones_usuarios (Verificaciones)
 -- ============================================
 
-CREATE TABLE user_verifications (
+CREATE TABLE verificaciones_usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  verification_type verification_type_enum NOT NULL,
-  document_type VARCHAR(50), -- 'passport', 'license', 'id_card', etc.
-  document_number VARCHAR(100),
-  document_url VARCHAR(500),
-  document_back_url VARCHAR(500),
-  selfie_url VARCHAR(500),
-  status verification_status_enum DEFAULT 'pending',
-  verified_by UUID REFERENCES users(id),
-  verified_at TIMESTAMP,
-  expires_at TIMESTAMP,
-  rejection_reason TEXT,
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_id, verification_type)
+  usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  tipo_verificacion tipo_verificacion_enum NOT NULL,
+  tipo_documento VARCHAR(50), -- 'pasaporte', 'licencia', 'dni', etc.
+  numero_documento VARCHAR(100),
+  url_documento VARCHAR(500),
+  url_documento_reverso VARCHAR(500),
+  url_selfie VARCHAR(500),
+  estado estado_verificacion_enum DEFAULT 'pendiente',
+  verificado_por UUID REFERENCES usuarios(id),
+  verificado_en TIMESTAMP,
+  expira_en TIMESTAMP,
+  razon_rechazo TEXT,
+  notas TEXT,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(usuario_id, tipo_verificacion)
 );
 
--- Índices para user_verifications
-CREATE INDEX idx_verifications_user ON user_verifications(user_id);
-CREATE INDEX idx_verifications_status ON user_verifications(status);
-CREATE INDEX idx_verifications_type ON user_verifications(verification_type);
+-- Ãndices para verificaciones_usuarios
+CREATE INDEX idx_verificaciones_usuario ON verificaciones_usuarios(usuario_id);
+CREATE INDEX idx_verificaciones_estado ON verificaciones_usuarios(estado);
+CREATE INDEX idx_verificaciones_tipo ON verificaciones_usuarios(tipo_verificacion);
 
 -- ============================================
--- TABLA: search_history (Historial de Búsquedas)
+-- TABLA: historial_busquedas (Historial de BÃºsquedas)
 -- ============================================
 
-CREATE TABLE search_history (
+CREATE TABLE historial_busquedas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  search_term VARCHAR(255) NOT NULL,
-  category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-  filters JSONB, -- Filtros aplicados en formato JSON
-  location VARCHAR(200),
-  latitude DECIMAL(10,8),
-  longitude DECIMAL(11,8),
-  results_count INTEGER,
-  clicked_service_id UUID REFERENCES services(id) ON DELETE SET NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  usuario_id UUID REFERENCES usuarios(id) ON DELETE CASCADE,
+  termino_busqueda VARCHAR(255) NOT NULL,
+  categoria_id UUID REFERENCES categorias(id) ON DELETE SET NULL,
+  filtros JSONB, -- Filtros aplicados en formato JSON
+  ubicacion VARCHAR(200),
+  latitud DECIMAL(10,8),
+  longitud DECIMAL(11,8),
+  conteo_resultados INTEGER,
+  servicio_clickeado_id UUID REFERENCES servicios(id) ON DELETE SET NULL,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para search_history
-CREATE INDEX idx_search_history_user ON search_history(user_id);
-CREATE INDEX idx_search_history_term ON search_history(search_term);
-CREATE INDEX idx_search_history_category ON search_history(category_id);
+-- Ãndices para historial_busquedas
+CREATE INDEX idx_historial_busquedas_usuario ON historial_busquedas(usuario_id);
+CREATE INDEX idx_historial_busquedas_termino ON historial_busquedas(termino_busqueda);
+CREATE INDEX idx_historial_busquedas_categoria ON historial_busquedas(categoria_id);
 
 -- ============================================
--- TABLA: tags (Etiquetas)
+-- TABLA: etiquetas (Etiquetas)
 -- ============================================
 
-CREATE TABLE tags (
+CREATE TABLE etiquetas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(50) UNIQUE NOT NULL,
+  nombre VARCHAR(50) UNIQUE NOT NULL,
   slug VARCHAR(50) UNIQUE NOT NULL,
-  usage_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  conteo_uso INTEGER DEFAULT 0,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_tags_slug ON tags(slug);
-CREATE INDEX idx_tags_usage ON tags(usage_count DESC);
+CREATE INDEX idx_etiquetas_slug ON etiquetas(slug);
+CREATE INDEX idx_etiquetas_uso ON etiquetas(conteo_uso DESC);
 
 -- ============================================
--- TABLA: service_tags (Relación Servicios-Etiquetas)
+-- TABLA: servicios_etiquetas (RelaciÃ³n Servicios-Etiquetas)
 -- ============================================
 
-CREATE TABLE service_tags (
-  service_id UUID REFERENCES services(id) ON DELETE CASCADE,
-  tag_id UUID REFERENCES tags(id) ON DELETE CASCADE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY(service_id, tag_id)
+CREATE TABLE servicios_etiquetas (
+  servicio_id UUID REFERENCES servicios(id) ON DELETE CASCADE,
+  etiqueta_id UUID REFERENCES etiquetas(id) ON DELETE CASCADE,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(servicio_id, etiqueta_id)
 );
 
-CREATE INDEX idx_service_tags_service ON service_tags(service_id);
-CREATE INDEX idx_service_tags_tag ON service_tags(tag_id);
+CREATE INDEX idx_servicios_etiquetas_servicio ON servicios_etiquetas(servicio_id);
+CREATE INDEX idx_servicios_etiquetas_etiqueta ON servicios_etiquetas(etiqueta_id);
 
 -- ============================================
--- TABLA: promocodes (Códigos Promocionales)
+-- TABLA: codigos_promocionales (CÃ³digos Promocionales)
 -- ============================================
 
-CREATE TABLE promocodes (
+CREATE TABLE codigos_promocionales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  code VARCHAR(50) UNIQUE NOT NULL,
-  description TEXT,
-  discount_type discount_type_enum NOT NULL,
-  discount_value DECIMAL(10,2) NOT NULL,
-  max_discount_amount DECIMAL(10,2), -- Descuento máximo para porcentajes
-  max_uses INTEGER,
-  max_uses_per_user INTEGER DEFAULT 1,
-  used_count INTEGER DEFAULT 0,
-  min_purchase_amount DECIMAL(10,2),
-  category_id UUID REFERENCES categories(id) ON DELETE SET NULL, -- Específico para categoría
-  applicable_services UUID[], -- Array de IDs de servicios aplicables
-  valid_from TIMESTAMP NOT NULL,
-  valid_until TIMESTAMP NOT NULL,
-  is_active BOOLEAN DEFAULT true,
-  created_by UUID REFERENCES users(id),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  codigo VARCHAR(50) UNIQUE NOT NULL,
+  descripcion TEXT,
+  tipo_descuento tipo_descuento_enum NOT NULL,
+  valor_descuento DECIMAL(10,2) NOT NULL,
+  monto_descuento_maximo DECIMAL(10,2), -- Descuento mÃ¡ximo para porcentajes
+  usos_maximos INTEGER,
+  usos_maximos_por_usuario INTEGER DEFAULT 1,
+  conteo_usos INTEGER DEFAULT 0,
+  monto_compra_minimo DECIMAL(10,2),
+  categoria_id UUID REFERENCES categorias(id) ON DELETE SET NULL, -- EspecÃ­fico para categorÃ­a
+  servicios_aplicables UUID[], -- Array de IDs de servicios aplicables
+  valido_desde TIMESTAMP NOT NULL,
+  valido_hasta TIMESTAMP NOT NULL,
+  esta_activo BOOLEAN DEFAULT true,
+  creado_por UUID REFERENCES usuarios(id),
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para promocodes
-CREATE INDEX idx_promocodes_code ON promocodes(code);
-CREATE INDEX idx_promocodes_active ON promocodes(is_active);
-CREATE INDEX idx_promocodes_valid ON promocodes(valid_from, valid_until);
+-- Ãndices para codigos_promocionales
+CREATE INDEX idx_codigos_promocionales_codigo ON codigos_promocionales(codigo);
+CREATE INDEX idx_codigos_promocionales_activo ON codigos_promocionales(esta_activo);
+CREATE INDEX idx_codigos_promocionales_valido ON codigos_promocionales(valido_desde, valido_hasta);
 
 -- ============================================
--- TABLA: user_followers (Seguidores)
+-- TABLA: uso_codigos_promocionales (Uso de CÃ³digos)
 -- ============================================
 
-CREATE TABLE user_followers (
+CREATE TABLE uso_codigos_promocionales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  follower_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  following_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(follower_id, following_id),
-  CHECK(follower_id != following_id)
+  codigo_promocional_id UUID NOT NULL REFERENCES codigos_promocionales(id) ON DELETE CASCADE,
+  usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  monto_descuento DECIMAL(10,2) NOT NULL,
+  usado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_followers_follower ON user_followers(follower_id);
-CREATE INDEX idx_followers_following ON user_followers(following_id);
+-- Ãndices para uso_codigos_promocionales
+CREATE INDEX idx_uso_codigos_codigo ON uso_codigos_promocionales(codigo_promocional_id);
+CREATE INDEX idx_uso_codigos_usuario ON uso_codigos_promocionales(usuario_id);
+-- (booking_id removed)
 
 -- ============================================
--- TABLA: user_badges (Insignias de Usuario)
+-- TABLA: seguidores_usuarios (Seguidores)
 -- ============================================
 
-CREATE TABLE user_badges (
+CREATE TABLE seguidores_usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(100) NOT NULL,
-  slug VARCHAR(100) UNIQUE NOT NULL,
-  description TEXT,
-  icon_url VARCHAR(500),
-  requirements JSONB, -- Requisitos para obtener la insignia
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  seguidor_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  seguido_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(seguidor_id, seguido_id),
+  CHECK(seguidor_id != seguido_id)
 );
 
-CREATE TABLE user_earned_badges (
+CREATE INDEX idx_seguidores_seguidor ON seguidores_usuarios(seguidor_id);
+CREATE INDEX idx_seguidores_seguido ON seguidores_usuarios(seguido_id);
+
+-- ============================================
+-- TABLA: portafolios (Portafolio del Proveedor)
+-- ============================================
+
+CREATE TABLE portafolios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  badge_id UUID NOT NULL REFERENCES user_badges(id) ON DELETE CASCADE,
-  earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_id, badge_id)
+  proveedor_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  titulo VARCHAR(200) NOT NULL,
+  descripcion TEXT,
+  url_imagen VARCHAR(500) NOT NULL,
+  url_miniatura VARCHAR(500),
+  categoria_id UUID REFERENCES categorias(id) ON DELETE SET NULL,
+  indice_orden INTEGER DEFAULT 0,
+  es_destacado BOOLEAN DEFAULT false,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_earned_badges_user ON user_earned_badges(user_id);
-CREATE INDEX idx_earned_badges_badge ON user_earned_badges(badge_id);
+CREATE INDEX idx_portafolios_proveedor ON portafolios(proveedor_id);
+CREATE INDEX idx_portafolios_categoria ON portafolios(categoria_id);
 
 -- ============================================
--- TABLA: portfolios (Portafolio del Proveedor)
+-- TABLA: preguntas_frecuentes_servicios (Preguntas Frecuentes)
 -- ============================================
 
-CREATE TABLE portfolios (
+CREATE TABLE preguntas_frecuentes_servicios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  provider_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title VARCHAR(200) NOT NULL,
-  description TEXT,
-  image_url VARCHAR(500) NOT NULL,
-  thumbnail_url VARCHAR(500),
-  category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-  order_index INTEGER DEFAULT 0,
-  is_featured BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  servicio_id UUID NOT NULL REFERENCES servicios(id) ON DELETE CASCADE,
+  pregunta TEXT NOT NULL,
+  respuesta TEXT NOT NULL,
+  indice_orden INTEGER DEFAULT 0,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_portfolios_provider ON portfolios(provider_id);
-CREATE INDEX idx_portfolios_category ON portfolios(category_id);
+CREATE INDEX idx_preguntas_frecuentes_servicio ON preguntas_frecuentes_servicios(servicio_id);
 
 -- ============================================
--- TABLA: service_faqs (Preguntas Frecuentes)
+-- TABLA: usuarios_bloqueados (Usuarios Bloqueados)
 -- ============================================
 
-CREATE TABLE service_faqs (
+CREATE TABLE usuarios_bloqueados (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  question TEXT NOT NULL,
-  answer TEXT NOT NULL,
-  order_index INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  bloqueador_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  bloqueado_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  razon TEXT,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(bloqueador_id, bloqueado_id),
+  CHECK(bloqueador_id != bloqueado_id)
 );
 
-CREATE INDEX idx_faqs_service ON service_faqs(service_id);
+CREATE INDEX idx_bloqueados_bloqueador ON usuarios_bloqueados(bloqueador_id);
+CREATE INDEX idx_bloqueados_bloqueado ON usuarios_bloqueados(bloqueado_id);
 
 -- ============================================
--- TABLA: blocked_users (Usuarios Bloqueados)
+-- TABLA: configuracion_app (ConfiguraciÃ³n de la App)
 -- ============================================
 
-CREATE TABLE blocked_users (
+CREATE TABLE configuracion_app (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  blocker_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  blocked_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  reason TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(blocker_id, blocked_id),
-  CHECK(blocker_id != blocked_id)
+  clave VARCHAR(100) UNIQUE NOT NULL,
+  valor TEXT NOT NULL,
+  tipo_dato VARCHAR(20) DEFAULT 'string', -- 'string', 'number', 'boolean', 'json'
+  descripcion TEXT,
+  es_publico BOOLEAN DEFAULT false, -- Si es visible para clientes
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_blocked_blocker ON blocked_users(blocker_id);
-CREATE INDEX idx_blocked_blocked ON blocked_users(blocked_id);
-
 -- ============================================
--- TABLA: audit_logs (Logs de Auditoría)
+-- TABLA: registros_auditoria (Logs de AuditorÃ­a)
 -- ============================================
 
-CREATE TABLE audit_logs (
+CREATE TABLE registros_auditoria (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  action VARCHAR(100) NOT NULL,
-  table_name VARCHAR(100),
-  record_id UUID,
-  old_values JSONB,
-  new_values JSONB,
-  ip_address VARCHAR(45),
-  user_agent TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  usuario_id UUID REFERENCES usuarios(id) ON DELETE SET NULL,
+  accion VARCHAR(100) NOT NULL,
+  nombre_tabla VARCHAR(100),
+  id_registro UUID,
+  valores_antiguos JSONB,
+  valores_nuevos JSONB,
+  direccion_ip VARCHAR(45),
+  agente_usuario TEXT,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_audit_logs_user ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_table ON audit_logs(table_name);
-CREATE INDEX idx_audit_logs_created ON audit_logs(created_at DESC);
+CREATE INDEX idx_registros_auditoria_usuario ON registros_auditoria(usuario_id);
+CREATE INDEX idx_registros_auditoria_accion ON registros_auditoria(accion);
+CREATE INDEX idx_registros_auditoria_tabla ON registros_auditoria(nombre_tabla);
+CREATE INDEX idx_registros_auditoria_creado ON registros_auditoria(creado_en DESC);
 
 -- ============================================
 -- FUNCIONES Y TRIGGERS
 -- ============================================
 
--- Función para actualizar updated_at automáticamente
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- FunciÃ³n para actualizar actualizado_en automÃ¡ticamente
+CREATE OR REPLACE FUNCTION actualizar_columna_actualizado_en()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.updated_at = CURRENT_TIMESTAMP;
+  NEW.actualizado_en = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Aplicar trigger a todas las tablas con updated_at
-CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Aplicar trigger a todas las tablas con actualizado_en
+CREATE TRIGGER actualizar_usuarios_actualizado_en BEFORE UPDATE ON usuarios
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_categorias_actualizado_en BEFORE UPDATE ON categorias
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_services_updated_at BEFORE UPDATE ON services
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_servicios_actualizado_en BEFORE UPDATE ON servicios
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_resenas_actualizado_en BEFORE UPDATE ON resenas
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_conversaciones_actualizado_en BEFORE UPDATE ON conversaciones
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_user_verifications_updated_at BEFORE UPDATE ON user_verifications
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_verificaciones_usuarios_actualizado_en BEFORE UPDATE ON verificaciones_usuarios
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
-CREATE TRIGGER update_promocodes_updated_at BEFORE UPDATE ON promocodes
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER actualizar_codigos_promocionales_actualizado_en BEFORE UPDATE ON codigos_promocionales
+  FOR EACH ROW EXECUTE FUNCTION actualizar_columna_actualizado_en();
 
--- Función para actualizar rating_average en users
-CREATE OR REPLACE FUNCTION update_user_rating()
+-- FunciÃ³n para actualizar promedio_calificacion en usuarios
+CREATE OR REPLACE FUNCTION actualizar_calificacion_usuario()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE users
+  UPDATE usuarios
   SET 
-    rating_average = (
-      SELECT COALESCE(AVG(rating), 0)
-      FROM reviews
-      WHERE reviewed_user_id = NEW.reviewed_user_id
+    promedio_calificacion = (
+      SELECT COALESCE(AVG(calificacion), 0)
+      FROM resenas
+      WHERE usuario_valorado_id = NEW.usuario_valorado_id
     ),
-    total_reviews = (
+    total_resenas = (
       SELECT COUNT(*)
-      FROM reviews
-      WHERE reviewed_user_id = NEW.reviewed_user_id
+      FROM resenas
+      WHERE usuario_valorado_id = NEW.usuario_valorado_id
     )
-  WHERE id = NEW.reviewed_user_id;
+  WHERE id = NEW.usuario_valorado_id;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_user_rating_trigger
-AFTER INSERT OR UPDATE ON reviews
-FOR EACH ROW EXECUTE FUNCTION update_user_rating();
+CREATE TRIGGER actualizar_calificacion_usuario_trigger
+AFTER INSERT OR UPDATE ON resenas
+FOR EACH ROW EXECUTE FUNCTION actualizar_calificacion_usuario();
 
--- Función para actualizar rating_average en services
-CREATE OR REPLACE FUNCTION update_service_rating()
+-- FunciÃ³n para actualizar promedio_calificacion en servicios
+CREATE OR REPLACE FUNCTION actualizar_calificacion_servicio()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE services
+  UPDATE servicios
   SET 
-    rating_average = (
-      SELECT COALESCE(AVG(rating), 0)
-      FROM reviews
-      WHERE service_id = NEW.service_id
+    promedio_calificacion = (
+      SELECT COALESCE(AVG(calificacion), 0)
+      FROM resenas
+      WHERE servicio_id = NEW.servicio_id
     ),
-    total_reviews = (
+    total_resenas = (
       SELECT COUNT(*)
-      FROM reviews
-      WHERE service_id = NEW.service_id
+      FROM resenas
+      WHERE servicio_id = NEW.servicio_id
     )
-  WHERE id = NEW.service_id;
+  WHERE id = NEW.servicio_id;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_service_rating_trigger
-AFTER INSERT OR UPDATE ON reviews
-FOR EACH ROW EXECUTE FUNCTION update_service_rating();
+CREATE TRIGGER actualizar_calificacion_servicio_trigger
+AFTER INSERT OR UPDATE ON resenas
+FOR EACH ROW EXECUTE FUNCTION actualizar_calificacion_servicio();
 
--- Función para actualizar contadores de favoritos
-CREATE OR REPLACE FUNCTION update_favorites_count()
+-- FunciÃ³n para actualizar contadores de favoritos
+CREATE OR REPLACE FUNCTION actualizar_conteo_favoritos()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
-    UPDATE services
-    SET favorites_count = favorites_count + 1
-    WHERE id = NEW.service_id;
+    UPDATE servicios
+    SET conteo_favoritos = conteo_favoritos + 1
+    WHERE id = NEW.servicio_id;
   ELSIF TG_OP = 'DELETE' THEN
-    UPDATE services
-    SET favorites_count = GREATEST(favorites_count - 1, 0)
-    WHERE id = OLD.service_id;
+    UPDATE servicios
+    SET conteo_favoritos = GREATEST(conteo_favoritos - 1, 0)
+    WHERE id = OLD.servicio_id;
   END IF;
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_favorites_count_trigger
-AFTER INSERT OR DELETE ON favorites
-FOR EACH ROW EXECUTE FUNCTION update_favorites_count();
+CREATE TRIGGER actualizar_conteo_favoritos_trigger
+AFTER INSERT OR DELETE ON favoritos
+FOR EACH ROW EXECUTE FUNCTION actualizar_conteo_favoritos();
+
 
 -- ============================================
--- VISTAS ÚTILES
+-- VISTAS ÃšTILES
 -- ============================================
 
--- Vista de servicios con información del proveedor
-CREATE VIEW services_with_provider AS
+-- Vista de servicios con informaciÃ³n del proveedor
+CREATE VIEW servicios_con_proveedor AS
 SELECT 
   s.*,
-  u.username as provider_username,
-  u.first_name as provider_first_name,
-  u.last_name as provider_last_name,
-  u.avatar_url as provider_avatar,
-  u.rating_average as provider_rating,
-  u.total_reviews as provider_total_reviews,
-  u.is_verified as provider_is_verified,
-  c.name as category_name,
-  c.slug as category_slug
-FROM services s
-JOIN users u ON s.provider_id = u.id
-JOIN categories c ON s.category_id = c.id
-WHERE s.deleted_at IS NULL;
+  u.usuario as nombre_usuario_proveedor,
+  u.nombre as nombre_proveedor,
+  u.apellido as apellido_proveedor,
+  u.url_avatar as avatar_proveedor,
+  u.promedio_calificacion as calificacion_proveedor,
+  u.total_resenas as total_resenas_proveedor,
+  u.esta_verificado as proveedor_esta_verificado,
+  c.nombre as nombre_categoria,
+  c.slug as slug_categoria
+FROM servicios s
+JOIN usuarios u ON s.proveedor_id = u.id
+JOIN categorias c ON s.categoria_id = c.id
+WHERE s.eliminado_en IS NULL;
+
+-- Vista de bookings completos
+-- (Vista de reservas eliminada)
 
 -- ============================================
 -- DATOS INICIALES
 -- ============================================
 
--- Insertar categorías principales
-INSERT INTO categories (name, slug, description, color, is_active, order_index) VALUES
-('Limpieza del Hogar', 'limpieza-hogar', 'Servicios de limpieza residencial y profesional', '#4CAF50', true, 1),
-('Reparaciones', 'reparaciones', 'Plomería, electricidad, carpintería y más', '#FF9800', true, 2),
-('Clases Particulares', 'clases-particulares', 'Tutorías y clases privadas', '#2196F3', true, 3),
-('Belleza y Estética', 'belleza-estetica', 'Peluquería, manicure, maquillaje', '#E91E63', true, 4),
-('Transporte y Mudanzas', 'transporte-mudanzas', 'Servicios de transporte y mudanzas', '#9C27B0', true, 5),
-('Tecnología', 'tecnologia', 'Reparación de computadoras, celulares, etc.', '#3F51B5', true, 6),
-('Fotografía y Video', 'fotografia-video', 'Fotografía profesional y videografía', '#00BCD4', true, 7),
-('Eventos y Catering', 'eventos-catering', 'Organización de eventos y catering', '#FFC107', true, 8),
-('Salud y Bienestar', 'salud-bienestar', 'Masajes, yoga, entrenamiento personal', '#8BC34A', true, 9),
-('Jardinería', 'jardineria', 'Cuidado de jardines y paisajismo', '#4CAF50', true, 10);
+-- Insertar configuraciones iniciales
+INSERT INTO configuracion_app (clave, valor, tipo_dato, descripcion, es_publico) VALUES
+('porcentaje_comision_plataforma', '15', 'number', 'Porcentaje de comisiÃ³n de la plataforma', false),
+('precio_servicio_minimo', '10', 'number', 'Precio mÃ­nimo de servicio', true),
+('precio_servicio_maximo', '10000', 'number', 'Precio mÃ¡ximo de servicio', true),
+('horas_cancelacion_reserva', '24', 'number', 'Horas antes para cancelar sin penalizaciÃ³n', true),
+('nombre_app', 'AplicacionServicios', 'string', 'Nombre de la aplicaciÃ³n', true),
+('email_soporte', 'soporte@aplicacionservicios.com', 'string', 'Email de soporte', true),
+('moneda_predeterminada', 'EUR', 'string', 'Moneda por defecto', true),
+('idioma_predeterminado', 'es', 'string', 'Idioma por defecto', true);
 
--- Insertar insignias de usuario
-INSERT INTO user_badges (name, slug, description, icon_url) VALUES
-('Proveedor Verificado', 'verified-provider', 'Usuario con identidad verificada', '/badges/verified.png'),
-('Top Rated', 'top-rated', 'Proveedor con calificación promedio de 4.8+', '/badges/top-rated.png'),
-('Respuesta Rápida', 'quick-response', 'Responde mensajes en menos de 1 hora', '/badges/quick-response.png'),
-('Profesional Confiable', 'trusted-pro', 'Más de 50 servicios completados', '/badges/trusted.png'),
-('Super Vendedor', 'super-seller', 'Más de 100 servicios completados', '/badges/super-seller.png');
+-- Insertar categorÃ­as principales
+INSERT INTO categorias (nombre, slug, descripcion, color, esta_activo, indice_orden) VALUES
+('Limpieza del Hogar', 'limpieza-hogar', 'Servicios de limpieza residencial y profesional', '#4CAF50', true, 1),
+('Reparaciones', 'reparaciones', 'PlomerÃ­a, electricidad, carpinterÃ­a y mÃ¡s', '#FF9800', true, 2),
+('Clases Particulares', 'clases-particulares', 'TutorÃ­as y clases privadas', '#2196F3', true, 3),
+('Belleza y EstÃ©tica', 'belleza-estetica', 'PeluquerÃ­a, manicure, maquillaje', '#E91E63', true, 4),
+('Transporte y Mudanzas', 'transporte-mudanzas', 'Servicios de transporte y mudanzas', '#9C27B0', true, 5),
+('TecnologÃ­a', 'tecnologia', 'ReparaciÃ³n de computadoras, celulares, etc.', '#3F51B5', true, 6),
+('FotografÃ­a y Video', 'fotografia-video', 'FotografÃ­a profesional y videografÃ­a', '#00BCD4', true, 7),
+('Eventos y Catering', 'eventos-catering', 'OrganizaciÃ³n de eventos y catering', '#FFC107', true, 8),
+('Salud y Bienestar', 'salud-bienestar', 'Masajes, yoga, entrenamiento personal', '#8BC34A', true, 9),
+('JardinerÃ­a', 'jardineria', 'Cuidado de jardines y paisajismo', '#4CAF50', true, 10);
+
 
 -- ============================================
 -- USUARIO DE PRUEBA
 -- ============================================
 
--- Insertar usuario de prueba (password: Admin123!)
--- El hash corresponde a la contraseña "Admin123!" usando bcrypt
-INSERT INTO users (
+-- Insertar usuario de prueba (contraseÃ±a: Admin123!)
+-- El hash corresponde a la contraseÃ±a "Admin123!" usando bcrypt
+INSERT INTO usuarios (
   id,
-  email,
-  password_hash,
-  username,
-  first_name,
-  last_name,
-  phone,
-  country_code,
-  avatar_url,
-  bio,
-  date_of_birth,
-  gender,
-  user_type,
-  user_role,
-  is_verified,
-  is_active,
-  is_online,
-  rating_average,
-  total_reviews,
-  language,
-  timezone,
-  currency,
-  email_notifications,
-  push_notifications,
-  sms_notifications,
-  created_at,
-  updated_at
+  correo,
+  hash_password,
+  usuario,
+  nombre,
+  apellido,
+  telefono,
+  codigo_pais,
+  url_avatar,
+  biografia,
+  fecha_nacimiento,
+  esta_verificado,
+  esta_activo,
+  esta_en_linea,
+  promedio_calificacion,
+  total_resenas,
+  idioma,
+  zona_horaria,
+  moneda,
+  notificaciones_email,
+  notificaciones_push,
+  notificaciones_sms,
+  creado_en,
+  actualizado_en
 ) VALUES (
   gen_random_uuid(),
-  'admin@servicesapp.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
+  'admin@aplicacionservicios.com',
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- ContraseÃ±a: Admin123!
   'admin',
   'Administrador',
   'Sistema',
-  '5551234567',
-  '+52',
+  '34912345678',
+  '+34',
   'https://ui-avatars.com/api/?name=Admin&background=4CAF50&color=fff&size=200',
   'Usuario administrador del sistema. Cuenta de prueba para desarrollo y testing.',
   '1990-01-15',
-  'Masculino',
-  'both',
-  'admin',
   true,
   true,
   false,
   4.95,
   125,
   'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  false,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'proveedor1@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'juan_electricista',
-  'Juan',
-  'García',
-  '5551234568',
-  '+52',
-  'https://ui-avatars.com/api/?name=Juan+Garcia&background=FF5722&color=fff&size=200',
-  'Electricista profesional con 10 años de experiencia. Trabajos residenciales y comerciales.',
-  '1985-03-20',
-  'Masculino',
-  'provider',
-  'provider',
-  true,
-  true,
-  false,
-  4.8,
-  45,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  false,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'proveedor2@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'maria_limpieza',
-  'María',
-  'López',
-  '5551234569',
-  '+52',
-  'https://ui-avatars.com/api/?name=Maria+Lopez&background=9C27B0&color=fff&size=200',
-  'Servicio de limpieza profesional. Casas, oficinas y espacios comerciales.',
-  '1990-07-15',
-  'Femenino',
-  'provider',
-  'provider',
-  true,
-  true,
-  true,
-  4.9,
-  78,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  true,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'proveedor3@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'carlos_plomero',
-  'Carlos',
-  'Ramírez',
-  '5551234570',
-  '+52',
-  'https://ui-avatars.com/api/?name=Carlos+Ramirez&background=2196F3&color=fff&size=200',
-  'Plomería residencial y comercial. Reparaciones, instalaciones y mantenimiento.',
-  '1982-11-08',
-  'Masculino',
-  'provider',
-  'provider',
-  true,
-  true,
-  false,
-  4.7,
-  92,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  false,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'cliente1@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'ana_cliente',
-  'Ana',
-  'Martínez',
-  '5551234571',
-  '+52',
-  'https://ui-avatars.com/api/?name=Ana+Martinez&background=E91E63&color=fff&size=200',
-  'Me encanta contratar servicios locales de calidad.',
-  '1995-05-12',
-  'Femenino',
-  'client',
-  'user',
-  true,
-  true,
-  true,
-  0,
-  0,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  false,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'cliente2@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'pedro_cliente',
-  'Pedro',
-  'Sánchez',
-  '5551234572',
-  '+52',
-  'https://ui-avatars.com/api/?name=Pedro+Sanchez&background=FFC107&color=fff&size=200',
-  'Usuario activo de la plataforma.',
-  '1988-09-25',
-  'Masculino',
-  'client',
-  'user',
-  false,
-  true,
-  false,
-  0,
-  0,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  false,
-  false,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'proveedorboth@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'sofia_profesional',
-  'Sofía',
-  'Torres',
-  '5551234573',
-  '+52',
-  'https://ui-avatars.com/api/?name=Sofia+Torres&background=00BCD4&color=fff&size=200',
-  'Profesora particular de inglés y matemáticas. También contrato servicios frecuentemente.',
-  '1992-02-18',
-  'Femenino',
-  'both',
-  'provider',
-  true,
-  true,
-  true,
-  4.85,
-  34,
-  'es',
-  'America/Mexico_City',
-  'MXN',
-  true,
-  true,
-  true,
-  CURRENT_TIMESTAMP,
-  CURRENT_TIMESTAMP
-),
-(
-  gen_random_uuid(),
-  'moderador@test.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', -- Password: Admin123!
-  'moderador_sistema',
-  'Laura',
-  'Fernández',
-  '5551234574',
-  '+52',
-  'https://ui-avatars.com/api/?name=Laura+Fernandez&background=8BC34A&color=fff&size=200',
-  'Moderadora del sistema. Encargada de revisar reportes y mantener la calidad.',
-  '1987-06-30',
-  'Femenino',
-  'both',
-  'moderator',
-  true,
-  true,
-  false,
-  0,
-  0,
-  'es',
-  'America/Mexico_City',
-  'MXN',
+  'Europe/Madrid',
+  'EUR',
   true,
   true,
   false,
@@ -1078,16 +859,38 @@ INSERT INTO users (
 );
 
 -- ============================================
--- COMENTARIOS Y DOCUMENTACIÓN
+-- COMENTARIOS Y DOCUMENTACIÃ“N
 -- ============================================
 
-COMMENT ON TABLE users IS 'Tabla principal de usuarios de la plataforma';
-COMMENT ON TABLE services IS 'Servicios publicados por los proveedores';
-COMMENT ON TABLE reviews IS 'Valoraciones y reseñas de servicios';
-COMMENT ON TABLE conversations IS 'Conversaciones de chat entre usuarios';
-COMMENT ON TABLE messages IS 'Mensajes individuales en las conversaciones';
-COMMENT ON TABLE notifications IS 'Sistema de notificaciones push e in-app';
+COMMENT ON TABLE usuarios IS 'Tabla principal de usuarios de la plataforma';
+COMMENT ON TABLE servicios IS 'Servicios publicados por los proveedores';
+COMMENT ON TABLE resenas IS 'Valoraciones y reseÃ±as de servicios';
+COMMENT ON TABLE conversaciones IS 'Conversaciones de chat entre usuarios';
+COMMENT ON TABLE mensajes IS 'Mensajes individuales en las conversaciones';
+
+COMMENT ON TABLE notificaciones IS 'Sistema de notificaciones push e in-app';
 
 -- ============================================
 -- FIN DEL SCRIPT
 -- ============================================
+
+-- Para verificar que todo se creÃ³ correctamente:
+SELECT 'Tables created: ' || COUNT(*) FROM information_schema.tables 
+WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+
+SELECT 'Views created: ' || COUNT(*) FROM information_schema.views 
+WHERE table_schema = 'public';
+
+SELECT 'Indexes created: ' || COUNT(*) FROM pg_indexes 
+WHERE schemaname = 'public';
+
+-- ============================================
+-- âœ… INSTALACIÃ“N COMPLETADA
+-- ============================================
+-- Si ves los resultados de las queries anteriores, la base de datos estÃ¡ lista.
+-- 
+-- ðŸ‘¤ Usuario de prueba creado:
+-- Email: admin@aplicacionservicios.com
+-- ContraseÃ±a: Admin123!
+-- Usuario: admin
+

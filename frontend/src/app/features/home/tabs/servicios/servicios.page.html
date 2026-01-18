@@ -4,149 +4,138 @@
   </ion-refresher>
 
   <div class="servicios-container">
-      <!-- Barra de búsqueda -->
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+      <div class="add-button">
+        <img src="assets/add.svg" alt="Agregar">
+      </div>
       <div class="search-bar">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
-        <input 
-          type="text" 
-          placeholder="Buscar servicios..." 
-          (input)="onSearch($event)">
+        <input type="text" placeholder="Buscar servicios..." (input)="onSearch($event)">
       </div>
 
-      <!-- Categorías -->
-      <div class="categorias-section">
-        <h3 class="section-title">Categorías</h3>
-        <div class="categorias-grid">
-          <div 
-            class="categoria-chip"
-            [class.active]="categoriaSeleccionada === null"
-            (click)="filtrarPorCategoria(null)">
-            <span>Todos</span>
-          </div>
-          <div 
-            *ngFor="let categoria of categorias"
-            class="categoria-chip"
-            [class.active]="categoriaSeleccionada === categoria.id"
-            [style.--categoria-color]="categoria.color"
-            (click)="filtrarPorCategoria(categoria.id)">
-            <span>{{ categoria.icon_url }} {{ categoria.name }}</span>
-          </div>
+    </div>
+
+    <!-- Categorías -->
+    <div class="categorias-section">
+      <h3 class="section-title">Categorías</h3>
+      <div class="categorias-grid">
+        <div class="categoria-chip" [class.active]="categoriaSeleccionada === null" (click)="filtrarPorCategoria(null)">
+          <span>Todos</span>
+        </div>
+        <div *ngFor="let categoria of categorias" class="categoria-chip"
+          [class.active]="categoriaSeleccionada === categoria.id" [style.--categoria-color]="categoria.color"
+          (click)="filtrarPorCategoria(categoria.id)">
+          <span>{{ categoria.url_icono }} {{ categoria.nombre }}</span>
         </div>
       </div>
+    </div>
 
-      <!-- Loading -->
-      <div *ngIf="isLoading" class="loading-container">
-        <div class="spinner"></div>
-        <p>Cargando servicios...</p>
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando servicios...</p>
+    </div>
+
+    <!-- Lista de servicios -->
+    <div class="servicios-section" *ngIf="!isLoading">
+
+
+      <!-- No hay resultados -->
+      <div *ngIf="serviciosFiltrados.length === 0" class="no-results">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <p>No se encontraron servicios</p>
+        <button class="btn-reset" (click)="filtrarPorCategoria(null); searchQuery = ''">
+          Limpiar filtros
+        </button>
       </div>
 
-      <!-- Lista de servicios -->
-      <div class="servicios-section" *ngIf="!isLoading">
-        
-        
-        <!-- No hay resultados -->
-        <div *ngIf="serviciosFiltrados.length === 0" class="no-results">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <p>No se encontraron servicios</p>
-          <button class="btn-reset" (click)="filtrarPorCategoria(null); searchQuery = ''">
-            Limpiar filtros
-          </button>
+      <!-- Cards de servicios -->
+      <div class="servicio-card" *ngFor="let servicio of serviciosFiltrados" (click)="verDetalle(servicio)">
+        <div class="servicio-image">
+          <img
+            [src]="servicio.images && servicio.images.length > 0 ? servicio.images[0].url_imagen : 'https://via.placeholder.com/400x200'"
+            [alt]="servicio.titulo" />
+          <div class="servicio-categoria" [style.background-color]="servicio.category?.color">
+            {{ servicio.category?.url_icono }} {{ servicio.category?.nombre }}
+          </div>
+          <div class="servicio-badge" *ngIf="servicio.es_destacado">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+              </polygon>
+            </svg>
+            Destacado
+          </div>
+          <div class="servicio-badge verified" *ngIf="servicio.esta_verificado">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Verificado
+          </div>
         </div>
 
-        <!-- Cards de servicios -->
-        <div class="servicio-card" *ngFor="let servicio of serviciosFiltrados" (click)="verDetalle(servicio)">
-          <div class="servicio-image">
-            <img 
-              [src]="servicio.images && servicio.images.length > 0 ? servicio.images[0].image_url : 'https://via.placeholder.com/400x200'" 
-              [alt]="servicio.title" 
-            />
-            <div class="servicio-categoria" [style.background-color]="servicio.category?.color">
-              {{ servicio.category?.icon_url }} {{ servicio.category?.name }}
+        <div class="servicio-content">
+          <h4 class="servicio-titulo">{{ servicio.titulo }}</h4>
+
+          <p class="servicio-descripcion" *ngIf="servicio.descripcion_corta">
+            {{ servicio.descripcion_corta }}
+          </p>
+
+          <div class="servicio-proveedor">
+            <div class="proveedor-avatar">
+              <img
+                [src]="servicio.provider?.url_avatar || 'https://ui-avatars.com/api/?name=' + servicio.provider?.nombre + '+' + servicio.provider?.apellido"
+                [alt]="servicio.provider?.nombre" />
             </div>
-            <div class="servicio-badge" *ngIf="servicio.is_featured">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              Destacado
-            </div>
-            <div class="servicio-badge verified" *ngIf="servicio.is_verified">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Verificado
-            </div>
-          </div>
-          
-          <div class="servicio-content">
-            <h4 class="servicio-titulo">{{ servicio.title }}</h4>
-            
-            <p class="servicio-descripcion" *ngIf="servicio.short_description">
-              {{ servicio.short_description }}
-            </p>
-            
-            <div class="servicio-proveedor">
-              <div class="proveedor-avatar">
-                <img 
-                  [src]="servicio.provider?.avatar_url || 'https://ui-avatars.com/api/?name=' + servicio.provider?.first_name + '+' + servicio.provider?.last_name" 
-                  [alt]="servicio.provider?.first_name"
-                />
-              </div>
-              <div class="proveedor-info">
-                <span class="proveedor-nombre">
-                  {{ servicio.provider?.first_name }} {{ servicio.provider?.last_name }}
-                  <svg *ngIf="servicio.provider?.is_verified" class="verified-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
+            <div class="proveedor-info">
+              <span class="proveedor-nombre">
+                {{ servicio.provider?.nombre }} {{ servicio.provider?.apellido }}
+                <svg *ngIf="servicio.provider?.esta_verificado" class="verified-icon" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </span>
+              <div class="proveedor-stats">
+                <span *ngIf="servicio.provider?.porcentaje_respuesta">
+                  {{ servicio.provider?.porcentaje_respuesta }}% respuesta
                 </span>
-                <div class="proveedor-stats">
-                  <span *ngIf="servicio.provider?.response_rate">
-                    {{ servicio.provider?.response_rate }}% respuesta
-                  </span>
-                </div>
               </div>
             </div>
-            
-            <div class="servicio-info">
-              <div class="ubicacion" *ngIf="servicio.city">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                <span>{{ servicio.city }}, {{ servicio.state }}</span>
-              </div>
-              <div class="rating">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                <span>{{ servicio.rating_average }}</span>
-                <span class="reviews-count">({{ servicio.total_reviews }})</span>
-              </div>
-            </div>
+          </div>
 
-            <div class="servicio-meta">
-              <div class="meta-item" *ngIf="servicio.duration_minutes">
-                
-                {{ servicio.duration_minutes }} min
-              </div>
-              <div class="meta-item">
-                {{ getLocationText(servicio) }}
-              </div>
+          <div class="servicio-info">
+            <div class="ubicacion" *ngIf="servicio.ciudad">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>{{ servicio.ciudad }}, {{ servicio.estado }}</span>
             </div>
-            
-            <div class="servicio-footer">
-              <div class="precio">
-                <span class="precio-amount">{{ getPriceText(servicio) }}</span>
-              </div>
-              <button class="btn-ver-mas">Ver más</button>
+            <div class="rating">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107"
+                stroke-width="2">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+              </svg>
+              <span>{{ servicio.promedio_calificacion || 0 }}</span>
+              <span class="reviews-count">({{ servicio.total_resenas || 0 }})</span>
             </div>
+          </div>
+          <div class="servicio-footer">
+            <button class="btn-ver-mas">{{ servicio.precio }} {{ servicio.moneda || 'EUR' }}</button>
           </div>
         </div>
       </div>
+    </div>
   </div>
 </ion-content>

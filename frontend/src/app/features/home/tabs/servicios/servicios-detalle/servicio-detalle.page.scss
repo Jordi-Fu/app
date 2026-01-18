@@ -1,3 +1,5 @@
+@use '../../../../../../theme/variables' as *;
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -178,7 +180,10 @@ ion-toolbar {
     .price-value {
       font-size: 1.75rem;
       font-weight: 700;
-      color: var(--ion-color-primary);
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 }
@@ -234,6 +239,32 @@ ion-toolbar {
         ion-icon {
           color: #f59e0b;
         }
+      }
+    }
+    
+    .chat-button {
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: $primary-gradient;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      ion-icon {
+        font-size: 18px;
+      }
+      
+      &:hover {
+        opacity: 0.9;
+      }
+      
+      &:active {
+        opacity: 0.8;
       }
     }
   }

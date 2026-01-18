@@ -37,9 +37,9 @@ export class ServiciosPage implements OnInit {
     try {
       // Cargar servicios y categorías en paralelo
       const [serviciosResp, categoriasResp] = await Promise.all([
-        this.serviceService.getServices({ 
-          page: 1, 
-          limit: 100,
+        this.serviceService.getServices({
+          pagina: 1,
+          limite: 100,
         }).toPromise(),
         this.serviceService.getCategories().toPromise()
       ]);
@@ -47,7 +47,7 @@ export class ServiciosPage implements OnInit {
       this.servicios = serviciosResp?.services || [];
       this.serviciosFiltrados = this.servicios;
       this.categorias = categoriasResp?.data || [];
-      
+
       console.log('Servicios cargados:', this.servicios.length);
       console.log('Categorías cargadas:', this.categorias.length);
     } catch (error) {
@@ -80,15 +80,15 @@ export class ServiciosPage implements OnInit {
   aplicarFiltros() {
     this.serviciosFiltrados = this.servicios.filter(servicio => {
       // Filtro de búsqueda
-      const matchSearch = !this.searchQuery || 
-        servicio.title.toLowerCase().includes(this.searchQuery) ||
-        servicio.description.toLowerCase().includes(this.searchQuery) ||
-        servicio.provider?.first_name.toLowerCase().includes(this.searchQuery) ||
-        servicio.provider?.last_name.toLowerCase().includes(this.searchQuery);
+      const matchSearch = !this.searchQuery ||
+        servicio.titulo.toLowerCase().includes(this.searchQuery) ||
+        servicio.descripcion.toLowerCase().includes(this.searchQuery) ||
+        servicio.provider?.nombre.toLowerCase().includes(this.searchQuery) ||
+        servicio.provider?.apellido.toLowerCase().includes(this.searchQuery);
 
       // Filtro de categoría
-      const matchCategoria = !this.categoriaSeleccionada || 
-        servicio.category_id === this.categoriaSeleccionada;
+      const matchCategoria = !this.categoriaSeleccionada ||
+        servicio.categoria_id === this.categoriaSeleccionada;
 
       return matchSearch && matchCategoria;
     });
@@ -99,7 +99,7 @@ export class ServiciosPage implements OnInit {
     this.serviceService.incrementViews(servicio.id).subscribe({
       error: (err) => console.error('Error al incrementar vistas:', err)
     });
-    
+
     // Navegar a detalle
     this.router.navigate(['/home/servicios', servicio.id]);
   }
@@ -110,17 +110,17 @@ export class ServiciosPage implements OnInit {
   }
 
   getPriceText(servicio: Service): string {
-    if (!servicio.price) {
+    if (!servicio.precio) {
       return 'Precio no disponible';
     }
-    
-    if (servicio.price_type === 'negotiable') {
+
+    if (servicio.tipo_precio === 'negotiable') {
       return 'Negociable';
     }
-    
-    const symbol = servicio.currency === 'MXN' ? '$' : servicio.currency;
-    const suffix = servicio.price_type === 'hourly' ? '/hora' : '';
-    return `${symbol}${servicio.price}${suffix}`;
+
+    const symbol = servicio.moneda === 'MXN' ? '$' : servicio.moneda;
+    const suffix = servicio.tipo_precio === 'hourly' ? '/hora' : '';
+    return `${symbol}${servicio.precio}${suffix}`;
   }
 
   getLocationText(servicio: Service): string {
@@ -130,6 +130,6 @@ export class ServiciosPage implements OnInit {
       'at_provider': 'En ubicación del proveedor',
       'flexible': 'Flexible'
     };
-    return locations[servicio.location_type] || servicio.location_type;
+    return locations[servicio.tipo_ubicacion] || servicio.tipo_ubicacion;
   }
 }

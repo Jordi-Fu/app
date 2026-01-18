@@ -160,19 +160,7 @@ export class ServicioDetallePage implements OnInit {
     this.selectedImageIndex = index;
   }
 
-  getPriceText(): string {
-    if (!this.servicio || !this.servicio.price) {
-      return 'Precio no disponible';
-    }
-    
-    if (this.servicio.price_type === 'negotiable') {
-      return 'Precio negociable';
-    }
-    
-    const symbol = this.servicio.currency === 'MXN' ? '$' : this.servicio.currency;
-    const suffix = this.servicio.price_type === 'hourly' ? '/hora' : '';
-    return `${symbol}${this.servicio.price}${suffix}`;
-  }
+ 
 
   getLocationText(): string {
     if (!this.servicio) return '';
@@ -183,14 +171,14 @@ export class ServicioDetallePage implements OnInit {
       'at_provider': '🏢 En ubicación del proveedor',
       'flexible': '🔄 Ubicación flexible'
     };
-    return locations[this.servicio.location_type] || this.servicio.location_type;
+    return locations[this.servicio.tipo_ubicacion] || this.servicio.tipo_ubicacion;
   }
 
   getDurationText(): string {
-    if (!this.servicio?.duration_minutes) return 'Duración no especificada';
+    if (!this.servicio?.duracion_minutos) return 'Duración no especificada';
     
-    const hours = Math.floor(this.servicio.duration_minutes / 60);
-    const minutes = this.servicio.duration_minutes % 60;
+    const hours = Math.floor(this.servicio.duracion_minutos / 60);
+    const minutes = this.servicio.duracion_minutos % 60;
     
     if (hours > 0 && minutes > 0) {
       return `${hours}h ${minutes}min`;
@@ -206,16 +194,16 @@ export class ServicioDetallePage implements OnInit {
   }
 
   goToProvider() {
-    if (this.servicio?.provider_id) {
+    if (this.servicio?.proveedor_id) {
       // TODO: Navegar al perfil del proveedor
-      console.log('Navegar a proveedor:', this.servicio.provider_id);
+      console.log('Navegar a proveedor:', this.servicio.proveedor_id);
     }
   }
 
   contactProvider() {
-    if (this.servicio?.provider_id) {
+    if (this.servicio?.proveedor_id) {
       // TODO: Abrir chat con el proveedor
-      console.log('Contactar proveedor:', this.servicio.provider_id);
+      console.log('Contactar proveedor:', this.servicio.proveedor_id);
     }
   }
 
@@ -273,8 +261,8 @@ export class ServicioDetallePage implements OnInit {
     try {
       // Preparar el contenido para compartir
       const shareData: any = {
-        title: this.servicio.title,
-        text: `¡Mira este servicio! ${this.servicio.title}\n\n${this.servicio.description}\n\nPrecio: ${this.getPriceText()}`,
+        title: this.servicio.titulo,
+        text: `¡Mira este servicio! ${this.servicio.titulo}\n\n${this.servicio.descripcion}}`,
         url: window.location.href,
         dialogTitle: 'Compartir servicio'
       };

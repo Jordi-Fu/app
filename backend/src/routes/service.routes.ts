@@ -10,9 +10,6 @@ router.get('/featured', serviceController.getFeaturedServices.bind(serviceContro
 router.get('/provider/:providerId', serviceController.getServicesByProvider.bind(serviceController));
 router.get('/:id', serviceController.getServiceById.bind(serviceController));
 
-// Incrementar vistas (público)
-router.post('/:id/view', serviceController.incrementViews.bind(serviceController));
-
 // Rutas protegidas - requieren autenticación
 router.post('/:id/favorite', authMiddleware, serviceController.toggleFavorite.bind(serviceController));
 router.get('/:id/is-favorite', authMiddleware, serviceController.checkIsFavorite.bind(serviceController));

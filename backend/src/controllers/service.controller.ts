@@ -134,29 +134,6 @@ class ServiceController {
   }
 
   /**
-   * POST /api/services/:id/view
-   * Incrementar contador de vistas
-   */
-  async incrementViews(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      
-      await serviceService.incrementViews(id);
-      
-      res.status(200).json({
-        success: true,
-        message: 'Vista registrada',
-      });
-    } catch (error) {
-      console.error('[SERVICE] Error en incrementViews:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error al registrar vista',
-      });
-    }
-  }
-
-  /**
    * GET /api/categories
    * Obtener categorías de servicios
    */

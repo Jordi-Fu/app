@@ -17,21 +17,21 @@ class UserDatabase {
     try {
       const query = `
         SELECT 
-          id, username, email, password_hash as password,
-          first_name as "firstName", last_name as "lastName",
-          phone, country_code as "countryCode",
-          avatar_url as "avatarUrl", bio,
-          user_type as "userType", user_role as "userRole",
-          is_verified as "isVerified", is_active as "isActive",
-          is_online as "isOnline", last_seen as "lastSeen",
-          rating_average as "ratingAverage", total_reviews as "totalReviews",
-          failed_login_attempts as "failedLoginAttempts",
-          locked_until as "lockedUntil", last_login as "lastLogin",
-          created_at as "createdAt", updated_at as "updatedAt"
-        FROM users 
-        WHERE LOWER(username) = $1 
-           OR LOWER(email) = $1 
-           OR phone = $1
+          id, usuario as username, correo as email, hash_password as password,
+          nombre as "firstName", apellido as "lastName",
+          telefono as phone, codigo_pais as "countryCode",
+          url_avatar as "avatarUrl", biografia as bio,
+          'client' as "userType", 'user' as "userRole",
+          esta_verificado as "isVerified", esta_activo as "isActive",
+          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
+          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
+          intentos_fallidos_login as "failedLoginAttempts",
+          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
+          creado_en as "createdAt", actualizado_en as "updatedAt"
+        FROM usuarios 
+        WHERE LOWER(usuario) = $1 
+           OR LOWER(correo) = $1 
+           OR telefono = $1
         LIMIT 1
       `;
       
@@ -53,7 +53,7 @@ class UserDatabase {
    */
   async existsByUsername(username: string): Promise<boolean> {
     try {
-      const query = 'SELECT id FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1';
+      const query = 'SELECT id FROM usuarios WHERE LOWER(usuario) = LOWER($1) LIMIT 1';
       const result = await pool.query(query, [username]);
       return result.rows.length > 0;
     } catch (error) {
@@ -67,7 +67,7 @@ class UserDatabase {
    */
   async existsByEmail(email: string): Promise<boolean> {
     try {
-      const query = 'SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1';
+      const query = 'SELECT id FROM usuarios WHERE LOWER(correo) = LOWER($1) LIMIT 1';
       const result = await pool.query(query, [email]);
       return result.rows.length > 0;
     } catch (error) {
@@ -82,7 +82,7 @@ class UserDatabase {
   async existsByPhone(phone: string): Promise<boolean> {
     try {
       const cleanPhone = phone.replace(/\s/g, '');
-      const query = 'SELECT id FROM users WHERE phone = $1 LIMIT 1';
+      const query = 'SELECT id FROM usuarios WHERE telefono = $1 LIMIT 1';
       const result = await pool.query(query, [cleanPhone]);
       return result.rows.length > 0;
     } catch (error) {
@@ -107,31 +107,31 @@ class UserDatabase {
       const userId = uuidv4();
       
       const query = `
-        INSERT INTO users (
-          id, username, email, password_hash,
-          first_name, last_name, phone, country_code,
-          bio, user_type, user_role,
-          is_verified, is_active, is_online,
-          rating_average, total_reviews,
-          failed_login_attempts,
-          created_at, updated_at
+        INSERT INTO usuarios (
+          id, usuario, correo, hash_password,
+          nombre, apellido, telefono, codigo_pais,
+          biografia,
+          esta_verificado, esta_activo, esta_en_linea,
+          promedio_calificacion, total_resenas,
+          intentos_fallidos_login,
+          creado_en, actualizado_en
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 0,
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 0,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING 
-          id, username, email, password_hash as password,
-          first_name as "firstName", last_name as "lastName",
-          phone, country_code as "countryCode",
-          avatar_url as "avatarUrl", bio,
-          user_type as "userType", user_role as "userRole",
-          is_verified as "isVerified", is_active as "isActive",
-          is_online as "isOnline", last_seen as "lastSeen",
-          rating_average as "ratingAverage", total_reviews as "totalReviews",
-          failed_login_attempts as "failedLoginAttempts",
-          locked_until as "lockedUntil", last_login as "lastLogin",
-          created_at as "createdAt", updated_at as "updatedAt"
+          id, usuario as username, correo as email, hash_password as password,
+          nombre as "firstName", apellido as "lastName",
+          telefono as phone, codigo_pais as "countryCode",
+          url_avatar as "avatarUrl", biografia as bio,
+          'client' as "userType", 'user' as "userRole",
+          esta_verificado as "isVerified", esta_activo as "isActive",
+          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
+          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
+          intentos_fallidos_login as "failedLoginAttempts",
+          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
+          creado_en as "createdAt", actualizado_en as "updatedAt"
       `;
       
       const values = [
@@ -143,14 +143,12 @@ class UserDatabase {
         userData.apellidos,                  // $6 - last_name
         cleanPhone,                          // $7 - phone
         '+34',                               // $8 - country_code (España por defecto)
-        userData.bio || null,                // $9 - bio
-        'client',                            // $10 - user_type
-        'user',                              // $11 - user_role
-        false,                               // $12 - is_verified
-        true,                                // $13 - is_active
-        false,                               // $14 - is_online
-        0.00,                                // $15 - rating_average
-        0                                    // $16 - total_reviews
+        userData.bio || null,                // $9 - biografia
+        false,                               // $10 - esta_verificado
+        true,                                // $11 - esta_activo
+        false,                               // $12 - esta_en_linea
+        0.00,                                // $13 - promedio_calificacion
+        0                                    // $14 - total_resenas
       ];
       
       const result = await pool.query(query, values);
@@ -173,18 +171,18 @@ class UserDatabase {
     try {
       const query = `
         SELECT 
-          id, username, email, password_hash as password,
-          first_name as "firstName", last_name as "lastName",
-          phone, country_code as "countryCode",
-          avatar_url as "avatarUrl", bio,
-          user_type as "userType", user_role as "userRole",
-          is_verified as "isVerified", is_active as "isActive",
-          is_online as "isOnline", last_seen as "lastSeen",
-          rating_average as "ratingAverage", total_reviews as "totalReviews",
-          failed_login_attempts as "failedLoginAttempts",
-          locked_until as "lockedUntil", last_login as "lastLogin",
-          created_at as "createdAt", updated_at as "updatedAt"
-        FROM users 
+          id, usuario as username, correo as email, hash_password as password,
+          nombre as "firstName", apellido as "lastName",
+          telefono as phone, codigo_pais as "countryCode",
+          url_avatar as "avatarUrl", biografia as bio,
+          'client' as "userType", 'user' as "userRole",
+          esta_verificado as "isVerified", esta_activo as "isActive",
+          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
+          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
+          intentos_fallidos_login as "failedLoginAttempts",
+          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
+          creado_en as "createdAt", actualizado_en as "updatedAt"
+        FROM usuarios 
         WHERE id = $1
       `;
       
@@ -212,10 +210,10 @@ class UserDatabase {
       
       // Mapeo de campos TypeScript a columnas PostgreSQL
       const fieldMapping: Record<string, string> = {
-        isActive: 'is_active',
-        failedLoginAttempts: 'failed_login_attempts',
-        lockUntil: 'locked_until',
-        updatedAt: 'updated_at',
+        isActive: 'esta_activo',
+        failedLoginAttempts: 'intentos_fallidos_login',
+        lockUntil: 'bloqueado_hasta',
+        updatedAt: 'actualizado_en',
       };
       
       for (const [key, value] of Object.entries(updates)) {
@@ -226,7 +224,7 @@ class UserDatabase {
       }
       
       // Agregar updated_at automáticamente
-      fields.push(`updated_at = CURRENT_TIMESTAMP`);
+      fields.push(`actualizado_en = CURRENT_TIMESTAMP`);
       
       if (fields.length === 0) {
         return this.findById(id);
@@ -234,13 +232,13 @@ class UserDatabase {
       
       values.push(id);
       const query = `
-        UPDATE users 
+        UPDATE usuarios 
         SET ${fields.join(', ')}
         WHERE id = $${paramCounter}
-        RETURNING id, username, email, phone, password_hash as password,
-                  is_active as "isActive", failed_login_attempts as "failedLoginAttempts",
-                  locked_until as "lockUntil", created_at as "createdAt",
-                  updated_at as "updatedAt"
+        RETURNING id, usuario as username, correo as email, telefono as phone, hash_password as password,
+                  esta_activo as "isActive", intentos_fallidos_login as "failedLoginAttempts",
+                  bloqueado_hasta as "lockUntil", creado_en as "createdAt",
+                  actualizado_en as "updatedAt"
       `;
       
       const result = await pool.query(query, values);
@@ -262,14 +260,14 @@ class UserDatabase {
   async incrementFailedAttempts(id: string): Promise<void> {
     try {
       const query = `
-        UPDATE users 
-        SET failed_login_attempts = failed_login_attempts + 1,
-            locked_until = CASE 
-              WHEN failed_login_attempts + 1 >= 5 
+        UPDATE usuarios 
+        SET intentos_fallidos_login = intentos_fallidos_login + 1,
+            bloqueado_hasta = CASE 
+              WHEN intentos_fallidos_login + 1 >= 5 
               THEN CURRENT_TIMESTAMP + INTERVAL '15 minutes'
-              ELSE locked_until
+              ELSE bloqueado_hasta
             END,
-            updated_at = CURRENT_TIMESTAMP
+            actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $1
       `;
       
@@ -285,11 +283,11 @@ class UserDatabase {
   async resetFailedAttempts(id: string): Promise<void> {
     try {
       const query = `
-        UPDATE users 
-        SET failed_login_attempts = 0,
-            locked_until = NULL,
-            last_login = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
+        UPDATE usuarios 
+        SET intentos_fallidos_login = 0,
+            bloqueado_hasta = NULL,
+            ultimo_login = CURRENT_TIMESTAMP,
+            actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $1
       `;
       
@@ -305,9 +303,9 @@ class UserDatabase {
   async updatePassword(userId: string, hashedPassword: string): Promise<boolean> {
     try {
       const query = `
-        UPDATE users 
-        SET password_hash = $1,
-            updated_at = CURRENT_TIMESTAMP
+        UPDATE usuarios 
+        SET hash_password = $1,
+            actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $2
       `;
       
