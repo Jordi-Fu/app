@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { pool } from '../config/database.config';
 import { User, SafeUser, RegisterRequest } from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
+import { saveBase64Image } from '../utils/image.util';
 
 /**
  * Acceso a datos de usuarios en PostgreSQL
@@ -106,18 +107,24 @@ class UserDatabase {
       // Generar ID único
       const userId = uuidv4();
       
+      // Procesar foto de perfil si existe
+      let avatarUrl = null;
+      if (userData.profilePhoto) {
+        avatarUrl = await saveBase64Image(userData.profilePhoto, 'uploads/avatars');
+      }
+      
       const query = `
         INSERT INTO usuarios (
           id, usuario, correo, hash_password,
           nombre, apellido, telefono, codigo_pais,
-          biografia,
+          url_avatar, biografia,
           esta_verificado, esta_activo, esta_en_linea,
           promedio_calificacion, total_resenas,
           intentos_fallidos_login,
           creado_en, actualizado_en
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 0,
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 0,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING 
@@ -143,12 +150,13 @@ class UserDatabase {
         userData.apellidos,                  // $6 - last_name
         cleanPhone,                          // $7 - phone
         '+34',                               // $8 - country_code (España por defecto)
-        userData.bio || null,                // $9 - biografia
-        false,                               // $10 - esta_verificado
-        true,                                // $11 - esta_activo
-        false,                               // $12 - esta_en_linea
-        0.00,                                // $13 - promedio_calificacion
-        0                                    // $14 - total_resenas
+        avatarUrl,                           // $9 - url_avatar
+        userData.bio || null,                // $10 - biografia
+        false,                               // $11 - esta_verificado
+        true,                                // $12 - esta_activo
+        false,                               // $13 - esta_en_linea
+        0.00,                                // $14 - promedio_calificacion
+        0                                    // $15 - total_resenas
       ];
       
       const result = await pool.query(query, values);

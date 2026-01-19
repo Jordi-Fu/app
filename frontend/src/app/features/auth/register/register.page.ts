@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { IonContent, ActionSheetController, LoadingController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, ActionSheetController, LoadingController, ToastController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -55,7 +55,8 @@ export class RegisterPage implements OnInit {
     private actionSheetCtrl: ActionSheetController,
     private authService: AuthService,
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController
   ) { }
 
   ngOnInit() {
@@ -141,8 +142,98 @@ export class RegisterPage implements OnInit {
     await actionSheet.present();
   }
 
+  /**
+   * Verificar y solicitar permisos para cámara o galería
+   */
+  async checkAndRequestPermissions(source: CameraSource): Promise<boolean> {
+    try {
+      // Verificar permisos actuales
+      const permissions = await Camera.checkPermissions();
+      
+      let permissionStatus;
+      if (source === CameraSource.Camera) {
+        permissionStatus = permissions.camera;
+      } else {
+        permissionStatus = permissions.photos;
+      }
+
+      // Si ya tiene permisos, retornar true
+      if (permissionStatus === 'granted') {
+        return true;
+      }
+
+      // Si los permisos fueron denegados permanentemente
+      if (permissionStatus === 'denied') {
+        await this.showPermissionDeniedAlert(source);
+        return false;
+      }
+
+      // Solicitar permisos
+      const requestResult = await Camera.requestPermissions({
+        permissions: source === CameraSource.Camera ? ['camera'] : ['photos']
+      });
+
+      const newPermissionStatus = source === CameraSource.Camera 
+        ? requestResult.camera 
+        : requestResult.photos;
+
+      if (newPermissionStatus === 'granted') {
+        return true;
+      }
+
+      // Si el usuario denegó los permisos
+      await this.showToast(
+        source === CameraSource.Camera 
+          ? 'Se necesitan permisos de cámara para tomar fotos' 
+          : 'Se necesitan permisos de galería para seleccionar fotos',
+        'warning'
+      );
+      return false;
+
+    } catch (error) {
+      console.error('Error al verificar permisos:', error);
+      await this.showToast('Error al verificar permisos', 'danger');
+      return false;
+    }
+  }
+
+  /**
+   * Mostrar alerta cuando los permisos fueron denegados permanentemente
+   */
+  async showPermissionDeniedAlert(source: CameraSource) {
+    const alert = await this.alertCtrl.create({
+      header: 'Permisos necesarios',
+      message: source === CameraSource.Camera
+        ? 'Para usar la cámara, debes habilitar los permisos en la configuración de la aplicación.'
+        : 'Para acceder a la galería, debes habilitar los permisos en la configuración de la aplicación.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Abrir configuración',
+          handler: () => {
+            // En producción, esto abrirá la configuración de la app
+            // Para desarrollo web, solo mostramos un mensaje
+            this.showToast('Abre la configuración de tu dispositivo y habilita los permisos', 'warning');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   async takePicture(source: CameraSource) {
     try {
+      // Verificar y solicitar permisos antes de acceder a cámara/galería
+      const hasPermission = await this.checkAndRequestPermissions(source);
+      
+      if (!hasPermission) {
+        return; // No continuar si no hay permisos
+      }
+
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
@@ -151,8 +242,13 @@ export class RegisterPage implements OnInit {
       });
 
       this.profilePhoto = image.dataUrl || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al capturar imagen:', error);
+      
+      // Manejar caso cuando el usuario cancela o hay un error
+      if (error.message && !error.message.includes('User cancelled')) {
+        await this.showToast('Error al capturar la imagen', 'danger');
+      }
     }
   }
 
@@ -235,10 +331,11 @@ export class RegisterPage implements OnInit {
       username: this.registerForm.value.username.trim(),
       email: this.registerForm.value.email.trim(),
       password: this.registerForm.value.password,
-      bio: this.registerForm.value.bio?.trim() || undefined
+      bio: this.registerForm.value.bio?.trim() || undefined,
+      profilePhoto: this.profilePhoto || undefined
     };
 
-    console.log('Enviando datos de registro:', { ...registerData, password: '***' });
+    console.log('Enviando datos de registro:', { ...registerData, password: '***', profilePhoto: this.profilePhoto ? 'foto incluida' : 'sin foto' });
 
     this.authService.register(registerData).subscribe({
       next: async (response: AuthResponse) => {

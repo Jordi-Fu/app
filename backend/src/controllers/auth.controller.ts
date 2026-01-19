@@ -37,7 +37,7 @@ class AuthController {
    */
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, apellidos, telefono, username, email, password, bio } = req.body;
+      const { nombre, apellidos, telefono, username, email, password, bio, profilePhoto } = req.body;
       
       const result = await authService.register({
         nombre,
@@ -47,6 +47,7 @@ class AuthController {
         email,
         password,
         bio,
+        profilePhoto,
       });
       
       if (!result.success) {

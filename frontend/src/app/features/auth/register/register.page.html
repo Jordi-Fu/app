@@ -1,6 +1,9 @@
 <ion-content>
   <div class="register-container">
     <div class="register-card">
+      <!-- Flecha de retroceso -->
+      <div *ngIf="currentStep > 1" class="back-arrow" (click)="previousStep()"></div>
+      
       <!-- Header -->
       <div class="header">
         <span class="brand">Kurro</span>
@@ -142,14 +145,9 @@
           </svg>
         </div>
 
-        <div class="navigation-buttons">
-          <button type="button" class="btn-secondary" (click)="previousStep()">
-            Atrás
-          </button>
-          <button type="button" class="btn-primary" (click)="nextStep()" [disabled]="!isStepValid(2)">
-            Siguiente
-          </button>
-        </div>
+        <button type="button" class="btn-primary" (click)="nextStep()" [disabled]="!isStepValid(2)">
+          Siguiente
+        </button>
       </form>
 
       <!-- Paso 3: Perfil -->
@@ -175,14 +173,9 @@
           <textarea placeholder="Descripción breve sobre ti..." formControlName="bio" rows="4"></textarea>
         </div>
 
-        <div class="navigation-buttons">
-          <button type="button" class="btn-secondary" (click)="previousStep()">
-            Atrás
-          </button>
-          <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="!registerForm.valid">
-            Crear cuenta
-          </button>
-        </div>
+        <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="!registerForm.valid">
+          Crear cuenta
+        </button>
       </form>
       </div>
     </div>

@@ -58,7 +58,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     promedio_calificacion, total_resenas, idioma, zona_horaria, moneda
   ) VALUES
-    ('juan@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('juan@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'juan_electricista', 'Juan', 'Martínez', '34666111222', '+34',
      'https://ui-avatars.com/api/?name=Juan&background=FF9800&color=fff&size=200',
      'Electricista profesional con 10 años de experiencia', '1985-03-15', true, true, 4.8, 45, 'es', 'Europe/Madrid', 'EUR')
@@ -69,7 +69,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     promedio_calificacion, total_resenas, idioma, zona_horaria, moneda
   ) VALUES
-    ('maria@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('maria@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'maria_limpieza', 'María', 'García', '34666222333', '+34',
      'https://ui-avatars.com/api/?name=Maria&background=4CAF50&color=fff&size=200',
      'Servicio profesional de limpieza con productos ecológicos', '1990-07-22', true, true, 4.9, 78, 'es', 'Europe/Madrid', 'EUR')
@@ -80,7 +80,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     promedio_calificacion, total_resenas, idioma, zona_horaria, moneda
   ) VALUES
-    ('carlos@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('carlos@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'carlos_plomero', 'Carlos', 'López', '34666333444', '+34',
      'https://ui-avatars.com/api/?name=Carlos&background=2196F3&color=fff&size=200',
      'Plomero certificado - Emergencias 24/7', '1988-11-10', true, true, 4.7, 92, 'es', 'Europe/Madrid', 'EUR')
@@ -91,7 +91,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     idioma, zona_horaria, moneda
   ) VALUES
-    ('ana@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('ana@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'ana_cliente', 'Ana', 'Rodríguez', '34666444555', '+34',
      'https://ui-avatars.com/api/?name=Ana&background=E91E63&color=fff&size=200',
      'Cliente activa de la plataforma', '1992-05-18', true, true, 'es', 'Europe/Madrid', 'EUR')
@@ -102,7 +102,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     idioma, zona_horaria, moneda
   ) VALUES
-    ('pedro@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('pedro@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'pedro_cliente', 'Pedro', 'Fernández', '34666555666', '+34',
      'https://ui-avatars.com/api/?name=Pedro&background=9C27B0&color=fff&size=200',
      'Buscando servicios de calidad', '1987-09-25', true, true, 'es', 'Europe/Madrid', 'EUR')
@@ -113,7 +113,7 @@ BEGIN
     url_avatar, biografia, fecha_nacimiento, esta_verificado, esta_activo,
     promedio_calificacion, total_resenas, idioma, zona_horaria, moneda
   ) VALUES
-    ('sofia@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIw8nC8hYq', 
+    ('sofia@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'sofia_profesional', 'Sofía', 'Torres', '34666777888', '+34',
      'https://ui-avatars.com/api/?name=Sofia&background=00BCD4&color=fff&size=200',
      'Profesora certificada de inglés y matemáticas', '1991-12-08', true, true, 4.85, 34, 'es', 'Europe/Madrid', 'EUR')

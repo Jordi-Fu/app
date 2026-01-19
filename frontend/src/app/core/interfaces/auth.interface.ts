@@ -15,6 +15,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   bio?: string;
+  profilePhoto?: string;
 }
 
 export interface SafeUser {

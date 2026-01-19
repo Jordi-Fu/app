@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 import { ENV } from './config/env.config';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares';
@@ -18,15 +19,9 @@ const createApp = (): Application => {
   
   // Helmet - Headers de seguridad
   app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
+    contentSecurityPolicy: false, // Desactivar CSP para permitir carga de recursos
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Permitir carga de recursos cross-origin
   }));
 
   // CORS - Control de origen cruzado
@@ -65,9 +60,20 @@ const createApp = (): Application => {
   // PARSERS
   // ============================================
   
-  // Limitar tamaño del body para prevenir ataques
-  app.use(express.json({ limit: '10kb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+  // Aumentar límite para imágenes base64 (5MB)
+  app.use(express.json({ limit: '5mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+
+  // ============================================
+  // ARCHIVOS ESTÁTICOS
+  // ============================================
+  
+  // Servir archivos de uploads (avatares, etc.) con headers CORS
+  app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  }, express.static(path.join(process.cwd(), 'uploads')));
 
   // ============================================
   // RUTAS
