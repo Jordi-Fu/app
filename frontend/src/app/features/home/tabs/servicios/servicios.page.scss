@@ -53,35 +53,6 @@ ion-content {
   }
 }
 
-.titulo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-
-  .brand {
-    font-weight: bold;
-    font-size: 36px;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 20px;
-  }
-
-  .heading {
-    font-size: 18px;
-    font-weight: 600;
-    color: #000000;
-    margin-bottom: 8px;
-  }
-
-  .subtitle {
-    font-size: 13px;
-    color: #999999;
-  }
-}
-
 .search-bar {
   position: relative;
   flex: 1;
@@ -178,25 +149,6 @@ ion-content {
 
 .servicios-section {
   width: 100%;
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #000000;
-      margin: 0;
-    }
-
-    .results-count {
-      font-size: 14px;
-      color: #666666;
-    }
-  }
 
   .loading-container {
     text-align: center;
@@ -441,18 +393,6 @@ ion-content {
     --background: #1a1a1a;
   }
 
-
-
-  .titulo {
-    .heading {
-      color: #ffffff;
-    }
-
-    .subtitle {
-      color: #b3b3b3;
-    }
-  }
-
   .search-bar {
     input {
       background-color: #2a2a2a;
@@ -469,14 +409,9 @@ ion-content {
     }
   }
 
-  .categorias-section,
-  .servicios-section {
+  .categorias-section {
     .section-title {
       color: #ffffff;
-    }
-
-    .results-count {
-      color: #b3b3b3;
     }
   }
 
