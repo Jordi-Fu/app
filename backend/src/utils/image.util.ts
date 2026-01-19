@@ -1,13 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
 
 /**
  * Utilidades para manejo de imágenes
  */
 
 /**
- * Guardar imagen base64 en el sistema de archivos
+ * Guardar imagen base64 en el sistema de archivos con optimización
  * @param base64Data - Imagen en formato base64
  * @param directory - Directorio donde guardar la imagen (por defecto 'uploads/avatars')
  * @returns URL relativa de la imagen o null si hay error
@@ -30,11 +31,10 @@ export async function saveBase64Image(
       return null;
     }
 
-    const imageType = matches[1]; // jpg, png, etc.
     const imageBuffer = Buffer.from(matches[2], 'base64');
 
-    // Validar tamaño (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validar tamaño (máximo 10MB antes de comprimir)
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (imageBuffer.length > maxSize) {
       console.error('La imagen excede el tamaño máximo permitido');
       return null;
@@ -47,11 +47,20 @@ export async function saveBase64Image(
     }
 
     // Generar nombre único para la imagen
-    const filename = `${uuidv4()}.${imageType}`;
+    const filename = `${uuidv4()}.webp`; // Usar WebP para mejor compresión
     const filepath = path.join(uploadPath, filename);
 
-    // Guardar la imagen
-    fs.writeFileSync(filepath, imageBuffer);
+    // Optimizar y comprimir la imagen usando sharp
+    await sharp(imageBuffer)
+      .resize(800, 800, {
+        fit: 'inside',
+        withoutEnlargement: true // No agrandar imágenes pequeñas
+      })
+      .webp({
+        quality: 85, // Calidad alta pero optimizada
+        effort: 6    // Mayor esfuerzo de compresión
+      })
+      .toFile(filepath);
 
     // Retornar la URL relativa
     return `/${directory}/${filename}`;
