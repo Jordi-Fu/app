@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { pool } from '../config/database.config';
 import { User, SafeUser, RegisterRequest } from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { saveBase64Image } from '../utils/image.util';
+import { saveBase64Image, generateInitialsAvatar } from '../utils/image.util';
 
 /**
  * Acceso a datos de usuarios en PostgreSQL
@@ -107,10 +107,13 @@ class UserDatabase {
       // Generar ID único
       const userId = uuidv4();
       
-      // Procesar foto de perfil si existe
+      // Procesar foto de perfil si existe, o generar avatar con iniciales
       let avatarUrl = null;
       if (userData.profilePhoto) {
         avatarUrl = await saveBase64Image(userData.profilePhoto, 'uploads/avatars');
+      } else {
+        // Generar avatar con las iniciales del nombre y apellido
+        avatarUrl = generateInitialsAvatar(userData.nombre, userData.apellidos, 'uploads/avatars');
       }
       
       const query = `
@@ -121,10 +124,12 @@ class UserDatabase {
           esta_verificado, esta_activo, esta_en_linea,
           promedio_calificacion, total_resenas,
           intentos_fallidos_login,
+          idioma, zona_horaria, moneda,
           creado_en, actualizado_en
         )
         VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 0,
+          'es', 'Europe/Madrid', 'EUR',
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING 

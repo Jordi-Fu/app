@@ -5,21 +5,14 @@
 
       <div class="perfil-header" *ngIf="usuario">
         <div class="perfil-avatar">
-          <ng-container *ngIf="usuario.avatarUrl && !imageError; else defaultAvatar">
+          <ng-container *ngIf="usuario.avatarUrl && !imageError">
             <img [src]="getAvatarUrl(usuario.avatarUrl)" 
                  alt="Avatar" 
                  class="perfil-avatar-img"
                  (error)="onImageError()" />
           </ng-container>
-
-          <ng-template #defaultAvatar>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </ng-template>
         </div>
-        <h1 class="perfil-username">{{ usuario.username }}</h1>
+        <h1 class="perfil-username">{{ usuario.username }} {{usuario.lastName}}</h1>
         <p class="perfil-email">{{ usuario.email }}</p>
       </div>
 

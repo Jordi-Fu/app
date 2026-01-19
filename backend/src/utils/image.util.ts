@@ -81,3 +81,60 @@ export function deleteImage(imagePath: string): boolean {
     return false;
   }
 }
+
+/**
+ * Generar avatar con iniciales del usuario
+ * @param firstName - Nombre del usuario
+ * @param lastName - Apellido del usuario
+ * @param directory - Directorio donde guardar la imagen
+ * @returns URL relativa del avatar generado
+ */
+export function generateInitialsAvatar(
+  firstName: string,
+  lastName: string,
+  directory: string = 'uploads/avatars'
+): string | null {
+  try {
+    // Obtener las iniciales
+    const firstInitial = firstName.charAt(0).toUpperCase();
+    const lastInitial = lastName.charAt(0).toUpperCase();
+    const initials = `${firstInitial}${lastInitial}`;
+
+    // Generar color de fondo basado en las iniciales
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+      '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788'
+    ];
+    const colorIndex = (firstInitial.charCodeAt(0) + lastInitial.charCodeAt(0)) % colors.length;
+    const backgroundColor = colors[colorIndex];
+
+    // Crear SVG del avatar
+    const svg = `
+      <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="${backgroundColor}"/>
+        <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="80" 
+              font-weight="bold" fill="white" text-anchor="middle" 
+              dominant-baseline="central">${initials}</text>
+      </svg>
+    `.trim();
+
+    // Crear directorio si no existe
+    const uploadPath = path.join(process.cwd(), directory);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
+    // Generar nombre único para el avatar
+    const filename = `avatar-${uuidv4()}.svg`;
+    const filepath = path.join(uploadPath, filename);
+
+    // Guardar el SVG
+    fs.writeFileSync(filepath, svg);
+
+    // Retornar la URL relativa
+    return `/${directory}/${filename}`;
+  } catch (error) {
+    console.error('Error al generar avatar con iniciales:', error);
+    return null;
+  }
+}
