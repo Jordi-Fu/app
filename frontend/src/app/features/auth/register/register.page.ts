@@ -7,6 +7,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterRequest, AuthResponse } from '../../../core/interfaces';
+import { min } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -64,7 +65,7 @@ export class RegisterPage implements OnInit {
       // Paso 1: Datos Personales
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellidos: ['', [Validators.required, Validators.minLength(2)]],
-      telefono: ['', [Validators.required]],
+      telefono: ['', [Validators.required, this.phoneValidator()]],
       
       // Paso 2: Cuenta
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -73,12 +74,27 @@ export class RegisterPage implements OnInit {
       confirmPassword: ['', [Validators.required]],
       
       // Paso 3: Perfil
-      bio: ['', [Validators.maxLength(500)]]
+      bio: ['', [Validators.maxLength(200)]],
     });
+  }
+
+  phoneValidator() {
+    return (control: any) => {
+      if (!control.value) return null;
+      const digitsOnly = control.value.replace(/\D/g, '');
+      if (digitsOnly.length !== 9) {
+        return { phoneLength: true };
+      }
+      return null;
+    };
   }
 
   get serviciosArray(): FormArray {
     return this.registerForm.get('servicios') as FormArray;
+  }
+
+  get bioLength(): number {
+    return this.registerForm.get('bio')?.value?.length || 0;
   }
 
   togglePasswordVisibility() {

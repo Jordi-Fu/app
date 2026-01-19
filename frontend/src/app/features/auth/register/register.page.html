@@ -170,7 +170,8 @@
         </div>
 
         <div class="input-group">
-          <textarea placeholder="Descripción breve sobre ti..." formControlName="bio" rows="4"></textarea>
+          <textarea placeholder="Descripción breve sobre ti..." formControlName="bio" rows="4" maxlength="200"></textarea>
+          <div class="char-counter">{{ bioLength }}/200</div>
         </div>
 
         <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="!registerForm.valid">
