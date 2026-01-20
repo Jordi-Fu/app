@@ -332,6 +332,101 @@ class UserDatabase {
   }
   
   /**
+   * Obtener perfil público de un usuario por ID
+   */
+  async getUserById(userId: string): Promise<any | null> {
+    try {
+      const query = `
+        SELECT 
+          u.id,
+          u.nombre,
+          u.apellido,
+          u.correo as email,
+          u.telefono,
+          u.url_avatar,
+          u.biografia,
+          u.creado_en as fecha_creacion,
+          u.esta_verificado,
+          u.promedio_calificacion,
+          u.total_resenas,
+          (SELECT COUNT(*) FROM servicios WHERE proveedor_id = u.id AND esta_activo = true) as total_servicios
+        FROM usuarios u
+        WHERE u.id::text = $1 AND u.esta_activo = true
+      `;
+      
+      const result = await pool.query(query, [userId]);
+      
+      if (result.rows.length === 0) {
+        return null;
+      }
+      
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error al obtener usuario por ID:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener servicios de un usuario
+   */
+  async getUserServices(userId: string): Promise<any[]> {
+    try {
+      const query = `
+        SELECT 
+          s.id,
+          s.titulo,
+          s.descripcion,
+          s.precio,
+          s.moneda,
+          s.proveedor_id,
+          s.categoria_id,
+          s.tipo_ubicacion,
+          s.es_destacado,
+          s.esta_verificado,
+          s.creado_en as fecha_creacion,
+          COALESCE(AVG(r.calificacion), 0) as promedio_calificacion,
+          COUNT(DISTINCT r.id) as total_resenas,
+          c.nombre as category_name,
+          c.color as category_color,
+          c.url_icono as category_icon
+        FROM servicios s
+        LEFT JOIN resenas r ON r.servicio_id = s.id
+        LEFT JOIN categorias c ON c.id = s.categoria_id
+        WHERE s.proveedor_id::text = $1 AND s.esta_activo = true
+        GROUP BY s.id, c.nombre, c.color, c.url_icono
+        ORDER BY s.creado_en DESC
+      `;
+      
+      const result = await pool.query(query, [userId]);
+      const services = result.rows;
+
+      // Obtener imágenes para cada servicio
+      for (const service of services) {
+        const imagesQuery = `
+          SELECT 
+            id,
+            servicio_id,
+            url_imagen,
+            url_miniatura,
+            pie_de_foto,
+            indice_orden as orden
+          FROM imagenes_servicios
+          WHERE servicio_id = $1
+          ORDER BY indice_orden ASC
+        `;
+        const imagesResult = await pool.query(imagesQuery, [service.id]);
+        service.images = imagesResult.rows;
+      }
+
+      return services;
+    } catch (error) {
+      console.error('Error al obtener servicios del usuario:', error);
+      throw error;
+    }
+  }
+  
+  /**
    * Convertir a usuario seguro (sin contraseña)
    */
   toSafeUser(user: User): SafeUser {

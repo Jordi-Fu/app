@@ -1,0 +1,398 @@
+// ===============================================
+// PERFIL PÚBLICO - ESTILOS MODO CLARO Y OSCURO
+// ===============================================
+
+// Variables de color
+$primary-green: #10B981;
+$primary-green-light: #2DD4BF;
+$star-color: #fbbf24;
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  
+  p {
+    color: var(--ion-text-color);
+  }
+}
+
+.profile-container {
+  padding: 0;
+  padding-bottom: 80px;
+  background: var(--ion-background-color);
+}
+
+// ===============================================
+// HEADER DEL PERFIL
+// ===============================================
+.profile-header {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  background: var(--ion-background-color);
+  
+  .avatar-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    
+    .avatar-ring {
+      padding: 4px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $primary-green-light, $primary-green);
+      
+      .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border: 3px solid var(--ion-background-color);
+      }
+    }
+  }
+  
+  .user-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+  
+  .location-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+    
+    ion-icon {
+      font-size: 1rem;
+      color: $primary-green;
+    }
+    
+    span {
+      font-size: 0.875rem;
+      color: var(--ion-color-medium);
+    }
+  }
+  
+  .member-since {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+// ===============================================
+// TARJETA DE ESTADÍSTICAS
+// ===============================================
+.stats-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $primary-green-light, $primary-green);
+  margin: 0 1rem 1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 0.25rem;
+    }
+    
+    .rating-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      
+      .star-icon {
+        font-size: 1.25rem;
+        color: $star-color;
+      }
+    }
+  }
+  
+  .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 1rem;
+  }
+}
+
+// ===============================================
+// SECCIONES
+// ===============================================
+.section {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ion-text-color);
+    }
+    
+    .see-more {
+      font-size: 0.875rem;
+      color: $primary-green;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .sort-button {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.875rem;
+      color: var(--ion-color-medium);
+      cursor: pointer;
+      
+      ion-icon {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// ===============================================
+// LISTA DE SERVICIOS
+// ===============================================
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  
+  .service-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--ion-card-background);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    
+    &:active {
+      opacity: 0.8;
+    }
+    
+    .service-image {
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--ion-color-light);
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .service-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.25rem;
+      
+      .service-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--ion-text-color);
+      }
+      
+      .service-price {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $primary-green;
+      }
+      
+      .service-status {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+        
+        ion-icon {
+          font-size: 0.5rem;
+        }
+        
+        &.active {
+          color: $primary-green;
+          
+          ion-icon {
+            color: $primary-green;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ===============================================
+// LISTA DE RESEÑAS
+// ===============================================
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .review-item {
+    padding: 1rem;
+    background: var(--ion-card-background);
+    border-radius: 12px;
+    border: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1));
+    
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      
+      .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .reviewer-info {
+        display: flex;
+        flex-direction: column;
+        
+        .reviewer-name {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--ion-text-color);
+        }
+        
+        .reviewer-time {
+          font-size: 0.75rem;
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+    
+    .review-rating {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      
+      .stars {
+        display: flex;
+        gap: 0.15rem;
+        
+        ion-icon {
+          font-size: 1rem;
+          color: var(--ion-color-medium-tint);
+          
+          &.filled {
+            color: $primary-green;
+          }
+        }
+      }
+      
+      .review-date {
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+      }
+    }
+    
+    .review-text {
+      margin: 0 0 0.75rem 0;
+      font-size: 0.875rem;
+      color: var(--ion-text-color);
+      line-height: 1.5;
+    }
+    
+    .review-service {
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1));
+      
+      .review-service-label {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+      
+      .review-service-link {
+        font-size: 0.8rem;
+        color: $primary-green;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 2rem;
+  
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+}
+
+// ===============================================
+// FAB DE CONTACTO
+// ===============================================
+.contact-fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  
+  ion-fab-button {
+    --background: linear-gradient(135deg, $primary-green-light, $primary-green);
+    --box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  }
+}
+
+// ===============================================
+// ESTILOS ESPECÍFICOS MODO OSCURO
+// ===============================================
+:host-context(body.dark) {
+  .profile-header {
+    background: var(--ion-background-color);
+    
+    .avatar-ring {
+      .profile-avatar {
+        border-color: var(--ion-background-color);
+      }
+    }
+  }
+  
+  .service-item {
+    background: var(--ion-color-step-100);
+  }
+  
+  .review-item {
+    background: var(--ion-color-step-100);
+    border-color: var(--ion-color-step-200);
+  }
+}

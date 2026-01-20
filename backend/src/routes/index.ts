@@ -3,6 +3,7 @@ import authRoutes from './auth.routes';
 import serviceRoutes from './service.routes';
 import categoryRoutes from './category.routes';
 import chatRoutes from './chat.routes';
+import userRoutes from './user.routes';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.use('/auth', authRoutes);
 router.use('/services', serviceRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/chat', chatRoutes);
+router.use('/users', userRoutes);
 
 // Ruta de salud
 router.get('/health', (req, res) => {

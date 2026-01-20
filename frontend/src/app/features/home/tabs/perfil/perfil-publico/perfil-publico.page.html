@@ -1,0 +1,140 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home/servicios"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ userProfile?.nombre ? '@' + getUsername() : 'Perfil' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <!-- Perfil del usuario -->
+  <div *ngIf="!isLoading && userProfile" class="profile-container">
+    
+    <!-- Cabecera del perfil -->
+    <div class="profile-header">
+      <div class="avatar-container">
+        <div class="avatar-ring">
+          <ion-avatar class="profile-avatar">
+            <img 
+              [src]="userProfile.url_avatar || 'https://ui-avatars.com/api/?name=' + userProfile.nombre + '+' + userProfile.apellido + '&background=2DD4BF&color=fff'" 
+              [alt]="userProfile.nombre + ' ' + userProfile.apellido"
+            />
+          </ion-avatar>
+        </div>
+      </div>
+      
+      <h1 class="user-name">{{ userProfile.nombre }} {{ userProfile.apellido }}</h1>
+      
+      <div class="location-badge" *ngIf="userProfile.esta_verificado">
+        <ion-icon name="checkmark-circle" color="success"></ion-icon>
+        <span>Madrid, España</span>
+      </div>
+      
+      <p class="member-since">Miembro en Kurro desde {{ getYear(userProfile.fecha_creacion) }}</p>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="stats-card">
+      <div class="stat-item">
+        <span class="stat-value">{{ userProfile.total_servicios || 0 }}</span>
+        <span class="stat-label">Servicios Activos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="rating-stat">
+          <ion-icon name="star" class="star-icon"></ion-icon>
+          <span class="stat-value">{{ userProfile.promedio_calificacion || 0 | number:'1.1-1' }}</span>
+        </div>
+        <span class="stat-label">({{ userProfile.total_resenas || 0 }} reseñas)</span>
+      </div>
+    </div>
+
+    <!-- Servicios del usuario -->
+    <div class="section" *ngIf="userServices && userServices.length > 0">
+      <div class="section-header">
+        <h2>Servicios</h2>
+        <span class="see-more" (click)="seeAllServices()">Ver más</span>
+      </div>
+      
+      <div class="services-list">
+        <div 
+          *ngFor="let service of userServices.slice(0, 3)" 
+          class="service-item"
+          (click)="goToService(service.id)">
+          <div class="service-image">
+            <img 
+              [src]="service.images && service.images.length > 0 ? service.images[0].url_imagen : 'assets/placeholder-service.png'" 
+              [alt]="service.titulo"
+            />
+          </div>
+          <div class="service-details">
+            <h3 class="service-title">{{ service.titulo }}</h3>
+            <span class="service-price">{{ service.precio }}€/hora</span>
+            <span class="service-status active">
+              <ion-icon name="ellipse"></ion-icon>
+              Activo
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reseñas -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Reseñas</h2>
+        <div class="sort-button" (click)="toggleSort()">
+          <ion-icon name="options-outline"></ion-icon>
+          <span>Ordenar</span>
+        </div>
+      </div>
+      
+      <div class="reviews-list" *ngIf="userReviews && userReviews.length > 0">
+        <div *ngFor="let review of userReviews" class="review-item">
+          <div class="review-header">
+            <ion-avatar class="reviewer-avatar">
+              <img [src]="review.reviewer_avatar || 'https://ui-avatars.com/api/?name=' + review.reviewer_name" [alt]="review.reviewer_name" />
+            </ion-avatar>
+            <div class="reviewer-info">
+              <span class="reviewer-name">{{ review.reviewer_name }}</span>
+              <span class="reviewer-time">{{ review.reviewer_time_in_app }} en Kurro</span>
+            </div>
+          </div>
+          <div class="review-rating">
+            <div class="stars">
+              <ion-icon *ngFor="let star of getStarsArray()" 
+                [name]="star <= review.rating ? 'star' : 'star-outline'"
+                [class.filled]="star <= review.rating">
+              </ion-icon>
+            </div>
+            <span class="review-date">Hace {{ review.time_ago }}</span>
+          </div>
+          <p class="review-text">{{ review.comment }}</p>
+          <div class="review-service" *ngIf="review.service_name">
+            <span class="review-service-label">Servicio:</span>
+            <a class="review-service-link" (click)="goToService(review.service_id)">{{ review.service_name }}</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="no-reviews" *ngIf="!userReviews || userReviews.length === 0">
+        <p>Este usuario aún no tiene reseñas</p>
+      </div>
+    </div>
+
+    <!-- Botón de contacto fijo -->
+    <div class="contact-fab">
+      <ion-fab-button (click)="contactUser()">
+        <ion-icon name="chatbubble-outline"></ion-icon>
+      </ion-fab-button>
+    </div>
+
+  </div>
+</ion-content>

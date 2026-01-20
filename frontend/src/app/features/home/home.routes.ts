@@ -27,6 +27,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },
       {
+        path: 'usuario/:id',
+        loadComponent: () => import('./tabs/perfil/perfil-publico/perfil-publico.page').then(m => m.PerfilPublicoPage)
+      },
+      {
         path: 'alta-servicio',
         loadComponent: () => import('./tabs/servicios/alta-servicio/alta-servicios.page').then(m => m.AltaServicioPage)
       },

@@ -195,8 +195,7 @@ export class ServicioDetallePage implements OnInit {
 
   goToProvider() {
     if (this.servicio?.proveedor_id) {
-      // TODO: Navegar al perfil del proveedor
-      console.log('Navegar a proveedor:', this.servicio.proveedor_id);
+      this.router.navigate(['/home/usuario', this.servicio.proveedor_id]);
     }
   }
 
