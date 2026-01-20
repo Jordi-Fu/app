@@ -73,7 +73,6 @@ class SocketService {
         const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
         
         if (!token) {
-          console.log('🔴 Socket: Token no proporcionado');
           return next(new Error('Token de autenticación requerido'));
         }
 
@@ -83,10 +82,8 @@ class SocketService {
         (socket as any).userId = decoded.userId;
         (socket as any).username = decoded.username;
         
-        console.log(`🟢 Socket: Usuario ${decoded.username} autenticado`);
         next();
       } catch (error) {
-        console.log('🔴 Socket: Token inválido');
         next(new Error('Token inválido'));
       }
     });
@@ -102,7 +99,6 @@ class SocketService {
       const userId = (socket as any).userId;
       const username = (socket as any).username;
       
-      console.log(`👤 Usuario conectado: ${username} (${userId}) - Socket: ${socket.id}`);
 
       // Registrar el socket del usuario
       this.addUserSocket(userId, socket.id);
@@ -116,13 +112,11 @@ class SocketService {
       // Evento: Unirse a una conversación específica
       socket.on('join:conversation', (conversacionId: string) => {
         socket.join(`conversation:${conversacionId}`);
-        console.log(`📥 ${username} se unió a la conversación ${conversacionId}`);
       });
 
       // Evento: Salir de una conversación
       socket.on('leave:conversation', (conversacionId: string) => {
         socket.leave(`conversation:${conversacionId}`);
-        console.log(`📤 ${username} salió de la conversación ${conversacionId}`);
       });
 
       // Evento: Usuario está escribiendo
@@ -144,7 +138,6 @@ class SocketService {
 
       // Evento: Desconexión
       socket.on('disconnect', (reason) => {
-        console.log(`👋 Usuario desconectado: ${username} - Razón: ${reason}`);
         this.removeUserSocket(userId, socket.id);
         
         // Solo marcar offline si no tiene más sockets conectados
@@ -166,7 +159,6 @@ class SocketService {
         [isOnline, userId]
       );
       
-      console.log(`📡 Usuario ${userId} ahora está ${isOnline ? 'online' : 'offline'}`);
       
       // Emitir evento a todos los usuarios para que actualicen el estado
       if (this.io) {
@@ -217,7 +209,6 @@ class SocketService {
   emitNewMessage(conversacionId: string, mensaje: MensajeRealTime): void {
     if (!this.io) return;
     
-    console.log(`📨 Emitiendo mensaje a conversación ${conversacionId}`);
     this.io.to(`conversation:${conversacionId}`).emit('message:new', mensaje);
   }
 

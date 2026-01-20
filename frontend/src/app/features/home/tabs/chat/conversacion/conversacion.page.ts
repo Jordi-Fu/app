@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewIn
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonFooter, ViewDidEnter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
@@ -28,7 +28,7 @@ const USER_KEY = 'kurro_user';
     IonFooter
   ]
 })
-export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewDidEnter {
+export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewDidEnter, ViewWillLeave {
   @ViewChild(IonContent) content!: IonContent;
   
   chatId: string = '';
@@ -86,6 +86,14 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     setTimeout(() => this.scrollToBottom(), 100);
     setTimeout(() => this.scrollToBottom(), 300);
     setTimeout(() => this.scrollToBottom(), 500);
+  }
+
+  ionViewWillLeave() {
+    // Salir de la conversación cuando se abandone la vista
+    console.log('ionViewWillLeave - leaving conversation');
+    if (this.chatId) {
+      this.socketService.leaveConversation(this.chatId);
+    }
   }
 
   ngOnDestroy() {
@@ -393,9 +401,5 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     if (!this.conversacion) return '';
     const usuario = this.conversacion.otro_usuario;
     return `${usuario.nombre} ${usuario.apellido}`;
-  }
-
-  volver() {
-    this.router.navigate(['/home/chat']);
   }
 }
