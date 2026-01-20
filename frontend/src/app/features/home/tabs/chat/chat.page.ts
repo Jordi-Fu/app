@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonSpinner } from '@ionic/angular/standalone';
+import { ChatService, ConversacionUsuario } from '../../../../core/services';
 
 @Component({
   selector: 'app-chat',
@@ -10,45 +11,66 @@ import { IonContent } from '@ionic/angular/standalone';
   standalone: true,
   imports: [
     CommonModule,
-    IonContent
+    IonContent,
+    IonRefresher,
+    IonRefresherContent,
+    IonSpinner
   ]
 })
 export class ChatPage implements OnInit {
-  conversaciones: any[] = [];
+  conversaciones: ConversacionUsuario[] = [];
+  cargando = false;
+  error: string | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private chatService: ChatService
+  ) {}
 
   ngOnInit() {
-    // Mock data
-    this.conversaciones = [
-      {
-        id: 1,
-        usuario: 'María García',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        ultimoMensaje: '¿A qué hora puedes venir?',
-        fecha: '10:30 AM',
-        noLeidos: 2
-      },
-      {
-        id: 2,
-        usuario: 'Juan Pérez',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        ultimoMensaje: 'Perfecto, nos vemos mañana',
-        fecha: 'Ayer',
-        noLeidos: 0
-      },
-      {
-        id: 3,
-        usuario: 'Ana Martínez',
-        avatar: 'https://i.pravatar.cc/150?img=5',
-        ultimoMensaje: 'Gracias por el servicio',
-        fecha: '2 días',
-        noLeidos: 0
-      }
-    ];
+    this.cargarConversaciones();
   }
 
-  abrirConversacion(chat: any) {
+  async cargarConversaciones(event?: any) {
+    try {
+      this.cargando = true;
+      this.error = null;
+      this.conversaciones = await this.chatService.obtenerConversaciones();
+    } catch (error) {
+      console.error('Error al cargar conversaciones:', error);
+      this.error = 'Error al cargar las conversaciones';
+    } finally {
+      this.cargando = false;
+      if (event) {
+        event.target.complete();
+      }
+    }
+  }
+
+  abrirConversacion(chat: ConversacionUsuario) {
     this.router.navigate(['/home/conversacion', chat.id]);
+  }
+
+  formatearFecha(fecha?: string): string {
+    if (!fecha) return '';
+    
+    const fechaMensaje = new Date(fecha);
+    const ahora = new Date();
+    const diff = ahora.getTime() - fechaMensaje.getTime();
+    const minutos = Math.floor(diff / 60000);
+    const horas = Math.floor(diff / 3600000);
+    const dias = Math.floor(diff / 86400000);
+
+    if (minutos < 1) return 'Ahora';
+    if (minutos < 60) return `Hace ${minutos} min`;
+    if (horas < 24) return `${fechaMensaje.getHours()}:${fechaMensaje.getMinutes().toString().padStart(2, '0')}`;
+    if (dias === 1) return 'Ayer';
+    if (dias < 7) return `Hace ${dias} días`;
+    
+    return `${fechaMensaje.getDate()}/${fechaMensaje.getMonth() + 1}/${fechaMensaje.getFullYear()}`;
+  }
+
+  getNombreCompleto(usuario: any): string {
+    return `${usuario.nombre} ${usuario.apellido}`;
   }
 }

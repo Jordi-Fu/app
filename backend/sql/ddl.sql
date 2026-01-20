@@ -163,7 +163,6 @@ CREATE TABLE servicios (
   promedio_calificacion DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio_calificacion >= 0 AND promedio_calificacion <= 5),
   total_resenas INTEGER DEFAULT 0,
   tiempo_respuesta_horas INTEGER,
-  politica_cancelacion TEXT,
   incluye TEXT, -- QuÃ© incluye el servicio
   no_incluye TEXT, -- QuÃ© no incluye
   url_video VARCHAR(500),

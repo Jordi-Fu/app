@@ -503,20 +503,23 @@ BEGIN
     CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP - INTERVAL '1 day'
   FROM conversaciones WHERE participante_1_id = v_ana_id AND participante_2_id = v_juan_id;
   
-  -- Mensajes de la conversación Pedro-María
+  -- Mensajes de la conversación Pedro-María (orden cronológico correcto)
+  -- Mensaje 1: Pedro inicia la conversación (hace 4 horas)
   INSERT INTO mensajes (conversacion_id, remitente_id, tipo_mensaje, contenido, esta_leido, leido_en, creado_en)
   SELECT id, v_pedro_id, 'texto', 'Hola María, necesito limpieza profunda de mi departamento. ¿Cuándo puedes?', true,
     CURRENT_TIMESTAMP - INTERVAL '4 hours', CURRENT_TIMESTAMP - INTERVAL '4 hours'
   FROM conversaciones WHERE participante_1_id = v_pedro_id AND participante_2_id = v_maria_id;
   
+  -- Mensaje 2: María responde (hace 3 horas)
   INSERT INTO mensajes (conversacion_id, remitente_id, tipo_mensaje, contenido, esta_leido, leido_en, creado_en)
   SELECT id, v_maria_id, 'texto', 'Hola Pedro, ¿qué tal el sábado a las 9am?', true,
-    CURRENT_TIMESTAMP - INTERVAL '3 hours' + INTERVAL '30 minutes', CURRENT_TIMESTAMP - INTERVAL '3 hours' + INTERVAL '30 minutes'
+    CURRENT_TIMESTAMP - INTERVAL '3 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours'
   FROM conversaciones WHERE participante_1_id = v_pedro_id AND participante_2_id = v_maria_id;
   
+  -- Mensaje 3: Pedro confirma (hace 2 horas)
   INSERT INTO mensajes (conversacion_id, remitente_id, tipo_mensaje, contenido, esta_leido, leido_en, creado_en)
   SELECT id, v_pedro_id, 'texto', 'Claro que sí, el sábado a las 9am está perfecto.', false, null,
-    CURRENT_TIMESTAMP - INTERVAL '3 hours'
+    CURRENT_TIMESTAMP - INTERVAL '2 hours'
   FROM conversaciones WHERE participante_1_id = v_pedro_id AND participante_2_id = v_maria_id;
   
   -- ============================================

@@ -27,6 +27,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },
       {
+        path: 'alta-servicio',
+        loadComponent: () => import('./tabs/servicios/alta-servicio/alta-servicios.page').then(m => m.AltaServicioPage)
+      },
+      {
         path: '',
         redirectTo: 'servicios',
         pathMatch: 'full'

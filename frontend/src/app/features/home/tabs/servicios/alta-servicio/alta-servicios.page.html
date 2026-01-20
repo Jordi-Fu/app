@@ -1,0 +1,102 @@
+<ion-content [scrollY]="true">
+  <div class="service-container">
+    <div class="service-card">
+      
+      <h2 class="title">Publica tu servicio</h2>
+
+      <!-- Sección de imágenes -->
+      <div class="images-section">
+        <div 
+          *ngFor="let image of serviceImages; let i = index" 
+          class="image-box"
+          [class.primary]="i === 0"
+          [class.has-image]="image"
+          (click)="selectImageSource(i)">
+          
+          <img *ngIf="image" [src]="image" alt="Imagen del servicio" />
+          
+          <div *ngIf="!image" class="image-placeholder">
+            <img src="/assets/imagen.svg" alt="Icono de imagen" />
+          </div>
+
+          <button 
+            *ngIf="image" 
+            type="button" 
+            class="remove-image-btn"
+            (click)="removeImage(i); $event.stopPropagation()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <p class="image-hint">Al subir varias fotos, la primera imagen será la principal y es la que se muestre al momento de publicar.</p>
+
+      <!-- Formulario -->
+      <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form">
+        
+        <div class="form-group">
+          <label>Título</label>
+          <input 
+            type="text" 
+            placeholder="¿Qué servicio ofreces?" 
+            formControlName="titulo"
+            maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea 
+            placeholder="Descripción del servicio que ofreces" 
+            formControlName="descripcion"
+            rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Precio</label>
+          <input 
+            type="number" 
+            placeholder="0.00" 
+            formControlName="precio"
+            step="0.01"
+            min="0">
+          <p class="input-hint">Al pulsar € se puede cambiar el tipo de moneda</p>
+        </div>
+
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input 
+            type="text" 
+            placeholder="Ciudad, C.P" 
+            formControlName="ubicacion">
+        </div>
+
+        <div class="form-group">
+          <label>Categoría</label>
+          <select formControlName="categoria">
+            <option value="" disabled selected>Selecciona tu</option>
+            <option value="limpieza">Limpieza</option>
+            <option value="reparaciones">Reparaciones</option>
+            <option value="jardineria">Jardinería</option>
+            <option value="plomeria">Plomería</option>
+            <option value="electricidad">Electricidad</option>
+            <option value="pintura">Pintura</option>
+            <option value="carpinteria">Carpintería</option>
+            <option value="mudanzas">Mudanzas</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-publish"
+          [disabled]="!serviceForm.valid">
+          Publicar
+        </button>
+      </form>
+
+    </div>
+  </div>
+</ion-content>

@@ -1,52 +1,112 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home/chat" (click)="volver()"></ion-back-button>
+      <ion-back-button defaultHref="/home/chat"></ion-back-button>
     </ion-buttons>
     
-    <div class="header-content">
+    <div class="header-content" *ngIf="conversacion">
       <div class="contact-avatar">
-        <img [src]="contacto?.avatar" [alt]="contacto?.usuario" />
+        <img 
+          [src]="conversacion.otro_usuario.url_avatar || 'assets/avatar-default.png'" 
+          [alt]="getNombreCompleto()"
+          onerror="this.src='assets/avatar-default.png'"
+        />
+        <span class="online-indicator" *ngIf="conversacion.otro_usuario.esta_en_linea"></span>
       </div>
       <div class="contact-info">
-        <ion-title>{{ contacto?.usuario }}</ion-title>
-        <span class="status">En línea</span>
+        <ion-title>{{ getNombreCompleto() }}</ion-title>
+        <span class="status" *ngIf="conversacion.otro_usuario.esta_en_linea">En línea</span>
+        <span class="status offline" *ngIf="!conversacion.otro_usuario.esta_en_linea">Desconectado</span>
       </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="conversacion-container">
-    <div class="messages-wrapper" #messagesContainer>
-      <div class="mensaje" 
-           *ngFor="let mensaje of mensajes" 
-           [ngClass]="{'mensaje-propio': mensaje.esPropio, 'mensaje-otro': !mensaje.esPropio}">
+<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)">
+  <!-- Spinner de carga -->
+  <div class="loading-container" *ngIf="cargando">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando mensajes...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-container" *ngIf="error && !cargando">
+    <p class="error-message">{{ error }}</p>
+    <button class="retry-button" (click)="cargarConversacion()">Reintentar</button>
+  </div>
+
+  <!-- Mensajes -->
+  <div class="messages-wrapper" *ngIf="!cargando && !error">
+    <ng-container *ngFor="let mensaje of mensajes; let i = index">
+      <!-- Mensaje propio (derecha) -->
+      <div class="mensaje mensaje-propio" *ngIf="esPropio(mensaje)">
         <div class="mensaje-bubble">
-          <p class="mensaje-texto">{{ mensaje.texto }}</p>
-          <span class="mensaje-fecha">{{ formatearFecha(mensaje.fecha) }}</span>
+          <p class="mensaje-texto">{{ mensaje.contenido }}</p>
+          <span class="mensaje-fecha">{{ formatearFecha(mensaje.creado_en) }}</span>
         </div>
       </div>
+
+      <!-- Mensaje del otro usuario (izquierda) -->
+      <div class="mensaje mensaje-otro" 
+           *ngIf="!esPropio(mensaje)"
+           [class.sin-avatar]="!esUltimoMensajeDelOtro(i)">
+        <!-- Avatar solo en el último mensaje consecutivo del otro usuario -->
+        <div class="mensaje-avatar" *ngIf="esUltimoMensajeDelOtro(i)">
+          <img 
+            [src]="mensaje.remitente.url_avatar || conversacion?.otro_usuario?.url_avatar || 'assets/avatar-default.png'"
+            [alt]="mensaje.remitente.nombre"
+            onerror="this.src='assets/avatar-default.png'"
+          />
+        </div>
+        <!-- Espacio vacío cuando no hay avatar -->
+        <div class="avatar-space" *ngIf="!esUltimoMensajeDelOtro(i)"></div>
+        
+        <div class="mensaje-bubble">
+          <p class="mensaje-texto">{{ mensaje.contenido }}</p>
+          <span class="mensaje-fecha">{{ formatearFecha(mensaje.creado_en) }}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Indicador de escribiendo -->
+    <div class="typing-indicator" *ngIf="otroUsuarioEscribiendo">
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <span class="typing-text">{{ getNombreCompleto() }} está escribiendo...</span>
     </div>
 
+    <div class="empty-messages" *ngIf="mensajes.length === 0">
+      <p>No hay mensajes aún. ¡Envía el primero!</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
     <div class="input-container">
       <div class="input-wrapper">
         <input 
           type="text" 
+          class="mensaje-input"
           placeholder="Escribe un mensaje..."
           [(ngModel)]="nuevoMensaje"
           (keyup.enter)="enviarMensaje()"
-          class="mensaje-input">
+          (input)="onInputChange()"
+          [disabled]="enviando">
         <button 
           class="btn-enviar" 
           (click)="enviarMensaje()"
-          [disabled]="!nuevoMensaje.trim()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          [disabled]="!nuevoMensaje.trim() || enviando">
+          <ion-spinner name="crescent" *ngIf="enviando"></ion-spinner>
+          <svg *ngIf="!enviando" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
         </button>
       </div>
     </div>
-  </div>
-</ion-content>
+  </ion-toolbar>
+</ion-footer>

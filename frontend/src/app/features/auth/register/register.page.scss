@@ -276,7 +276,7 @@ ion-content {
     font-size: 12px;
     color: #1a1a1a;
     pointer-events: none;
-    background-color: white;
+    background-color: #f5f5f5;
     padding: 2px 6px;
     border-radius: 4px;
   }
@@ -478,6 +478,11 @@ ion-content {
       &::placeholder {
         color: #808080;
       }
+    }
+
+    .char-counter {
+      color: #ffffff;
+      background-color: #1a1a1a;
     }
   }
 

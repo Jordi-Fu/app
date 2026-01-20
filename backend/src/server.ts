@@ -1,6 +1,8 @@
+import { createServer } from 'http';
 import createApp from './app';
 import { ENV, validateEnv } from './config/env.config';
 import { testConnection, closePool } from './config/database.config';
+import { socketService } from './services/socket.service';
 
 /**
  * Iniciar servidor
@@ -18,8 +20,14 @@ const startServer = async (): Promise<void> => {
     
     const app = createApp();
     
+    // Crear servidor HTTP para Socket.IO
+    const httpServer = createServer(app);
+    
+    // Inicializar Socket.IO
+    socketService.initialize(httpServer);
+    
     // Escuchar en 0.0.0.0 para aceptar conexiones desde cualquier interfaz de red
-    app.listen(ENV.PORT, '0.0.0.0', () => {
+    httpServer.listen(ENV.PORT, '0.0.0.0', () => {
       console.log('=========================================');
       console.log(`🚀 Servidor iniciado en puerto ${ENV.PORT}`);
       console.log(`📍 Entorno: ${ENV.NODE_ENV}`);
@@ -27,6 +35,7 @@ const startServer = async (): Promise<void> => {
       console.log(`📱 Red: http://192.168.26.207:${ENV.PORT}`);
       console.log(`🔒 CORS habilitado para: ${ENV.CORS_ORIGINS.join(', ')}`);
       console.log(`💾 Base de datos: ${ENV.DB_NAME} en ${ENV.DB_HOST}:${ENV.DB_PORT}`);
+      console.log(`🔌 WebSocket: Habilitado`);
       console.log('=========================================');
     });
   } catch (error) {

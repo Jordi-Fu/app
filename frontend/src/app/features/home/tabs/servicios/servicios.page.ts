@@ -132,4 +132,7 @@ export class ServiciosPage implements OnInit {
     };
     return locations[servicio.tipo_ubicacion] || servicio.tipo_ubicacion;
   }
+  abrirCrearServicio(){
+    this.router.navigate(['/home/alta-servicio']);
+  }
 }

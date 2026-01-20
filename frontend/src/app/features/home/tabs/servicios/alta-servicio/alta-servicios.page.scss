@@ -1,0 +1,300 @@
+@use '../../../../../../theme/variables.scss' as *;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+ion-content {
+  --background: #ffffff;
+}
+
+.service-container {
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.service-card {
+  background: #ffffff;
+  border-radius: 0;
+  padding: 30px 20px;
+  box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 24px 0;
+  color: #000000;
+}
+
+.images-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.image-box {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 2px dashed #d0d0d0;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &.primary {
+    background-color: #E0F7F4;
+    border-color: #13B5B5;
+  }
+
+  &.has-image {
+    border-style: solid;
+    border-color: #13B5B5;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .remove-image-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: white;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
+.image-hint {
+  font-size: 11px;
+  color: #999999;
+  text-align: center;
+  margin: 0 0 24px 0;
+  line-height: 1.4;
+}
+
+.service-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 4px;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #e0e0e0;
+    padding: 12px 16px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: $font-family;
+
+    &::placeholder {
+      color: #999999;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #13B5B5;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999999' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  .input-hint {
+    font-size: 11px;
+    color: #999999;
+    margin: 0;
+  }
+}
+
+.btn-publish {
+  margin: 0 auto;
+  width: 70%;
+  height: 48px;
+  border-radius: 25px;
+  background: $primary-gradient;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(19, 181, 181, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, #cccccc 0%, #999999 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .service-container {
+    padding: 0;
+  }
+
+  .service-card {
+    padding: 24px 16px;
+    border-radius: 0;
+  }
+
+  .images-section {
+    gap: 8px;
+  }
+}
+
+// Modo oscuro
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: #1a1a1a;
+  }
+
+  .service-card {
+    background: #1a1a1a;
+    box-shadow: none;
+  }
+
+  .title {
+    color: #ffffff;
+  }
+
+  .image-box {
+    border-color: #404040;
+    background-color: #2a2a2a;
+
+    &.primary {
+      background-color: rgba(19, 181, 181, 0.15);
+      border-color: #13B5B5;
+    }
+
+    .image-placeholder img {
+      filter: brightness(0) invert(1);
+    }
+  }
+
+  .image-hint {
+    color: #b3b3b3;
+  }
+
+  .form-group {
+    label {
+      color: #ffffff;
+    }
+
+    input,
+    textarea,
+    select {
+      background-color: #2a2a2a;
+      color: #ffffff;
+      border-color: #404040;
+
+      &::placeholder {
+        color: #808080;
+      }
+
+      &:focus {
+        border-color: #13B5B5;
+      }
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23808080' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    }
+
+    .input-hint {
+      color: #b3b3b3;
+    }
+  }
+}

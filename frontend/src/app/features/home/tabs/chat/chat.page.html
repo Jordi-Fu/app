@@ -1,33 +1,56 @@
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="cargarConversaciones($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="chat-container">
-      <div class="chat-content" *ngIf="conversaciones.length > 0; else noChats">
-        <div class="chat-item" *ngFor="let chat of conversaciones" (click)="abrirConversacion(chat)">
-          <div class="chat-avatar">
-            <img [src]="chat.avatar" [alt]="chat.usuario" />
+    <!-- Spinner de carga -->
+    <div class="loading-container" *ngIf="cargando && conversaciones.length === 0">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando conversaciones...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error && conversaciones.length === 0">
+      <p class="error-message">{{ error }}</p>
+      <button class="retry-button" (click)="cargarConversaciones()">Reintentar</button>
+    </div>
+
+    <!-- Lista de conversaciones -->
+    <div class="chat-content" *ngIf="!cargando && conversaciones.length > 0">
+      <div class="chat-item" *ngFor="let chat of conversaciones" (click)="abrirConversacion(chat)">
+        <div class="chat-avatar">
+          <img 
+            [src]="chat.otro_usuario.url_avatar || 'assets/avatar-default.png'" 
+            [alt]="getNombreCompleto(chat.otro_usuario)" 
+            onerror="this.src='assets/avatar-default.png'"
+          />
+          <span class="online-indicator" *ngIf="chat.otro_usuario.esta_en_linea"></span>
+        </div>
+        
+        <div class="chat-info">
+          <div class="chat-header">
+            <h3 class="chat-usuario">{{ getNombreCompleto(chat.otro_usuario) }}</h3>
+            <span class="chat-fecha">{{ formatearFecha(chat.ultimo_mensaje_en) }}</span>
           </div>
-          
-          <div class="chat-info">
-            <div class="chat-header">
-              <h3 class="chat-usuario">{{ chat.usuario }}</h3>
-              <span class="chat-fecha">{{ chat.fecha }}</span>
-            </div>
-            <p class="chat-mensaje">{{ chat.ultimoMensaje }}</p>
-          </div>
-          
-          <div class="chat-badge" *ngIf="chat.noLeidos > 0">
-            {{ chat.noLeidos }}
-          </div>
+          <p class="chat-mensaje">{{ chat.texto_ultimo_mensaje || 'Sin mensajes' }}</p>
+        </div>
+        
+        <div class="chat-badge" *ngIf="chat.no_leidos > 0">
+          {{ chat.no_leidos }}
         </div>
       </div>
+    </div>
 
-      <ng-template #noChats>
-        <div class="empty-state">
-          <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <h2>No tienes conversaciones</h2>
-          <p>Cuando contactes con un proveedor, aparecerán aquí</p>
-        </div>
-      </ng-template>
+    <!-- Estado vacío -->
+    <ng-template #noChats>
+      <div class="empty-state" *ngIf="!cargando && conversaciones.length === 0 && !error">
+        <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <h2>No tienes conversaciones</h2>
+        <p>Cuando contactes con un proveedor, aparecerán aquí</p>
+      </div>
+    </ng-template>
   </div>
 </ion-content>

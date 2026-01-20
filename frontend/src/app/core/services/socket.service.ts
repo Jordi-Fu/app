@@ -1,0 +1,226 @@
+import { Injectable, OnDestroy } from '@angular/core';
+import { io, Socket } from 'socket.io-client';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { StorageService } from './storage.service';
+import { MensajeConRemitente } from '../interfaces';
+
+const ACCESS_TOKEN_KEY = 'kurro_access_token';
+
+/**
+ * Interfaz para mensaje en tiempo real
+ */
+export interface MensajeRealTime {
+  id: string;
+  conversacion_id: string;
+  remitente_id: string;
+  tipo_mensaje: string;
+  contenido: string;
+  url_media?: string;
+  creado_en: string;
+  remitente: {
+    id: string;
+    nombre: string;
+    apellido: string;
+    usuario: string;
+    url_avatar?: string;
+  };
+}
+
+/**
+ * Interfaz para actualización de conversación
+ */
+export interface ConversationUpdate {
+  conversacionId: string;
+  ultimoMensaje: string;
+  ultimoMensajeEn: string;
+  remitenteId: string;
+}
+
+/**
+ * Interfaz para evento de typing
+ */
+export interface TypingEvent {
+  conversacionId: string;
+  userId: string;
+  username: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SocketService implements OnDestroy {
+  private socket: Socket | null = null;
+  private readonly baseUrl: string;
+  
+  // Subjects para emitir eventos
+  private newMessageSubject = new Subject<MensajeRealTime>();
+  private conversationUpdateSubject = new Subject<ConversationUpdate>();
+  private userTypingSubject = new Subject<TypingEvent>();
+  private userStoppedTypingSubject = new Subject<{ conversacionId: string; userId: string }>();
+  private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+  
+  // Observables públicos
+  public newMessage$ = this.newMessageSubject.asObservable();
+  public conversationUpdate$ = this.conversationUpdateSubject.asObservable();
+  public userTyping$ = this.userTypingSubject.asObservable();
+  public userStoppedTyping$ = this.userStoppedTypingSubject.asObservable();
+  public connectionStatus$ = this.connectionStatusSubject.asObservable();
+
+  constructor(private storageService: StorageService) {
+    // Extraer la URL base del API (sin /api)
+    this.baseUrl = environment.apiUrl.replace('/api', '');
+    console.log('🔌 SocketService: URL base:', this.baseUrl);
+  }
+
+  /**
+   * Conectar al servidor de WebSocket
+   */
+  async connect(): Promise<void> {
+    if (this.socket?.connected) {
+      console.log('🔌 Socket ya está conectado');
+      return;
+    }
+
+    try {
+      const token = await this.storageService.get(ACCESS_TOKEN_KEY);
+      
+      if (!token) {
+        console.error('🔴 No hay token para conectar al socket');
+        return;
+      }
+
+      console.log('🔌 Conectando al socket:', this.baseUrl);
+      
+      this.socket = io(this.baseUrl, {
+        auth: { token },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 10000
+      });
+
+      this.setupEventListeners();
+    } catch (error) {
+      console.error('🔴 Error al conectar socket:', error);
+    }
+  }
+
+  /**
+   * Configurar listeners de eventos
+   */
+  private setupEventListeners(): void {
+    if (!this.socket) return;
+
+    // Conexión exitosa
+    this.socket.on('connect', () => {
+      console.log('🟢 Socket conectado:', this.socket?.id);
+      this.connectionStatusSubject.next(true);
+    });
+
+    // Desconexión
+    this.socket.on('disconnect', (reason) => {
+      console.log('🔴 Socket desconectado:', reason);
+      this.connectionStatusSubject.next(false);
+    });
+
+    // Error de conexión
+    this.socket.on('connect_error', (error) => {
+      console.error('🔴 Error de conexión socket:', error.message);
+      this.connectionStatusSubject.next(false);
+    });
+
+    // Nuevo mensaje en conversación
+    this.socket.on('message:new', (mensaje: MensajeRealTime) => {
+      console.log('📨 Nuevo mensaje recibido:', mensaje);
+      this.newMessageSubject.next(mensaje);
+    });
+
+    // Actualización de conversación (para lista de chats)
+    this.socket.on('conversation:update', (update: ConversationUpdate) => {
+      console.log('📝 Actualización de conversación:', update);
+      this.conversationUpdateSubject.next(update);
+    });
+
+    // Usuario escribiendo
+    this.socket.on('user:typing', (event: TypingEvent) => {
+      this.userTypingSubject.next(event);
+    });
+
+    // Usuario dejó de escribir
+    this.socket.on('user:stopped-typing', (event: { conversacionId: string; userId: string }) => {
+      this.userStoppedTypingSubject.next(event);
+    });
+  }
+
+  /**
+   * Unirse a una conversación para recibir mensajes en tiempo real
+   */
+  joinConversation(conversacionId: string): void {
+    if (!this.socket?.connected) {
+      console.warn('🟡 Socket no conectado, intentando conectar...');
+      this.connect().then(() => {
+        setTimeout(() => {
+          this.socket?.emit('join:conversation', conversacionId);
+          console.log('📥 Unido a conversación:', conversacionId);
+        }, 500);
+      });
+      return;
+    }
+    
+    this.socket.emit('join:conversation', conversacionId);
+    console.log('📥 Unido a conversación:', conversacionId);
+  }
+
+  /**
+   * Salir de una conversación
+   */
+  leaveConversation(conversacionId: string): void {
+    if (!this.socket?.connected) return;
+    
+    this.socket.emit('leave:conversation', conversacionId);
+    console.log('📤 Salió de conversación:', conversacionId);
+  }
+
+  /**
+   * Notificar que el usuario está escribiendo
+   */
+  startTyping(conversacionId: string): void {
+    if (!this.socket?.connected) return;
+    
+    this.socket.emit('typing:start', { conversacionId });
+  }
+
+  /**
+   * Notificar que el usuario dejó de escribir
+   */
+  stopTyping(conversacionId: string): void {
+    if (!this.socket?.connected) return;
+    
+    this.socket.emit('typing:stop', { conversacionId });
+  }
+
+  /**
+   * Verificar si está conectado
+   */
+  isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  /**
+   * Desconectar del servidor
+   */
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+      this.connectionStatusSubject.next(false);
+      console.log('🔌 Socket desconectado manualmente');
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.disconnect();
+  }
+}
