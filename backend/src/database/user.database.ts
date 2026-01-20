@@ -120,7 +120,7 @@ class UserDatabase {
         INSERT INTO usuarios (
           id, usuario, correo, hash_password,
           nombre, apellido, telefono, codigo_pais,
-          url_avatar, biografia,
+          fecha_nacimiento, url_avatar, biografia,
           esta_verificado, esta_activo, esta_en_linea,
           promedio_calificacion, total_resenas,
           intentos_fallidos_login,
@@ -128,7 +128,7 @@ class UserDatabase {
           creado_en, actualizado_en
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 0,
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 0,
           'es', 'Europe/Madrid', 'EUR',
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
@@ -155,13 +155,14 @@ class UserDatabase {
         userData.apellidos,                  // $6 - last_name
         cleanPhone,                          // $7 - phone
         '+34',                               // $8 - country_code (España por defecto)
-        avatarUrl,                           // $9 - url_avatar
-        userData.bio || null,                // $10 - biografia
-        false,                               // $11 - esta_verificado
-        true,                                // $12 - esta_activo
-        false,                               // $13 - esta_en_linea
-        0.00,                                // $14 - promedio_calificacion
-        0                                    // $15 - total_resenas
+        userData.fechaNacimiento || null,    // $9 - fecha_nacimiento
+        avatarUrl,                           // $10 - url_avatar
+        userData.bio || null,                // $11 - biografia
+        false,                               // $12 - esta_verificado
+        true,                                // $13 - esta_activo
+        false,                               // $14 - esta_en_linea
+        0.00,                                // $15 - promedio_calificacion
+        0                                    // $16 - total_resenas
       ];
       
       const result = await pool.query(query, values);

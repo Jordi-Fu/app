@@ -8,12 +8,18 @@
 
 ion-content {
   --background: #f5f5f5;
+  --padding-top: 0;
+  --padding-bottom: 0;
 }
 
 .register-container {
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
   padding: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -192,6 +198,17 @@ ion-content {
   will-change: transform, opacity;
 }
 
+.input-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+
+  .input-group {
+    flex: 1;
+    margin-bottom: 16px;
+  }
+}
+
 .input-group {
   position: relative;
   margin-bottom: 16px;
@@ -213,7 +230,7 @@ ion-content {
     background-color: #f5f5f5;
     color: #000000;
     border: 1px solid #e0e0e0;
-    padding: 0 45px;
+    padding: 0 12px 0 42px;
     font-size: 14px;
     box-sizing: border-box;
 
@@ -225,6 +242,24 @@ ion-content {
       outline: none;
       border-color: #13B5B5;
     }
+
+    &.date-input {
+      color-scheme: light;
+      
+      &::-webkit-calendar-picker-indicator {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .date-placeholder {
+    position: absolute;
+    left: 42px;
+    top: 14px;
+    color: #999999;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1;
   }
 
   textarea {
@@ -239,9 +274,9 @@ ion-content {
     bottom: 8px;
     right: 12px;
     font-size: 12px;
-    color: white;
+    color: #1a1a1a;
     pointer-events: none;
-    background-color: #1a1a1a;
+    background-color: white;
     padding: 2px 6px;
     border-radius: 4px;
   }
@@ -269,7 +304,7 @@ ion-content {
 }
 
 .btn-primary {
-  width: 100%;
+  width: 70%;
   height: 48px;
   border-radius: 24px;
   background: $primary-gradient;
@@ -278,7 +313,7 @@ ion-content {
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   transition: opacity 0.3s;
   display: flex;

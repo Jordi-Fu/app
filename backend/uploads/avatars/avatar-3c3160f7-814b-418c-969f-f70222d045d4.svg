@@ -1,0 +1,6 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#98D8C8"/>
+        <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="80" 
+              font-weight="bold" fill="white" text-anchor="middle" 
+              dominant-baseline="central">RR</text>
+      </svg>

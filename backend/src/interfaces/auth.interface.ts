@@ -96,6 +96,7 @@ export interface RegisterRequest {
   nombre: string;
   apellidos: string;
   telefono: string;
+  fechaNacimiento: string;
   username: string;
   email: string;
   password: string;

@@ -66,6 +66,7 @@ export class RegisterPage implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellidos: ['', [Validators.required, Validators.minLength(2)]],
       telefono: ['', [Validators.required, this.phoneValidator()]],
+      fechaNacimiento: ['', [Validators.required]],
       
       // Paso 2: Cuenta
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -311,7 +312,8 @@ export class RegisterPage implements OnInit {
       case 1:
         return !!(this.registerForm.get('nombre')?.valid &&
                this.registerForm.get('apellidos')?.valid &&
-               this.registerForm.get('telefono')?.valid);
+               this.registerForm.get('telefono')?.valid &&
+               this.registerForm.get('fechaNacimiento')?.valid);
       case 2:
         return !!(this.registerForm.get('username')?.valid &&
                this.registerForm.get('email')?.valid &&
@@ -344,6 +346,7 @@ export class RegisterPage implements OnInit {
       nombre: this.registerForm.value.nombre.trim(),
       apellidos: this.registerForm.value.apellidos.trim(),
       telefono: telefonoLimpio,
+      fechaNacimiento: this.registerForm.value.fechaNacimiento,
       username: this.registerForm.value.username.trim(),
       email: this.registerForm.value.email.trim(),
       password: this.registerForm.value.password,
