@@ -46,6 +46,15 @@ export interface TypingEvent {
   username: string;
 }
 
+/**
+ * Interfaz para evento de cambio de estado online
+ */
+export interface UserStatusEvent {
+  userId: string;
+  isOnline: boolean;
+  timestamp: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,6 +68,7 @@ export class SocketService implements OnDestroy {
   private userTypingSubject = new Subject<TypingEvent>();
   private userStoppedTypingSubject = new Subject<{ conversacionId: string; userId: string }>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+  private userStatusChangeSubject = new Subject<UserStatusEvent>();
   
   // Observables públicos
   public newMessage$ = this.newMessageSubject.asObservable();
@@ -66,6 +76,7 @@ export class SocketService implements OnDestroy {
   public userTyping$ = this.userTypingSubject.asObservable();
   public userStoppedTyping$ = this.userStoppedTypingSubject.asObservable();
   public connectionStatus$ = this.connectionStatusSubject.asObservable();
+  public userStatusChange$ = this.userStatusChangeSubject.asObservable();
 
   constructor(private storageService: StorageService) {
     // Extraer la URL base del API (sin /api)
@@ -94,16 +105,19 @@ export class SocketService implements OnDestroy {
       
       this.socket = io(this.baseUrl, {
         auth: { token },
-        transports: ['websocket', 'polling'],
+        transports: ['polling', 'websocket'], // Polling primero es más compatible
         reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        timeout: 10000
+        reconnectionAttempts: 10,
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 10000,
+        timeout: 30000, // 30 segundos de timeout
+        forceNew: true
       });
 
       this.setupEventListeners();
     } catch (error) {
       console.error('🔴 Error al conectar socket:', error);
+      // No lanzar error, solo loguear - la app puede funcionar sin socket
     }
   }
 
@@ -151,6 +165,12 @@ export class SocketService implements OnDestroy {
     // Usuario dejó de escribir
     this.socket.on('user:stopped-typing', (event: { conversacionId: string; userId: string }) => {
       this.userStoppedTypingSubject.next(event);
+    });
+
+    // Cambio de estado online/offline de un usuario
+    this.socket.on('user:status-change', (event: UserStatusEvent) => {
+      console.log('👤 Cambio de estado de usuario:', event);
+      this.userStatusChangeSubject.next(event);
     });
   }
 

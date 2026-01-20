@@ -7,3 +7,6 @@ export * from './socket.service';
 
 // Re-exportar interfaces de chat para facilitar importación
 export { ConversacionUsuario, MensajeConRemitente, EnviarMensajeRequest } from '../interfaces';
+
+// Re-exportar tipos de socket
+export { MensajeRealTime, ConversationUpdate, TypingEvent, UserStatusEvent } from './socket.service';

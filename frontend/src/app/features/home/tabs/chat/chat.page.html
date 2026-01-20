@@ -4,21 +4,43 @@
   </ion-refresher>
 
   <div class="chat-container">
+    <div class="search-container">
+      <div class="search-bar">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" placeholder="Buscar conversaciones..." (input)="onSearch($event)">
+      </div>
+
+    </div>
     <!-- Spinner de carga -->
     <div class="loading-container" *ngIf="cargando && conversaciones.length === 0">
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando conversaciones...</p>
     </div>
-
+    <div *ngIf="!cargando && conversaciones.length === 0 && !error">
+      <ng-container *ngTemplateOutlet="noChats"></ng-container>
+    </div>
     <!-- Error -->
     <div class="error-container" *ngIf="error && conversaciones.length === 0">
       <p class="error-message">{{ error }}</p>
       <button class="retry-button" (click)="cargarConversaciones()">Reintentar</button>
     </div>
 
+    <!-- Sin resultados de búsqueda -->
+    <div class="no-results" *ngIf="!cargando && conversaciones.length > 0 && conversacionesFiltradas.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <p>No se encontraron conversaciones</p>
+    </div>
+
     <!-- Lista de conversaciones -->
     <div class="chat-content" *ngIf="!cargando && conversaciones.length > 0">
-      <div class="chat-item" *ngFor="let chat of conversaciones" (click)="abrirConversacion(chat)">
+      <div class="chat-item" *ngFor="let chat of conversacionesFiltradas" (click)="abrirConversacion(chat)">
         <div class="chat-avatar">
           <img 
             [src]="chat.otro_usuario.url_avatar || 'assets/avatar-default.png'" 

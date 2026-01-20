@@ -5,25 +5,25 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: #0d0d0d;
+  background: #f5f5f5;
 }
 
 // ============ HEADER ============
 ion-header {
-  background: #1a1a1a;
+  background: #ffffff;
   
   // Padding para el notch/safe-area
   padding-top: var(--ion-safe-area-top, env(safe-area-inset-top, 0px));
   
   ion-toolbar {
-    --background: #1a1a1a;
+    --background: #ffffff;
     --border-width: 0 0 1px 0;
-    --border-color: #2a2a2a;
-    --color: #ffffff;
+    --border-color: #e0e0e0;
+    --color: #000000;
     padding: 8px 0;
     
     ion-back-button {
-      --color: #ffffff;
+      --color: #000000;
       --icon-font-size: 24px;
     }
 
@@ -55,7 +55,7 @@ ion-header {
           height: 10px;
           border-radius: 50%;
           background-color: #4caf50;
-          border: 2px solid #1a1a1a;
+          border: 2px solid #ffffff;
         }
       }
 
@@ -69,7 +69,7 @@ ion-header {
           padding: 0;
           font-size: 16px;
           font-weight: 600;
-          color: #ffffff;
+          color: #000000;
         }
 
         .status {
@@ -88,7 +88,7 @@ ion-header {
 
 // ============ CONTENT ============
 ion-content {
-  --background: #0d0d0d;
+  --background: #f5f5f5;
   --padding-bottom: 0;
   --padding-top: 0;
 }
@@ -98,7 +98,7 @@ ion-content {
   flex-direction: column;
   gap: 4px;
   padding: 16px;
-  padding-bottom: 80px; // Espacio extra para que no quede oculto bajo el input
+  padding-bottom: 80px;
   min-height: 100%;
 }
 
@@ -112,7 +112,7 @@ ion-content {
   animation: messageSlideIn 0.2s ease-out;
 }
 
-// Mensaje del usuario actual (derecha) - clase separada para mayor especificidad
+// Mensaje del usuario actual (derecha)
 .mensaje.mensaje-propio {
   flex-direction: row-reverse !important;
   justify-content: flex-start !important;
@@ -130,22 +130,23 @@ ion-content {
   color: rgba(255, 255, 255, 0.7) !important;
 }
 
-// Mensaje del otro usuario (izquierda) - clase separada para mayor especificidad
+// Mensaje del otro usuario (izquierda)
 .mensaje.mensaje-otro {
   flex-direction: row !important;
   justify-content: flex-start !important;
 }
 
 .mensaje-otro .mensaje-bubble {
-  background: #2a2a2a !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
   border-radius: 18px 18px 18px 4px !important;
   margin-right: 50px !important;
   margin-left: 0 !important;
+  border: 1px solid #e0e0e0;
 }
 
 .mensaje-otro .mensaje-bubble .mensaje-fecha {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: #999999 !important;
 }
 
 // Espacio para avatar cuando no se muestra
@@ -220,7 +221,7 @@ ion-content {
 
   p {
     font-size: 14px;
-    color: #808080;
+    color: #666666;
     margin: 0;
   }
 
@@ -248,12 +249,12 @@ ion-content {
 
 // ============ FOOTER / INPUT ============
 ion-footer {
-  background: #1a1a1a;
+  background: #ffffff;
   
   ion-toolbar {
-    --background: #1a1a1a;
+    --background: #ffffff;
     --border-width: 1px 0 0 0;
-    --border-color: #2a2a2a;
+    --border-color: #e0e0e0;
     --padding-start: 0;
     --padding-end: 0;
     --padding-top: 0;
@@ -266,7 +267,7 @@ ion-footer {
   display: flex;
   align-items: center;
   padding: 10px 16px;
-  background: #1a1a1a;
+  background: #ffffff;
   width: 100%;
   box-sizing: border-box;
 }
@@ -275,7 +276,8 @@ ion-footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #2a2a2a;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
   border-radius: 24px;
   padding: 6px 6px 6px 16px;
   flex: 1;
@@ -288,12 +290,12 @@ ion-footer {
   background: transparent;
   outline: none;
   font-size: 15px;
-  color: #ffffff;
+  color: #000000;
   padding: 8px 0;
   min-width: 0;
 
   &::placeholder {
-    color: #808080;
+    color: #999999;
   }
 
   &:disabled {
@@ -411,5 +413,87 @@ ion-footer {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ============ MODO OSCURO ============
+@media (prefers-color-scheme: dark) {
+  :host {
+    background: #0d0d0d;
+  }
+
+  ion-header {
+    background: #1a1a1a;
+    
+    ion-toolbar {
+      --background: #1a1a1a;
+      --border-color: #2a2a2a;
+      --color: #ffffff;
+      
+      ion-back-button {
+        --color: #ffffff;
+      }
+
+      .header-content {
+        .contact-avatar {
+          .online-indicator {
+            border-color: #1a1a1a;
+          }
+        }
+
+        .contact-info {
+          ion-title {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  ion-content {
+    --background: #0d0d0d;
+  }
+
+  .mensaje-otro .mensaje-bubble {
+    background: #2a2a2a !important;
+    color: #ffffff !important;
+    border: none !important;
+  }
+
+  .mensaje-otro .mensaje-bubble .mensaje-fecha {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .loading-container,
+  .error-container {
+    p {
+      color: #808080;
+    }
+  }
+
+  ion-footer {
+    background: #1a1a1a;
+    
+    ion-toolbar {
+      --background: #1a1a1a;
+      --border-color: #2a2a2a;
+    }
+  }
+
+  .input-container {
+    background: #1a1a1a;
+  }
+
+  .input-wrapper {
+    background-color: #2a2a2a;
+    border-color: #404040;
+  }
+
+  .mensaje-input {
+    color: #ffffff;
+
+    &::placeholder {
+      color: #808080;
+    }
   }
 }

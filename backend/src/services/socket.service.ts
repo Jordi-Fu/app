@@ -2,6 +2,7 @@ import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/env.config';
+import { pool } from '../config/database.config';
 
 /**
  * Interfaz para el payload del JWT
@@ -105,6 +106,9 @@ class SocketService {
 
       // Registrar el socket del usuario
       this.addUserSocket(userId, socket.id);
+      
+      // Actualizar estado a online en la base de datos y notificar
+      this.setUserOnlineStatus(userId, true);
 
       // Unir al usuario a su room personal (para mensajes directos)
       socket.join(`user:${userId}`);
@@ -142,8 +146,39 @@ class SocketService {
       socket.on('disconnect', (reason) => {
         console.log(`👋 Usuario desconectado: ${username} - Razón: ${reason}`);
         this.removeUserSocket(userId, socket.id);
+        
+        // Solo marcar offline si no tiene más sockets conectados
+        if (!this.isUserOnline(userId)) {
+          this.setUserOnlineStatus(userId, false);
+        }
       });
     });
+  }
+
+  /**
+   * Actualizar estado online/offline del usuario en la base de datos y notificar
+   */
+  private async setUserOnlineStatus(userId: string, isOnline: boolean): Promise<void> {
+    try {
+      // Actualizar en la base de datos
+      await pool.query(
+        `UPDATE usuarios SET esta_en_linea = $1, ultima_actividad = CURRENT_TIMESTAMP WHERE id = $2`,
+        [isOnline, userId]
+      );
+      
+      console.log(`📡 Usuario ${userId} ahora está ${isOnline ? 'online' : 'offline'}`);
+      
+      // Emitir evento a todos los usuarios para que actualicen el estado
+      if (this.io) {
+        this.io.emit('user:status-change', {
+          userId,
+          isOnline,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error al actualizar estado online del usuario:', error);
+    }
   }
 
   /**

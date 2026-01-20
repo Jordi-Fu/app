@@ -14,9 +14,7 @@ class ChatController {
     try {
       const userId = req.user?.userId;
       
-      console.log('=== OBTENER CONVERSACIONES ===');
-      console.log('Usuario autenticado ID:', userId);
-      console.log('req.user completo:', req.user);
+
       
       if (!userId) {
         res.status(401).json({ error: 'No autenticado' });
@@ -25,7 +23,6 @@ class ChatController {
 
       const conversaciones = await chatService.obtenerConversaciones(userId);
       
-      console.log(`Conversaciones encontradas: ${conversaciones.length}`);
       
       res.status(200).json({
         success: true,

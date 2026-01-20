@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonFooter, ViewDidEnter } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime } from '../../../../../core/services';
+import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
 
 // Constante de clave de storage (igual que en auth.service.ts)
@@ -168,6 +168,22 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         }
       });
       this.subscriptions.push(stoppedTypingSub);
+      
+      // Suscribirse a cambios de estado online/offline del otro usuario
+      const statusSub = this.socketService.userStatusChange$.subscribe((event: UserStatusEvent) => {
+        if (this.conversacion && this.conversacion.otro_usuario.id === event.userId) {
+          this.conversacion = {
+            ...this.conversacion,
+            otro_usuario: {
+              ...this.conversacion.otro_usuario,
+              esta_en_linea: event.isOnline
+            }
+          };
+          this.cdr.detectChanges();
+          console.log(`👤 Estado del usuario actualizado: ${event.isOnline ? 'En línea' : 'Desconectado'}`);
+        }
+      });
+      this.subscriptions.push(statusSub);
       
       console.log('🔌 Socket inicializado para conversación:', this.chatId);
     } catch (error) {
