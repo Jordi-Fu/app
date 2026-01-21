@@ -51,6 +51,7 @@ export class PerfilPublicoPage implements OnInit {
   userServices: any[] = [];
   userReviews: Review[] = [];
   isLoading = true;
+  isDescripcionExpanded = false;
 
   constructor() {
     addIcons({
@@ -140,6 +141,10 @@ export class PerfilPublicoPage implements OnInit {
     const nombre = this.userProfile.nombre.toLowerCase().replace(/\s/g, '');
     const apellido = this.userProfile.apellido.toLowerCase().replace(/\s/g, '');
     return `${nombre}${apellido}_`;
+  }
+
+  toggleDescripcion() {
+    this.isDescripcionExpanded = !this.isDescripcionExpanded;
   }
 
   formatDate(dateString: string): string {

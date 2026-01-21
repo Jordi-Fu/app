@@ -17,21 +17,32 @@
     <!-- Cabecera del perfil con avatar e info lado a lado -->
     <div class="profile-header">
       <div class="avatar-container">
-        <div class="avatar-ring">
-          <ion-avatar class="profile-avatar">
-            <img 
-              [src]="userProfile.url_avatar || 'https://ui-avatars.com/api/?name=' + userProfile.nombre + '+' + userProfile.apellido + '&background=2DD4BF&color=fff'" 
-              [alt]="userProfile.nombre + ' ' + userProfile.apellido"
-            />
-          </ion-avatar>
-        </div>
+        <ion-avatar class="profile-avatar">
+          <img 
+            [src]="userProfile.url_avatar || 'https://ui-avatars.com/api/?name=' + userProfile.nombre + '+' + userProfile.apellido + '&background=2DD4BF&color=fff'" 
+            [alt]="userProfile.nombre + ' ' + userProfile.apellido"
+          />
+        </ion-avatar>
       </div>
       
       <div class="profile-info">
         <h2 class="user-name">{{ userProfile.nombre }} {{ userProfile.apellido }}</h2>
-        <p class="location-text">📍 Madrid, España</p>
-        <p class="member-since">Miembro en Kurro desde {{ getYear(userProfile.fecha_creacion) }}</p>
+        <p class="member-since gradient-text">Miembro en Kurro desde {{ getYear(userProfile.fecha_creacion) }}</p>
       </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="descripcion-section" *ngIf="userProfile?.biografia">
+      <h3 class="section-title">Descripción</h3>
+      <p class="descripcion-text">
+        {{ isDescripcionExpanded ? userProfile.biografia : (userProfile.biografia | slice:0:100) }}
+        <span *ngIf="userProfile.biografia && userProfile.biografia.length > 100">
+          <span *ngIf="!isDescripcionExpanded">...</span>
+          <button class="ver-mas-btn" (click)="toggleDescripcion()">
+            {{ isDescripcionExpanded ? 'Ver menos' : 'Ver más' }}
+          </button>
+        </span>
+      </p>
     </div>
 
     <!-- Stats Card -->

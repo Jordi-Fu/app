@@ -1,86 +1,161 @@
 <ion-content>
   <div class="perfil-container">
-    <div class="perfil-card">
+    <!-- Header con username centrado -->
+    <div class="custom-header">
+      <h1 class="username-title">{{ usuario?.username || '@usuario' }}</h1>
+    </div>
+
+    <!-- Cabecera del perfil con avatar e info lado a lado -->
+    <div class="profile-header" *ngIf="usuario">
+      <div class="avatar-container">
+        <ng-container *ngIf="usuario.avatarUrl && !imageError">
+          <img [src]="getAvatarUrl(usuario.avatarUrl)" 
+               alt="Avatar" 
+               class="profile-avatar"
+               (error)="onImageError()" />
+        </ng-container>
+        <ng-container *ngIf="!usuario.avatarUrl || imageError">
+          <div class="profile-avatar placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+        </ng-container>
+      </div>
       
-
-      <div class="perfil-header" *ngIf="usuario">
-        <div class="perfil-avatar">
-          <ng-container *ngIf="usuario.avatarUrl && !imageError">
-            <img [src]="getAvatarUrl(usuario.avatarUrl)" 
-                 alt="Avatar" 
-                 class="perfil-avatar-img"
-                 (error)="onImageError()" />
-          </ng-container>
-        </div>
-        <h1 class="perfil-username">{{ usuario.username }} {{usuario.lastName}}</h1>
-        <p class="perfil-email">{{ usuario.email }}</p>
+      <div class="profile-info">
+        <h2 class="user-name">{{ usuario.firstName }} {{ usuario.lastName }}</h2>
+        <p class="member-since gradient-text">Miembro en Kurro desde {{ getMemberYear() }}</p>
       </div>
+    </div>
 
-      <div class="info-section" *ngIf="usuario">
-        <div class="info-item">
-          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
+    <!-- Descripción -->
+    <div class="descripcion-section" *ngIf="usuario?.bio">
+      <h3 class="section-title">Descripción</h3>
+      <p class="descripcion-text">
+        {{ isDescripcionExpanded ? usuario.bio : (usuario.bio | slice:0:100) }}
+        <span *ngIf="usuario.bio && usuario.bio.length > 100">
+          <span *ngIf="!isDescripcionExpanded">...</span>
+          <button class="ver-mas-btn" (click)="toggleDescripcion()">
+            {{ isDescripcionExpanded ? 'Ver menos' : 'Ver más' }}
+          </button>
+        </span>
+      </p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-card">
+      <div class="stat-item">
+        <span class="stat-value">{{ serviciosActivos?.length || 0 }}</span>
+        <span class="stat-label">Servicios Activos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="rating-stat">
+          <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
-          <div class="info-text">
-            <span class="info-label">Email</span>
-            <span class="info-value">{{ usuario.email }}</span>
+          <span class="stat-value">{{ usuario?.ratingAverage || '0.0' }}</span>
+        </div>
+        <span class="stat-label">({{ usuario?.totalReviews || 0 }} reseñas)</span>
+      </div>
+    </div>
+
+    <!-- Mis Servicios -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Mis servicios</h2>
+      </div>
+      
+      <!-- Si hay servicios -->
+      <div class="services-list" *ngIf="serviciosActivos && serviciosActivos.length > 0">
+        <div class="service-item" *ngFor="let servicio of serviciosActivos">
+          <div class="service-image">
+            <img *ngIf="servicio.images && servicio.images.length > 0" 
+                 [src]="getServiceImageUrl(servicio.images[0].url_imagen)" 
+                 alt="{{ servicio.titulo }}" />
+            <div *ngIf="!servicio.images || servicio.images.length === 0" class="service-img-placeholder"></div>
+          </div>
+          <div class="service-details">
+            <h3 class="service-title">{{ servicio.titulo }}</h3>
+            <span class="service-price">{{ servicio.precio }}€/hora</span>
+            <span class="service-status" [class.active]="servicio.esta_activo">
+              <span class="status-dot"></span>
+              {{ servicio.esta_activo ? 'Activo' : 'Inactivo' }}
+            </span>
           </div>
         </div>
-        
-        <div class="info-item" *ngIf="usuario.phone">
-          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-          </svg>
-          <div class="info-text">
-            <span class="info-label">Teléfono</span>
-            <span class="info-value">{{ usuario.phone }}</span>
-          </div>
-        </div>
       </div>
 
-      <div class="menu-list">
-        <div class="menu-item">
-          <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 1v6m0 6v6m8.66-13.66l-4.24 4.24m-4.24 4.24l-4.24 4.24m0-12.48l4.24 4.24m4.24 4.24l4.24 4.24"></path>
+      <!-- Si no hay servicios -->
+      <div class="no-servicios" *ngIf="!serviciosActivos || serviciosActivos.length === 0">
+        <p class="no-servicios-text">¡Sube tu primer servicio!!</p>
+        <button class="add-servicio-btn" (click)="irAltaServicio()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          <span class="menu-label">Configuración</span>
-          <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </div>
+        </button>
+      </div>
+    </div>
 
-        <div class="menu-item">
-          <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-          <span class="menu-label">Privacidad</span>
-          <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </div>
-
-        <div class="menu-item">
-          <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3m.08 4h.01"></path>
-          </svg>
-          <span class="menu-label">Ayuda</span>
-          <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </div>
+    <!-- Menú de opciones -->
+    <div class="menu-list">
+      <div class="menu-item" (click)="irResenasRecibidas()">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="menu-label">Reseñas recibidas</span>
+        <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
       </div>
 
-      <button class="btn-logout" (click)="cerrarSesion()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="menu-item" (click)="irServiciosFavoritos()">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span class="menu-label">Servicios Favoritos</span>
+        <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+
+      <div class="menu-item" (click)="irConfiguracion()">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span class="menu-label">Configuración</span>
+        <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+
+      <div class="menu-item" (click)="irAyuda()">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span class="menu-label">Ayuda y Soporte</span>
+        <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+
+      <div class="menu-item logout" (click)="cerrarSesion()">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
           <polyline points="16 17 21 12 16 7"></polyline>
           <line x1="21" y1="12" x2="9" y2="12"></line>
         </svg>
-        Cerrar sesión
-      </button>
+        <span class="menu-label">Cerrar Sesión</span>
+        <svg class="menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
     </div>
   </div>
 </ion-content>

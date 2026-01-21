@@ -86,16 +86,11 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   .avatar-container {
     flex-shrink: 0;
     
-    .avatar-ring {
-      padding: 4px;
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
-      background: linear-gradient(135deg, $primary-green-light, $primary-green);
-      
-      .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border: 3px solid var(--ion-background-color);
-      }
+      object-fit: cover;
     }
   }
   
@@ -122,6 +117,46 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       margin: 0;
       font-size: 0.75rem;
       color: var(--ion-color-medium);
+      
+      &.gradient-text {
+        background: $primary-gradient;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// ===============================================
+// SECCIÓN DESCRIPCIÓN
+// ===============================================
+.descripcion-section {
+  padding: 0 1rem 1rem;
+  
+  .section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .descripcion-text {
+    font-size: 0.875rem;
+    color: var(--ion-color-medium);
+    line-height: 1.5;
+    margin: 0;
+    
+    .ver-mas-btn {
+      background: none;
+      border: none;
+      color: $primary-green;
+      font-size: 0.875rem;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 4px;
+      font-weight: 500;
     }
   }
 }

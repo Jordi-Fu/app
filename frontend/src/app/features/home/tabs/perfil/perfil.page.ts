@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
 import { environment } from '../../../../../environments/environment';
+import { Service } from '../../../../core/interfaces';
 
 @Component({
   selector: 'app-perfil',
@@ -18,16 +20,33 @@ import { environment } from '../../../../../environments/environment';
 export class PerfilPage implements OnInit {
   usuario: any = null;
   imageError = false;
+  isDescripcionExpanded = false;
+  serviciosActivos: Service[] = [];
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
-     
+      if (user?.id) {
+        this.cargarServicios(user.id);
+      }
+    });
+  }
+
+  cargarServicios(userId: string) {
+    this.userService.getUserServices(userId).subscribe({
+      next: (response: any) => {
+        this.serviciosActivos = response.data || response || [];
+      },
+      error: (err) => {
+        console.error('Error al cargar servicios:', err);
+        this.serviciosActivos = [];
+      }
     });
   }
 
@@ -35,18 +54,62 @@ export class PerfilPage implements OnInit {
     if (!avatarUrl) {
       return '';
     }
-    // Si ya es una URL completa, devolverla tal cual
     if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
       return avatarUrl;
     }
-    // Construir URL completa desde el servidor
     const baseUrl = environment.apiUrl.replace('/api', '');
     return `${baseUrl}${avatarUrl}`;
+  }
+
+  getServiceImageUrl(imageUrl: string | null): string {
+    if (!imageUrl) {
+      return '';
+    }
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    return `${baseUrl}${imageUrl}`;
   }
 
   onImageError() {
     console.error('Error al cargar la imagen del avatar');
     this.imageError = true;
+  }
+
+  getMemberYear(): string {
+    if (this.usuario?.createdAt) {
+      return new Date(this.usuario.createdAt).getFullYear().toString();
+    }
+    return new Date().getFullYear().toString();
+  }
+
+  toggleDescripcion() {
+    this.isDescripcionExpanded = !this.isDescripcionExpanded;
+  }
+
+  irAltaServicio() {
+    this.router.navigate(['/home/alta-servicio']);
+  }
+
+  irResenasRecibidas() {
+    // TODO: Implementar navegación a reseñas
+    console.log('Ir a reseñas recibidas');
+  }
+
+  irServiciosFavoritos() {
+    // TODO: Implementar navegación a favoritos
+    console.log('Ir a servicios favoritos');
+  }
+
+  irConfiguracion() {
+    // TODO: Implementar navegación a configuración
+    console.log('Ir a configuración');
+  }
+
+  irAyuda() {
+    // TODO: Implementar navegación a ayuda
+    console.log('Ir a ayuda');
   }
 
   cerrarSesion() {
