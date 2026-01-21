@@ -21,17 +21,43 @@ ion-header {
     --border-color: #e0e0e0;
     --color: #000000;
     padding: 8px 0;
+    position: relative;
     
-    ion-back-button {
-      --color: #000000;
-      --icon-font-size: 24px;
+    .back-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 16px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+      z-index: 10;
+      background: $primary-gradient;
+      mask-image: url('/assets/back.svg');
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      -webkit-mask-image: url('/assets/back.svg');
+      -webkit-mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+
+      &:hover {
+        transform: translateY(-50%) scale(1.1);
+        opacity: 0.8;
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.95);
+      }
     }
 
     .header-content {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 0 16px 0 0;
+      padding: 0 16px 0 52px; // Padding izquierdo mayor para la flecha
 
       .contact-avatar {
         width: 40px;

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent } from '../../../../../core/services';
+import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent, AuthService } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
 
 // Constante de clave de storage (igual que en auth.service.ts)
@@ -55,7 +55,8 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     private chatService: ChatService,
     private storageService: StorageService,
     private socketService: SocketService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -65,14 +66,13 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     const user = await this.storageService.getObject<any>(USER_KEY);
     this.usuarioActualId = user?.id || '';
     
-    console.log('=== DEBUG CHAT ===');
-    console.log('Usuario actual ID:', this.usuarioActualId);
-    console.log('Chat ID:', this.chatId);
-    
     await this.cargarConversacion();
     
     // Inicializar WebSocket
     await this.initializeSocket();
+    
+    // Escuchar cambios de autenticación
+    this.listenToAuthChanges();
   }
 
   ngAfterViewInit() {
@@ -82,7 +82,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
 
   ionViewDidEnter() {
     // Scroll al fondo cada vez que se entra a la vista
-    console.log('ionViewDidEnter - scrolling to bottom');
     setTimeout(() => this.scrollToBottom(), 100);
     setTimeout(() => this.scrollToBottom(), 300);
     setTimeout(() => this.scrollToBottom(), 500);
@@ -90,7 +89,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
 
   ionViewWillLeave() {
     // Salir de la conversación cuando se abandone la vista
-    console.log('ionViewWillLeave - leaving conversation');
     if (this.chatId) {
       this.socketService.leaveConversation(this.chatId);
     }
@@ -109,6 +107,28 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout);
     }
+  }
+
+  /**
+   * Escuchar cambios en la autenticación
+   */
+  private listenToAuthChanges() {
+    const authSub = this.authService.currentUser$.subscribe(user => {
+      const newUserId = user?.id || '';
+      
+      // Si el usuario cambió y no es el mismo que el actual
+      if (this.usuarioActualId && newUserId && this.usuarioActualId !== newUserId) {
+        console.log('Usuario cambió en conversación, regresando a chat...', {
+          anterior: this.usuarioActualId,
+          nuevo: newUserId
+        });
+        
+        // Regresar a la lista de conversaciones
+        //this.router.navigate(['/home/chat']);
+      }
+    });
+    
+    this.subscriptions.push(authSub);
   }
 
   /**
@@ -188,12 +208,10 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
             }
           };
           this.cdr.detectChanges();
-          console.log(`👤 Estado del usuario actualizado: ${event.isOnline ? 'En línea' : 'Desconectado'}`);
         }
       });
       this.subscriptions.push(statusSub);
       
-      console.log('🔌 Socket inicializado para conversación:', this.chatId);
     } catch (error) {
       console.error('Error al inicializar socket:', error);
     }
@@ -206,15 +224,13 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
 
       // Cargar datos de la conversación
       this.conversacion = await this.chatService.obtenerConversacion(this.chatId);
-      console.log('Conversación cargada:', this.conversacion);
       
       // Cargar mensajes
       this.mensajes = await this.chatService.obtenerMensajes(this.chatId);
-      console.log('Mensajes cargados:', this.mensajes.length);
       
       // Debug: mostrar cada mensaje y si es propio
       this.mensajes.forEach((m, i) => {
-        console.log(`Mensaje ${i}: remitente_id=${m.remitente_id}, usuarioActual=${this.usuarioActualId}, esPropio=${m.remitente_id === this.usuarioActualId}, contenido=${m.contenido?.substring(0, 30)}`);
+        // console.log(`Mensaje ${i}: remitente_id=${m.remitente_id}, usuarioActual=${this.usuarioActualId}, esPropio=${m.remitente_id === this.usuarioActualId}, contenido=${m.contenido?.substring(0, 30)}`);
       });
       
       // Marcar mensajes como leídos
@@ -341,16 +357,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     }
   }
 
-  /**
-   * Verificar si el usuario está cerca del fondo
-   */
-  private async checkIfNearBottom(): Promise<boolean> {
-    if (!this.content) return true;
-    
-    const scrollElement = await this.content.getScrollElement();
-    const distanceFromBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight;
-    return distanceFromBottom < this.SCROLL_THRESHOLD;
-  }
 
   formatearFecha(fecha: string): string {
     const fechaMensaje = new Date(fecha);
@@ -401,5 +407,16 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     if (!this.conversacion) return '';
     const usuario = this.conversacion.otro_usuario;
     return `${usuario.nombre} ${usuario.apellido}`;
+  }
+
+  goToProvider() {
+    console.log('Navegando al perfil del proveedor:', this.conversacion?.otro_usuario.nombre, this.conversacion?.otro_usuario.id);
+    if (this.conversacion?.otro_usuario.id) {
+      this.router.navigate(['/home/usuario', this.conversacion?.otro_usuario.id]);
+    }
+  }
+
+  goBack() {
+    this.router.navigate(['/home/chat']);
   }
 }

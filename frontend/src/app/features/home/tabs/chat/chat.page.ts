@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent, IonSpinner } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent } from '../../../../core/services';
+import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService } from '../../../../core/services';
 
 @Component({
   selector: 'app-chat',
@@ -26,16 +26,19 @@ export class ChatPage implements OnInit, OnDestroy {
   searchQuery = '';
   
   private subscriptions: Subscription[] = [];
+  private currentUserId: string | null = null;
 
   constructor(
     private router: Router,
     private chatService: ChatService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.cargarConversaciones();
     this.initializeSocket();
+    this.listenToAuthChanges();
   }
 
   ngOnDestroy() {
@@ -53,6 +56,37 @@ export class ChatPage implements OnInit, OnDestroy {
       this.actualizarEstadoUsuario(event.userId, event.isOnline);
     });
     this.subscriptions.push(statusSub);
+  }
+
+  /**
+   * Escuchar cambios en la autenticación
+   */
+  private listenToAuthChanges() {
+    const authSub = this.authService.currentUser$.subscribe(user => {
+      const newUserId = user?.id || null;
+      
+      // Si el usuario cambió (diferente ID o de no-autenticado a autenticado)
+      if (this.currentUserId !== null && this.currentUserId !== newUserId) {
+        console.log('Usuario cambió, recargando conversaciones...', {
+          anterior: this.currentUserId,
+          nuevo: newUserId
+        });
+        
+        // Limpiar datos anteriores
+        this.conversaciones = [];
+        this.conversacionesFiltradas = [];
+        this.searchQuery = '';
+        
+        // Recargar conversaciones si hay un usuario autenticado
+        if (newUserId) {
+          this.cargarConversaciones();
+        }
+      }
+      
+      this.currentUserId = newUserId;
+    });
+    
+    this.subscriptions.push(authSub);
   }
 
   /**

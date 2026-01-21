@@ -1,10 +1,8 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home/chat"></ion-back-button>
-    </ion-buttons>
+    <div class="back-arrow" (click)="goBack()"></div>
     
-    <div class="header-content" *ngIf="conversacion">
+    <div class="header-content" *ngIf="conversacion" (click)="goToProvider()">
       <div class="contact-avatar">
         <img 
           [src]="conversacion.otro_usuario.url_avatar || 'assets/avatar-default.png'" 
