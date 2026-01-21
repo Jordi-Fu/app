@@ -1,0 +1,132 @@
+<ion-content>
+  <div class="busqueda-container">
+    <!-- Header con barra de búsqueda -->
+    <div class="search-header">
+      <div class="back-arrow" (click)="goBack()"></div>
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        (ionInput)="onSearchChange($event)"
+        placeholder="Buscar servicios o personas..."
+        [debounce]="300"
+        animated="true"
+        show-clear-button="focus"
+      ></ion-searchbar>
+    </div>
+
+    <!-- Pestañas estilo Instagram -->
+    <div class="tabs-container" *ngIf="hasSearched">
+      <button class="tab-btn" [class.active]="activeTab === 'servicios'" (click)="cambiarTab('servicios')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        </svg>
+        <span>Servicios</span>
+        <span class="count" *ngIf="cantidadServicios > 0">{{ cantidadServicios }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'personas'" (click)="cambiarTab('personas')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Personas</span>
+        <span class="count" *ngIf="cantidadPersonas > 0">{{ cantidadPersonas }}</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isSearching" class="loading-container">
+      <div class="spinner"></div>
+      <p>Buscando...</p>
+    </div>
+
+    <!-- Resultados de búsqueda -->
+    <div *ngIf="hasSearched && !isSearching" class="resultados-container">
+      
+      <!-- Pestaña Servicios -->
+      <div *ngIf="activeTab === 'servicios'" class="tab-content">
+        <div *ngIf="serviciosResultados.length > 0">
+          <div class="resultado-item" *ngFor="let servicio of serviciosResultados" (click)="verServicio(servicio)">
+            <div class="resultado-image servicio">
+              <img [src]="servicio.imagen" [alt]="servicio.titulo" />
+            </div>
+            <div class="resultado-info">
+              <span class="resultado-title">{{ servicio.titulo }}</span>
+              <span class="resultado-subtitle">{{ servicio.descripcion }}</span>
+              <div class="resultado-meta">
+                <span *ngIf="servicio.rating" class="rating">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  {{ servicio.rating | number:'1.1-1' }}
+                </span>
+                <span *ngIf="servicio.precio" class="price">{{ servicio.precio }}€</span>
+              </div>
+            </div>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div *ngIf="serviciosResultados.length === 0" class="no-results-tab">
+          <p>No se encontraron servicios</p>
+        </div>
+      </div>
+
+      <!-- Pestaña Personas -->
+      <div *ngIf="activeTab === 'personas'" class="tab-content">
+        <div *ngIf="personasResultados.length > 0">
+          <div class="resultado-item persona" *ngFor="let persona of personasResultados" (click)="verPersona(persona)">
+            <div class="resultado-image persona">
+              <img [src]="persona.avatar" [alt]="persona.nombre" />
+            </div>
+            <div class="resultado-info">
+              <span class="resultado-title">{{ persona.nombre }}</span>
+              <span class="resultado-subtitle">Proveedor de servicios</span>
+              <div class="resultado-meta" *ngIf="persona.rating">
+                <span class="rating">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  {{ persona.rating | number:'1.1-1' }}
+                </span>
+              </div>
+            </div>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div *ngIf="personasResultados.length === 0" class="no-results-tab">
+          <p>No se encontraron personas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicios recientes (antes de buscar) -->
+    <div *ngIf="!hasSearched" class="recientes-section">
+      <h3 class="section-title">Servicios recientes</h3>
+      
+      <div class="recientes-grid" *ngIf="serviciosRecientes.length > 0">
+        <div class="reciente-card" *ngFor="let servicio of serviciosRecientes" (click)="verServicio(servicio)">
+          <div class="reciente-image">
+            <img [src]="servicio.imagen" [alt]="servicio.titulo" />
+          </div>
+          <div class="reciente-info">
+            <span class="reciente-titulo">{{ servicio.titulo }}</span>
+            <span class="reciente-precio" *ngIf="servicio.precio">{{ servicio.precio }}€</span>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="serviciosRecientes.length === 0" class="empty-recientes">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <p>Busca servicios o personas</p>
+        <span class="hint">Escribe al menos 2 caracteres para comenzar</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

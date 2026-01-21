@@ -54,7 +54,9 @@
       <div class="stat-divider"></div>
       <div class="stat-item">
         <div class="rating-stat">
-          <ion-icon name="star" class="star-icon"></ion-icon>
+          <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
           <span class="stat-value">{{ userProfile.promedio_calificacion || 0 | number:'1.1-1' }}</span>
         </div>
         <span class="stat-label">({{ userProfile.total_resenas || 0 }} reseñas)</span>
@@ -113,10 +115,13 @@
           </div>
           <div class="review-rating">
             <div class="stars">
-              <ion-icon *ngFor="let star of getStarsArray()" 
-                [name]="star <= review.rating ? 'star' : 'star-outline'"
-                [class.filled]="star <= review.rating">
-              </ion-icon>
+              <svg *ngFor="let star of getStarsArray()" 
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                [attr.fill]="star <= review.rating ? '#ffc107' : 'none'" 
+                [attr.stroke]="star <= review.rating ? '#ffc107' : '#ccc'" 
+                stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
             </div>
             <span class="review-date">Hace {{ review.time_ago }}</span>
           </div>

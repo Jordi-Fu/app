@@ -1,7 +1,7 @@
 <ion-header>
-  <ion-toolbar >
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home/servicios"></ion-back-button>
+      <div class="back-arrow" (click)="goBack()"></div>
     </ion-buttons>
     <ion-title>Detalle del Servicio</ion-title>
     <ion-buttons slot="end">
@@ -37,12 +37,18 @@
           [alt]="servicio.titulo"
         />
         <div class="image-badges">
-          <ion-badge *ngIf="servicio.es_destacado" color="warning">
-            <ion-icon name="star"></ion-icon> Destacado
-          </ion-badge>
-          <ion-badge *ngIf="servicio.esta_verificado" color="success">
-            <ion-icon name="checkmark-circle-outline"></ion-icon> Verificado
-          </ion-badge>
+          <div class="servicio-badge" *ngIf="servicio.es_destacado">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Destacado
+          </div>
+          <div class="servicio-badge verified" *ngIf="servicio.esta_verificado">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Verificado
+          </div>
         </div>
       </div>
       
@@ -68,11 +74,15 @@
 
       <div class="stats">
         <div class="rating">
-          <ion-icon 
-            *ngFor="let star of getStarsArray()" 
-            [name]="star <= (servicio.promedio_calificacion || 0) ? 'star' : 'star-outline'"
-            [class.filled]="star <= (servicio.promedio_calificacion || 0)">
-          </ion-icon>
+          <div class="stars">
+            <svg *ngFor="let star of getStarsArray()" 
+              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+              [attr.fill]="star <= (servicio.promedio_calificacion || 0) ? '#ffc107' : 'none'" 
+              [attr.stroke]="star <= (servicio.promedio_calificacion || 0) ? '#ffc107' : '#ccc'" 
+              stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
           <span class="rating-text">{{ servicio.promedio_calificacion || 0 }} ({{ servicio.total_resenas }} reseñas)</span>
         </div>
         <div class="views">
@@ -106,7 +116,9 @@
             </h3>
             <p>@{{ servicio.provider?.usuario }}</p>
             <div class="provider-rating">
-              <ion-icon name="star"></ion-icon>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
               <span>{{ servicio.provider?.promedio_calificacion }} ({{ servicio.provider?.total_resenas }} reseñas)</span>
             </div>
           </div>

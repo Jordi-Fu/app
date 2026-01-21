@@ -5,7 +5,6 @@ import {
   IonHeader, 
   IonToolbar, 
   IonButtons, 
-  IonBackButton, 
   IonTitle, 
   IonContent,
   IonButton,
@@ -49,7 +48,6 @@ import { Service } from '../../../../../core/interfaces';
     IonHeader,
     IonToolbar,
     IonButtons,
-    IonBackButton,
     IonTitle,
     IonContent,
     IonButton,
@@ -324,5 +322,9 @@ export class ServicioDetallePage implements OnInit {
   getAvailabilityText(dayOfWeek: number): string {
     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     return days[dayOfWeek];
+  }
+
+  goBack() {
+    this.router.navigate(['/home/servicios']);
   }
 }

@@ -1,5 +1,32 @@
 @use '../../../../../../theme/variables' as *;
 
+// Flecha de volver con degradado
+.back-arrow {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.3s;
+  background: $primary-gradient;
+  mask-image: url('/assets/back.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url('/assets/back.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  margin-left: 8px;
+
+  &:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -56,20 +83,30 @@ ion-toolbar {
     .image-badges {
       position: absolute;
       top: 1rem;
-      right: 1rem;
+      left: 1rem;
       display: flex;
       gap: 0.5rem;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
       
-      ion-badge {
+      .servicio-badge {
+        background: rgba(255, 193, 7, 0.95);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.5rem 0.75rem;
-        
-        ion-icon {
-          font-size: 0.875rem;
+        gap: 4px;
+
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+
+        &.verified {
+          background: rgba(76, 175, 80, 0.95);
         }
       }
     }
@@ -139,14 +176,15 @@ ion-toolbar {
     .rating {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.5rem;
       
-      ion-icon {
-        color: #fbbf24;
-        font-size: 1rem;
+      .stars {
+        display: flex;
+        gap: 0.15rem;
         
-        &.filled {
-          color: #f59e0b;
+        svg {
+          width: 16px;
+          height: 16px;
         }
       }
       
@@ -242,8 +280,9 @@ ion-toolbar {
         gap: 0.25rem;
         font-size: 0.875rem;
         
-        ion-icon {
-          color: #f59e0b;
+        svg {
+          width: 16px;
+          height: 16px;
         }
       }
     }

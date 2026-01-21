@@ -6,18 +6,12 @@
   <div class="servicios-container">
     <!-- Barra de búsqueda -->
     <div class="search-container">
-      <div class="add-button">
-        <img src="assets/add.svg" alt="Agregar" (click)="abrirCrearServicio()"/>
+      <div class="icon-button add-button" (click)="abrirCrearServicio()">
+        <img src="assets/add.svg" alt="Agregar"/>
       </div>
-      <div class="search-bar">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-        <input type="text" placeholder="Buscar servicios..." (input)="onSearch($event)">
+      <div class="icon-button search-button" (click)="abrirBusqueda()">
+        <div class="search-icon"></div>
       </div>
-
     </div>
 
     <!-- Categorías -->

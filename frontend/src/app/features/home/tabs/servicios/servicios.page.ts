@@ -143,4 +143,8 @@ export class ServiciosPage implements OnInit {
   abrirCrearServicio(){
     this.router.navigate(['/home/alta-servicio']);
   }
+
+  abrirBusqueda() {
+    this.router.navigate(['/home/buscar-servicio-persona']);
+  }
 }
