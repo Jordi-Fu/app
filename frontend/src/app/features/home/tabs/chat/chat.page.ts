@@ -67,11 +67,6 @@ export class ChatPage implements OnInit, OnDestroy {
       
       // Si el usuario cambió (diferente ID o de no-autenticado a autenticado)
       if (this.currentUserId !== null && this.currentUserId !== newUserId) {
-        console.log('Usuario cambió, recargando conversaciones...', {
-          anterior: this.currentUserId,
-          nuevo: newUserId
-        });
-        
         // Limpiar datos anteriores
         this.conversaciones = [];
         this.conversacionesFiltradas = [];
@@ -115,7 +110,6 @@ export class ChatPage implements OnInit, OnDestroy {
       this.conversaciones = await this.chatService.obtenerConversaciones();
       this.aplicarFiltro();
     } catch (error) {
-      console.error('Error al cargar conversaciones:', error);
       this.error = 'Error al cargar las conversaciones';
     } finally {
       this.cargando = false;

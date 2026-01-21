@@ -42,7 +42,6 @@ export class AuthService {
         this.isAuthenticatedSubject.next(true);
       }
     } catch (error) {
-      console.error('Error cargando autenticación:', error);
       await this.clearAuth();
     }
   }

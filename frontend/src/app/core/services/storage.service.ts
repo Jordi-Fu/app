@@ -28,7 +28,6 @@ export class StorageService {
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      console.error(`Error guardando ${key}:`, error);
       throw error;
     }
   }
@@ -46,7 +45,6 @@ export class StorageService {
       }
     } catch (error) {
       // Si la clave no existe, Secure Storage lanza error
-      console.warn(`Clave ${key} no encontrada:`, error);
       return null;
     }
   }

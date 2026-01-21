@@ -74,7 +74,7 @@ export class ServiceService {
    * Incrementar contador de vistas
    */
   incrementViews(serviceId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${serviceId}/view`, {});
+    return this.http.post<void>(`${this.apiUrl}/${serviceId}/views`, {});
   }
 
   /**

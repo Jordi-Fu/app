@@ -84,7 +84,6 @@ export class AltaServicioPage implements OnInit {
         this.serviceImages[index] = `data:image/${image.format};base64,${image.base64String}`;
       }
     } catch (error) {
-      console.error('Error al seleccionar imagen:', error);
       await this.showToast('Error al seleccionar la imagen', 'danger');
     }
   }
@@ -106,8 +105,6 @@ export class AltaServicioPage implements OnInit {
       return;
     }
 
-    console.log('Datos del servicio:', this.serviceForm.value);
-    console.log('Imágenes:', this.serviceImages.filter(img => img !== null));
 
     // TODO: Implementar lógica de guardado
     await this.showToast('Servicio publicado exitosamente', 'success');

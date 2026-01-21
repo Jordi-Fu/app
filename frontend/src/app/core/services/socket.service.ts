@@ -3,57 +3,15 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
-import { MensajeConRemitente } from '../interfaces';
+import { 
+  MensajeConRemitente, 
+  MensajeRealTime, 
+  ConversationUpdate, 
+  TypingEvent, 
+  UserStatusEvent 
+} from '../interfaces';
 
 const ACCESS_TOKEN_KEY = 'kurro_access_token';
-
-/**
- * Interfaz para mensaje en tiempo real
- */
-export interface MensajeRealTime {
-  id: string;
-  conversacion_id: string;
-  remitente_id: string;
-  tipo_mensaje: string;
-  contenido: string;
-  url_media?: string;
-  creado_en: string;
-  remitente: {
-    id: string;
-    nombre: string;
-    apellido: string;
-    usuario: string;
-    url_avatar?: string;
-  };
-}
-
-/**
- * Interfaz para actualización de conversación
- */
-export interface ConversationUpdate {
-  conversacionId: string;
-  ultimoMensaje: string;
-  ultimoMensajeEn: string;
-  remitenteId: string;
-}
-
-/**
- * Interfaz para evento de typing
- */
-export interface TypingEvent {
-  conversacionId: string;
-  userId: string;
-  username: string;
-}
-
-/**
- * Interfaz para evento de cambio de estado online
- */
-export interface UserStatusEvent {
-  userId: string;
-  isOnline: boolean;
-  timestamp: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -81,7 +39,6 @@ export class SocketService implements OnDestroy {
   constructor(private storageService: StorageService) {
     // Extraer la URL base del API (sin /api)
     this.baseUrl = environment.apiUrl.replace('/api', '');
-    console.log('🔌 SocketService: URL base:', this.baseUrl);
   }
 
   /**
@@ -89,7 +46,6 @@ export class SocketService implements OnDestroy {
    */
   async connect(): Promise<void> {
     if (this.socket?.connected) {
-      console.log('🔌 Socket ya está conectado');
       return;
     }
 
@@ -97,7 +53,6 @@ export class SocketService implements OnDestroy {
       const token = await this.storageService.get(ACCESS_TOKEN_KEY);
       
       if (!token) {
-        console.error('🔴 No hay token para conectar al socket');
         return;
       }
 
@@ -116,7 +71,6 @@ export class SocketService implements OnDestroy {
 
       this.setupEventListeners();
     } catch (error) {
-      console.error('🔴 Error al conectar socket:', error);
       // No lanzar error, solo loguear - la app puede funcionar sin socket
     }
   }
@@ -129,31 +83,26 @@ export class SocketService implements OnDestroy {
 
     // Conexión exitosa
     this.socket.on('connect', () => {
-      console.log('🟢 Socket conectado:', this.socket?.id);
       this.connectionStatusSubject.next(true);
     });
 
     // Desconexión
     this.socket.on('disconnect', (reason) => {
-      console.log('🔴 Socket desconectado:', reason);
       this.connectionStatusSubject.next(false);
     });
 
     // Error de conexión
     this.socket.on('connect_error', (error) => {
-      console.error('🔴 Error de conexión socket:', error.message);
       this.connectionStatusSubject.next(false);
     });
 
     // Nuevo mensaje en conversación
     this.socket.on('message:new', (mensaje: MensajeRealTime) => {
-      console.log('📨 Nuevo mensaje recibido:', mensaje);
       this.newMessageSubject.next(mensaje);
     });
 
     // Actualización de conversación (para lista de chats)
     this.socket.on('conversation:update', (update: ConversationUpdate) => {
-      console.log('📝 Actualización de conversación:', update);
       this.conversationUpdateSubject.next(update);
     });
 
@@ -169,7 +118,6 @@ export class SocketService implements OnDestroy {
 
     // Cambio de estado online/offline de un usuario
     this.socket.on('user:status-change', (event: UserStatusEvent) => {
-      console.log('👤 Cambio de estado de usuario:', event);
       this.userStatusChangeSubject.next(event);
     });
   }
@@ -179,18 +127,15 @@ export class SocketService implements OnDestroy {
    */
   joinConversation(conversacionId: string): void {
     if (!this.socket?.connected) {
-      console.warn('🟡 Socket no conectado, intentando conectar...');
       this.connect().then(() => {
         setTimeout(() => {
           this.socket?.emit('join:conversation', conversacionId);
-          console.log('📥 Unido a conversación:', conversacionId);
         }, 500);
       });
       return;
     }
     
     this.socket.emit('join:conversation', conversacionId);
-    console.log('📥 Unido a conversación:', conversacionId);
   }
 
   /**
@@ -200,7 +145,6 @@ export class SocketService implements OnDestroy {
     if (!this.socket?.connected) return;
     
     this.socket.emit('leave:conversation', conversacionId);
-    console.log('📤 Salió de conversación:', conversacionId);
   }
 
   /**
@@ -236,7 +180,6 @@ export class SocketService implements OnDestroy {
       this.socket.disconnect();
       this.socket = null;
       this.connectionStatusSubject.next(false);
-      console.log('🔌 Socket desconectado manualmente');
     }
   }
 

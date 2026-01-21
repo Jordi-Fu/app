@@ -261,17 +261,11 @@ class AuthService {
         console.error('[PASSWORD RESET] Error al enviar email');
         // En caso de error al enviar, mostramos el código en consola en desarrollo
         if (ENV.isDevelopment) {
-          console.log(`[PASSWORD RESET] Código para ${email}: ${code}`);
-          console.log(`[PASSWORD RESET] Expira: ${expiresAt}`);
+        
         }
       }
     } catch (error) {
       console.error('[PASSWORD RESET] Error al enviar email:', error);
-      // En desarrollo, mostramos el código en consola si falla el email
-      if (ENV.isDevelopment) {
-        console.log(`[PASSWORD RESET] Código para ${email}: ${code}`);
-        console.log(`[PASSWORD RESET] Expira: ${expiresAt}`);
-      }
     }
 
     return {

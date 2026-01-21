@@ -103,7 +103,6 @@ export class ServicioDetallePage implements OnInit {
       const result = await Share.canShare();
       this.isSharingSupported = result.value;
     } catch (error) {
-      console.log('Share API no disponible:', error);
       this.isSharingSupported = false;
     }
   }
@@ -124,14 +123,12 @@ export class ServicioDetallePage implements OnInit {
       this.servicio = response?.data || null;
       
       if (!this.servicio) {
-        console.error('Servicio no encontrado');
         this.router.navigate(['/home/servicios']);
       } else {
         // Verificar si el servicio está en favoritos desde el backend
         this.checkIfFavorite(id);
       }
     } catch (error) {
-      console.error('Error al cargar servicio:', error);
       this.router.navigate(['/home/servicios']);
     } finally {
       this.isLoading = false;
@@ -146,12 +143,10 @@ export class ServicioDetallePage implements OnInit {
           this.isFavorite = response.isFavorite;
         },
         error: (error) => {
-          console.log('No se pudo verificar favorito (usuario no autenticado o error):', error);
           this.isFavorite = false;
         }
       });
     } catch (error) {
-      console.error('Error al verificar favorito:', error);
       this.isFavorite = false;
     }
   }
@@ -202,7 +197,6 @@ export class ServicioDetallePage implements OnInit {
   contactProvider() {
     if (this.servicio?.proveedor_id) {
       // TODO: Abrir chat con el proveedor
-      console.log('Contactar proveedor:', this.servicio.proveedor_id);
     }
   }
 
@@ -217,7 +211,6 @@ export class ServicioDetallePage implements OnInit {
       // Llamar al servicio para actualizar en el backend
       this.serviceService.toggleFavorite(this.servicio.id).subscribe({
         next: async (response) => {
-          console.log('Favorito actualizado:', response);
           
           // Actualizar con el estado real del backend
           this.isFavorite = response.isFavorite;
@@ -232,7 +225,6 @@ export class ServicioDetallePage implements OnInit {
           await toast.present();
         },
         error: async (error) => {
-          console.error('Error al actualizar favorito:', error);
           // Revertir el cambio si hubo error
           this.isFavorite = previousState;
           
@@ -269,12 +261,10 @@ export class ServicioDetallePage implements OnInit {
       // Intentar usar la API nativa de Share
       if (this.isSharingSupported) {
         await Share.share(shareData);
-        console.log('Servicio compartido exitosamente');
       } else {
         // Fallback: usar Web Share API o copiar al portapapeles
         if (navigator.share) {
           await navigator.share(shareData);
-          console.log('Servicio compartido exitosamente (Web Share API)');
         } else {
           // Copiar URL al portapapeles como último recurso
           await this.copyToClipboard(window.location.href);
@@ -291,8 +281,6 @@ export class ServicioDetallePage implements OnInit {
     } catch (error: any) {
       // El usuario canceló o hubo un error
       if (error?.message !== 'Share canceled') {
-        console.error('Error al compartir:', error);
-        
         const toast = await this.toastController.create({
           message: 'No se pudo compartir el servicio',
           duration: 2500,
@@ -322,7 +310,6 @@ export class ServicioDetallePage implements OnInit {
         textArea.remove();
       }
     } catch (error) {
-      console.error('Error al copiar al portapapeles:', error);
       throw error;
     }
   }

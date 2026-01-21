@@ -249,6 +249,29 @@ class ServiceController {
       });
     }
   }
+
+  /**
+   * POST /api/services/:id/views
+   * Incrementar las vistas de un servicio
+   */
+  async incrementViews(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      
+      await serviceService.incrementViews(id);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Vista registrada correctamente',
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en incrementViews:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al registrar vista',
+      });
+    }
+  }
 }
 
 export const serviceController = new ServiceController();

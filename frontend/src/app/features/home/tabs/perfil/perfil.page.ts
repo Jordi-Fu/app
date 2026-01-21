@@ -27,11 +27,7 @@ export class PerfilPage implements OnInit {
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
-      console.log('Usuario en perfil:', this.usuario);
-      if (this.usuario?.avatarUrl) {
-        console.log('Avatar URL:', this.usuario.avatarUrl);
-        console.log('Avatar URL completa:', this.getAvatarUrl(this.usuario.avatarUrl));
-      }
+     
     });
   }
 
@@ -49,7 +45,6 @@ export class PerfilPage implements OnInit {
   }
 
   onImageError() {
-    console.error('Error al cargar la imagen del avatar');
     this.imageError = true;
   }
 

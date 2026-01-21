@@ -1,8 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home/servicios"></ion-back-button>
-    </ion-buttons>
+    <div class="back-arrow" (click)="goBack()"></div>
     <ion-title>{{ userProfile?.nombre ? '@' + getUsername() : 'Perfil' }}</ion-title>
   </ion-toolbar>
 </ion-header>

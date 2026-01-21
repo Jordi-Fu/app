@@ -6,6 +6,50 @@
 $primary-green: #10B981;
 $primary-green-light: #2DD4BF;
 $star-color: #fbbf24;
+$primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
+
+// ===============================================
+// HEADER CON FLECHA PERSONALIZADA
+// ===============================================
+ion-header {
+  ion-toolbar {
+    position: relative;
+    
+    .back-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 16px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+      z-index: 10;
+      background: $primary-gradient;
+      mask-image: url('/assets/back.svg');
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      -webkit-mask-image: url('/assets/back.svg');
+      -webkit-mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+
+      &:hover {
+        transform: translateY(-50%) scale(1.1);
+        opacity: 0.8;
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.95);
+      }
+    }
+    
+    ion-title {
+      padding-left: 20px; // Dar espacio a la flecha
+    }
+  }
+}
 
 .loading-container {
   display: flex;

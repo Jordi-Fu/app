@@ -208,7 +208,6 @@ export class RegisterPage implements OnInit {
       return false;
 
     } catch (error) {
-      console.error('Error al verificar permisos:', error);
       await this.showToast('Error al verificar permisos', 'danger');
       return false;
     }
@@ -260,8 +259,6 @@ export class RegisterPage implements OnInit {
 
       this.profilePhoto = image.dataUrl || null;
     } catch (error: any) {
-      console.error('Error al capturar imagen:', error);
-      
       // Manejar caso cuando el usuario cancela o hay un error
       if (error.message && !error.message.includes('User cancelled')) {
         await this.showToast('Error al capturar la imagen', 'danger');
@@ -354,7 +351,6 @@ export class RegisterPage implements OnInit {
       profilePhoto: this.profilePhoto || undefined
     };
 
-    console.log('Enviando datos de registro:', { ...registerData, password: '***', profilePhoto: this.profilePhoto ? 'foto incluida' : 'sin foto' });
 
     this.authService.register(registerData).subscribe({
       next: async (response: AuthResponse) => {
@@ -366,7 +362,6 @@ export class RegisterPage implements OnInit {
           this.router.navigate(['/login'], { replaceUrl: true });
         } else {
           await this.showToast(response.message || 'Error al crear la cuenta', 'danger');
-          console.error('Error del servidor:', response);
         }
       },
       error: async (error: any) => {
@@ -386,7 +381,6 @@ export class RegisterPage implements OnInit {
         }
         
         await this.showToast(message, 'danger');
-        console.error('Error completo en registro:', error);
       }
     });
   }

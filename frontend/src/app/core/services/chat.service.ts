@@ -23,7 +23,6 @@ export class ChatService {
       );
       return response.data || [];
     } catch (error) {
-      console.error('Error al obtener conversaciones:', error);
       throw error;
     }
   }
@@ -38,7 +37,6 @@ export class ChatService {
       );
       return response.data;
     } catch (error) {
-      console.error('Error al obtener conversación:', error);
       throw error;
     }
   }
@@ -56,7 +54,6 @@ export class ChatService {
       );
       return response.data;
     } catch (error) {
-      console.error('Error al obtener/crear conversación:', error);
       throw error;
     }
   }
@@ -71,7 +68,6 @@ export class ChatService {
       );
       return response.data || [];
     } catch (error) {
-      console.error('Error al obtener mensajes:', error);
       throw error;
     }
   }
@@ -86,7 +82,6 @@ export class ChatService {
       );
       return response.data;
     } catch (error) {
-      console.error('Error al enviar mensaje:', error);
       throw error;
     }
   }
@@ -100,7 +95,6 @@ export class ChatService {
         this.http.put<any>(`${this.apiUrl}/conversaciones/${conversacionId}/leer`, {})
       );
     } catch (error) {
-      console.error('Error al marcar como leído:', error);
       throw error;
     }
   }
@@ -114,7 +108,6 @@ export class ChatService {
         this.http.delete<any>(`${this.apiUrl}/mensajes/${mensajeId}`)
       );
     } catch (error) {
-      console.error('Error al eliminar mensaje:', error);
       throw error;
     }
   }
@@ -128,7 +121,6 @@ export class ChatService {
         this.http.put<any>(`${this.apiUrl}/conversaciones/${conversacionId}/archivar`, {})
       );
     } catch (error) {
-      console.error('Error al archivar conversación:', error);
       throw error;
     }
   }

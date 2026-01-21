@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewIn
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent, AuthService } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
@@ -22,8 +22,6 @@ const USER_KEY = 'kurro_user';
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonButtons,
-    IonBackButton,
     IonSpinner,
     IonFooter
   ]
@@ -118,10 +116,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       
       // Si el usuario cambió y no es el mismo que el actual
       if (this.usuarioActualId && newUserId && this.usuarioActualId !== newUserId) {
-        console.log('Usuario cambió en conversación, regresando a chat...', {
-          anterior: this.usuarioActualId,
-          nuevo: newUserId
-        });
+       
         
         // Regresar a la lista de conversaciones
         //this.router.navigate(['/home/chat']);
@@ -144,7 +139,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       
       // Suscribirse a nuevos mensajes
       const newMessageSub = this.socketService.newMessage$.subscribe((mensaje: MensajeRealTime) => {
-        console.log('📨 Mensaje recibido via socket:', mensaje);
         
         // Solo agregar si es de esta conversación y no es un mensaje propio
         if (mensaje.conversacion_id === this.chatId && mensaje.remitente_id !== this.usuarioActualId) {
@@ -173,7 +167,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
             }
             
             // Marcar como leído
-            this.chatService.marcarComoLeido(this.chatId).catch(console.error);
+            this.chatService.marcarComoLeido(this.chatId).catch(() => {});
           }
         }
       });
@@ -249,7 +243,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       setTimeout(() => this.scrollToBottom(), 300);
       setTimeout(() => this.scrollToBottom(), 500);
     } catch (error) {
-      console.error('Error al cargar conversación:', error);
       this.error = 'Error al cargar la conversación';
     } finally {
       this.cargando = false;
@@ -296,7 +289,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         contenido: contenido
       });
 
-      console.log('Mensaje enviado (respuesta del servidor):', mensaje);
 
       // Agregar el mensaje a la lista localmente
       // El socket también lo enviará, pero verificamos duplicados
@@ -328,7 +320,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       
       setTimeout(() => this.scrollToBottom(), 100);
     } catch (error) {
-      console.error('Error al enviar mensaje:', error);
       alert('Error al enviar el mensaje');
     } finally {
       this.enviando = false;
@@ -410,7 +401,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   }
 
   goToProvider() {
-    console.log('Navegando al perfil del proveedor:', this.conversacion?.otro_usuario.nombre, this.conversacion?.otro_usuario.id);
     if (this.conversacion?.otro_usuario.id) {
       this.router.navigate(['/home/usuario', this.conversacion?.otro_usuario.id]);
     }

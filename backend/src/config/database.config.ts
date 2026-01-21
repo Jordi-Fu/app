@@ -49,5 +49,4 @@ export const testConnection = async (): Promise<boolean> => {
  */
 export const closePool = async (): Promise<void> => {
   await pool.end();
-  console.log('🔌 Pool de conexiones cerrado');
 };

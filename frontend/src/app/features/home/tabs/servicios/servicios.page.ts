@@ -48,10 +48,8 @@ export class ServiciosPage implements OnInit {
       this.serviciosFiltrados = this.servicios;
       this.categorias = categoriasResp?.data || [];
 
-      console.log('Servicios cargados:', this.servicios.length);
-      console.log('Categorías cargadas:', this.categorias.length);
+    
     } catch (error) {
-      console.error('Error al cargar datos:', error);
       this.servicios = [];
       this.serviciosFiltrados = [];
       this.categorias = [];
@@ -95,12 +93,16 @@ export class ServiciosPage implements OnInit {
   }
 
   verDetalle(servicio: Service) {
-    // Incrementar vistas
+    // Incrementar vistas (sin esperar la respuesta)
     this.serviceService.incrementViews(servicio.id).subscribe({
-      error: (err) => console.error('Error al incrementar vistas:', err)
+      next: () => {
+      },
+      error: (error) => {
+        console.error('Error al incrementar vistas:', error);
+      }
     });
 
-    // Navegar a detalle
+    // Navegar a detalle inmediatamente
     this.router.navigate(['/home/servicios', servicio.id]);
   }
 

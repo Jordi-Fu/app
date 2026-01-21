@@ -210,10 +210,8 @@ Si no solicitaste restablecer tu contraseña, puedes ignorar este email de forma
   async verifyConnection(): Promise<boolean> {
     try {
       await this.transporter.verify();
-      console.log('[EMAIL] Conexión SMTP verificada correctamente');
       return true;
     } catch (error) {
-      console.error('[EMAIL] Error al verificar conexión SMTP:', error);
       return false;
     }
   }

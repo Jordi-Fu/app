@@ -42,9 +42,6 @@ class ServiceService {
         return null;
       }
 
-      // Incrementar contador de vistas
-      await serviceModel.incrementViews(id);
-
       return service;
     } catch (error) {
       console.error('Error en ServiceService.getServiceById:', error);
@@ -96,6 +93,18 @@ class ServiceService {
       return await serviceModel.getFavoriteServices(userId);
     } catch (error) {
       console.error('Error en ServiceService.getFavoriteServices:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Incrementar contador de vistas de un servicio
+   */
+  async incrementViews(serviceId: string): Promise<void> {
+    try {
+      await serviceModel.incrementViews(serviceId);
+    } catch (error) {
+      console.error('Error en ServiceService.incrementViews:', error);
       throw error;
     }
   }

@@ -1,11 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonHeader, 
   IonToolbar, 
-  IonButtons, 
-  IonBackButton, 
   IonTitle, 
   IonContent,
   IonAvatar,
@@ -23,19 +21,8 @@ import {
   ellipse,
   optionsOutline
 } from 'ionicons/icons';
-import { UserService, UserProfile } from '../../../../../core/services';
-
-interface Review {
-  id: string;
-  reviewer_name: string;
-  reviewer_avatar?: string;
-  reviewer_time_in_app: string;
-  rating: number;
-  time_ago: string;
-  comment: string;
-  service_id?: string;
-  service_name?: string;
-}
+import { UserService } from '../../../../../core/services';
+import { UserProfile, Review } from '../../../../../core/interfaces';
 
 @Component({
   selector: 'app-perfil-publico',
@@ -46,8 +33,6 @@ interface Review {
     CommonModule,
     IonHeader,
     IonToolbar,
-    IonButtons,
-    IonBackButton,
     IonTitle,
     IonContent,
     IonAvatar,
@@ -59,6 +44,7 @@ interface Review {
 export class PerfilPublicoPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
   private userService = inject(UserService);
   private toastController = inject(ToastController);
 
@@ -96,14 +82,12 @@ export class PerfilPublicoPage implements OnInit {
         this.userProfile = response?.data || null;
         
         if (!this.userProfile) {
-          console.error('Perfil de usuario no encontrado');
           this.showToast('Usuario no encontrado', 'danger');
           this.router.navigate(['/home/servicios']);
         }
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error al cargar perfil de usuario:', error);
         this.showToast('Error al cargar el perfil del usuario', 'danger');
         this.router.navigate(['/home/servicios']);
         this.isLoading = false;
@@ -117,7 +101,6 @@ export class PerfilPublicoPage implements OnInit {
         this.userServices = response?.data || [];
       },
       error: (error) => {
-        console.error('Error al cargar servicios del usuario:', error);
         this.userServices = [];
       }
     });
@@ -183,9 +166,14 @@ export class PerfilPublicoPage implements OnInit {
   contactUser() {
     if (this.userProfile?.id) {
       // TODO: Implementar navegación al chat o crear conversación
-      console.log('Contactar usuario:', this.userProfile.id);
       this.showToast('Funcionalidad de chat próximamente', 'warning');
     }
+  }
+
+  goBack() {
+    // Usar Location.back() para volver a la página anterior
+    // Esto funcionará desde conversacion, servicio-detalle, o cualquier otra ruta
+    this.location.back();
   }
 
   private async showToast(message: string, color: string = 'medium') {

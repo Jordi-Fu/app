@@ -2,21 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface UserProfile {
-  id: string;
-  nombre: string;
-  apellido: string;
-  email: string;
-  telefono?: string;
-  url_avatar?: string;
-  biografia?: string;
-  fecha_creacion: string;
-  esta_verificado: boolean;
-  promedio_calificacion?: number;
-  total_servicios?: number;
-  total_resenas?: number;
-}
+import { UserProfile } from '../interfaces';
 
 @Injectable({
   providedIn: 'root'

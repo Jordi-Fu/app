@@ -1,4 +1,4 @@
-@use '../../../../../../theme/variables.scss' as *;
+@use "../../../../../../theme/variables.scss" as *;
 
 :host {
   display: block;
@@ -11,7 +11,7 @@ ion-content {
 }
 
 .service-container {
-  padding: 0;
+  padding: 25px 0;
   display: flex;
   justify-content: center;
   min-height: 100%;
@@ -56,13 +56,13 @@ ion-content {
   transition: all 0.3s ease;
 
   &.primary {
-    background-color: #E0F7F4;
-    border-color: #13B5B5;
+    background-color: #e0f7f4;
+    border-color: #13b5b5;
   }
 
   &.has-image {
     border-style: solid;
-    border-color: #13B5B5;
+    border-color: #13b5b5;
   }
 
   &:active {
@@ -163,7 +163,7 @@ ion-content {
 
     &:focus {
       outline: none;
-      border-color: #13B5B5;
+      border-color: #13b5b5;
     }
   }
 
@@ -256,7 +256,7 @@ ion-content {
 
     &.primary {
       background-color: rgba(19, 181, 181, 0.15);
-      border-color: #13B5B5;
+      border-color: #13b5b5;
     }
 
     .image-placeholder img {
@@ -285,7 +285,7 @@ ion-content {
       }
 
       &:focus {
-        border-color: #13B5B5;
+        border-color: #13b5b5;
       }
     }
 
