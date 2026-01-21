@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, IonRefresher, IonRefresherContent, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonSpinner, ViewDidEnter } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService } from '../../../../core/services';
+import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService, MensajeRealTime } from '../../../../core/services';
 
 @Component({
   selector: 'app-chat',
@@ -18,7 +18,7 @@ import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthS
     IonSpinner
   ]
 })
-export class ChatPage implements OnInit, OnDestroy {
+export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   conversaciones: ConversacionUsuario[] = [];
   conversacionesFiltradas: ConversacionUsuario[] = [];
   cargando = false;
@@ -46,6 +46,13 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   /**
+   * Recargar conversaciones cada vez que se entra a la vista
+   */
+  ionViewDidEnter() {
+    this.cargarConversaciones();
+  }
+
+  /**
    * Inicializar socket y suscribirse a cambios de estado
    */
   private async initializeSocket() {
@@ -56,6 +63,41 @@ export class ChatPage implements OnInit, OnDestroy {
       this.actualizarEstadoUsuario(event.userId, event.isOnline);
     });
     this.subscriptions.push(statusSub);
+    
+    // Suscribirse a nuevos mensajes para actualizar la lista de conversaciones
+    const newMessageSub = this.socketService.newMessage$.subscribe((mensaje: MensajeRealTime) => {
+      this.actualizarConversacionConNuevoMensaje(mensaje);
+    });
+    this.subscriptions.push(newMessageSub);
+  }
+
+  /**
+   * Actualizar una conversación cuando llega un nuevo mensaje
+   */
+  private actualizarConversacionConNuevoMensaje(mensaje: MensajeRealTime) {
+    const convIndex = this.conversaciones.findIndex(c => c.id === mensaje.conversacion_id);
+    
+    if (convIndex !== -1) {
+      // Actualizar la conversación existente
+      const conv = this.conversaciones[convIndex];
+      const esPropio = mensaje.remitente_id === this.currentUserId;
+      
+      this.conversaciones[convIndex] = {
+        ...conv,
+        texto_ultimo_mensaje: mensaje.contenido,
+        ultimo_mensaje_en: mensaje.creado_en,
+        no_leidos: esPropio ? conv.no_leidos : (conv.no_leidos || 0) + 1
+      };
+      
+      // Mover la conversación al inicio (más reciente)
+      const [conversacionActualizada] = this.conversaciones.splice(convIndex, 1);
+      this.conversaciones.unshift(conversacionActualizada);
+      
+      this.aplicarFiltro();
+    } else {
+      // Si la conversación no existe en la lista, recargar todas
+      this.cargarConversaciones();
+    }
   }
 
   /**

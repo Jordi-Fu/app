@@ -31,7 +31,6 @@ import { UserProfile, Review } from '../../../../../core/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,

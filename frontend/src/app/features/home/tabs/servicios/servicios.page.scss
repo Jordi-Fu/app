@@ -128,11 +128,11 @@ ion-content {
       transition: all 0.3s;
       font-size: 14px;
       font-weight: 500;
-      color: #666666;
+      color: var(--ion-text-color);
       white-space: nowrap;
       flex-shrink: 0;
-      background: #e0e0e0;
-      border: 1px solid #d0d0d0;
+      background: var(--category-bg);
+      border: none;
 
       &.active {
         background: $primary-gradient;

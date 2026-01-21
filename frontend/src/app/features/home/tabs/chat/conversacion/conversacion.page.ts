@@ -58,13 +58,36 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   ) {}
 
   async ngOnInit() {
-    this.chatId = this.route.snapshot.paramMap.get('id') || '';
+    // Suscribirse a cambios en los parámetros de ruta
+    this.route.paramMap.subscribe(async params => {
+      const newChatId = params.get('id') || '';
+      
+      // Si el chatId cambió, recargar todo
+      if (newChatId !== this.chatId) {
+        // Salir de la conversación anterior si existe
+        if (this.chatId) {
+          this.socketService.leaveConversation(this.chatId);
+        }
+        
+        // Limpiar estado anterior
+        this.mensajes = [];
+        this.conversacion = null;
+        this.otroUsuarioEscribiendo = false;
+        
+        this.chatId = newChatId;
+        
+        if (this.chatId) {
+          await this.cargarConversacion();
+          
+          // Unirse a la nueva conversación
+          this.socketService.joinConversation(this.chatId);
+        }
+      }
+    });
     
     // Obtener ID del usuario actual
     const user = await this.storageService.getObject<any>(USER_KEY);
     this.usuarioActualId = user?.id || '';
-    
-    await this.cargarConversacion();
     
     // Inicializar WebSocket
     await this.initializeSocket();
@@ -78,7 +101,16 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     setTimeout(() => this.scrollToBottom(), 200);
   }
 
-  ionViewDidEnter() {
+  async ionViewDidEnter() {
+    // Recargar mensajes cada vez que se entra a la vista
+    // Esto asegura que se muestren los mensajes nuevos
+    if (this.chatId && !this.cargando) {
+      await this.cargarConversacion();
+      
+      // Volver a unirse a la conversación en el socket
+      this.socketService.joinConversation(this.chatId);
+    }
+    
     // Scroll al fondo cada vez que se entra a la vista
     setTimeout(() => this.scrollToBottom(), 100);
     setTimeout(() => this.scrollToBottom(), 300);
@@ -133,9 +165,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     try {
       // Conectar al socket si no está conectado
       await this.socketService.connect();
-      
-      // Unirse a la conversación
-      this.socketService.joinConversation(this.chatId);
       
       // Suscribirse a nuevos mensajes
       const newMessageSub = this.socketService.newMessage$.subscribe((mensaje: MensajeRealTime) => {

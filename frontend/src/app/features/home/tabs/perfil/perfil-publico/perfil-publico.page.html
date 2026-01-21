@@ -1,10 +1,3 @@
-<ion-header>
-  <ion-toolbar>
-    <div class="back-arrow" (click)="goBack()"></div>
-    <ion-title>{{ userProfile?.nombre ? '@' + getUsername() : 'Perfil' }}</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
   <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
@@ -15,7 +8,13 @@
   <!-- Perfil del usuario -->
   <div *ngIf="!isLoading && userProfile" class="profile-container">
     
-    <!-- Cabecera del perfil -->
+    <!-- Header con usuario y flecha -->
+    <div class="custom-header">
+      <div class="back-arrow" (click)="goBack()"></div>
+      <h1 class="username-title">{{ userProfile?.nombre ? getUsername() : 'Perfil' }}</h1>
+    </div>
+
+    <!-- Cabecera del perfil con avatar e info lado a lado -->
     <div class="profile-header">
       <div class="avatar-container">
         <div class="avatar-ring">
@@ -28,14 +27,11 @@
         </div>
       </div>
       
-      <h1 class="user-name">{{ userProfile.nombre }} {{ userProfile.apellido }}</h1>
-      
-      <div class="location-badge" *ngIf="userProfile.esta_verificado">
-        <ion-icon name="checkmark-circle" color="success"></ion-icon>
-        <span>Madrid, España</span>
+      <div class="profile-info">
+        <h2 class="user-name">{{ userProfile.nombre }} {{ userProfile.apellido }}</h2>
+        <p class="location-text">📍 Madrid, España</p>
+        <p class="member-since">Miembro en Kurro desde {{ getYear(userProfile.fecha_creacion) }}</p>
       </div>
-      
-      <p class="member-since">Miembro en Kurro desde {{ getYear(userProfile.fecha_creacion) }}</p>
     </div>
 
     <!-- Stats Card -->
@@ -58,12 +54,11 @@
     <div class="section" *ngIf="userServices && userServices.length > 0">
       <div class="section-header">
         <h2>Servicios</h2>
-        <span class="see-more" (click)="seeAllServices()">Ver más</span>
       </div>
       
       <div class="services-list">
         <div 
-          *ngFor="let service of userServices.slice(0, 3)" 
+          *ngFor="let service of userServices" 
           class="service-item"
           (click)="goToService(service.id)">
           <div class="service-image">

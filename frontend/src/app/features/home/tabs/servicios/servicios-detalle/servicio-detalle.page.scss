@@ -168,7 +168,7 @@ ion-toolbar {
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: var(--ion-color-light);
+    background: var(--card-light-bg);
     border-radius: 12px;
     margin-bottom: 1rem;
     
@@ -193,6 +193,7 @@ ion-toolbar {
   margin: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  background: var(--card-light-bg);
   
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -302,6 +303,7 @@ ion-toolbar {
 // Cards generales
 ion-card {
   margin: 1rem;
+  background: var(--card-light-bg);
   
   ion-card-title {
     font-size: 1.125rem;
@@ -391,7 +393,7 @@ ion-card {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
-    background: var(--ion-color-light);
+    background: var(--card-light-bg);
     border-radius: 8px;
     
     &.unavailable {
@@ -469,12 +471,6 @@ ion-card {
     }
   }
 
-  .price-section {
-    .price {
-      background: var(--ion-color-step-100);
-    }
-  }
-
   .provider-card {
     .provider-header {
       .provider-info {
@@ -531,8 +527,6 @@ ion-card {
 
   .availability-list {
     .availability-item {
-      background: var(--ion-color-step-100);
-      
       .day {
         color: var(--ion-color-light);
       }
