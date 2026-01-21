@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent, IonSpinner, ViewDidEnter } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService, MensajeRealTime } from '../../../../core/services';
+import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService, MensajeRealTime, ConversationUpdate } from '../../../../core/services';
 
 @Component({
   selector: 'app-chat',
@@ -32,13 +32,15 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
     private router: Router,
     private chatService: ChatService,
     private socketService: SocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    // Obtener el usuario actual primero
+    this.listenToAuthChanges();
     this.cargarConversaciones();
     this.initializeSocket();
-    this.listenToAuthChanges();
   }
 
   ngOnDestroy() {
@@ -66,21 +68,63 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
     
     // Suscribirse a nuevos mensajes para actualizar la lista de conversaciones
     const newMessageSub = this.socketService.newMessage$.subscribe((mensaje: MensajeRealTime) => {
+      console.log('📩 newMessage$ recibido:', mensaje);
       this.actualizarConversacionConNuevoMensaje(mensaje);
     });
     this.subscriptions.push(newMessageSub);
+    
+    // Suscribirse a actualizaciones de conversación (para cuando no estás en la conversación)
+    const convUpdateSub = this.socketService.conversationUpdate$.subscribe((update: ConversationUpdate) => {
+      console.log('📬 conversationUpdate$ recibido:', update);
+      this.actualizarConversacionDesdeUpdate(update);
+    });
+    this.subscriptions.push(convUpdateSub);
+  }
+
+  /**
+   * Actualizar conversación desde evento de update (cuando no estás en la conversación)
+   */
+  private actualizarConversacionDesdeUpdate(update: ConversationUpdate) {
+    const convIndex = this.conversaciones.findIndex(c => c.id === update.conversacionId);
+    
+    if (convIndex !== -1) {
+      const conv = this.conversaciones[convIndex];
+      const esPropio = update.remitenteId === this.currentUserId;
+      
+      this.conversaciones[convIndex] = {
+        ...conv,
+        texto_ultimo_mensaje: update.ultimoMensaje,
+        ultimo_mensaje_en: update.ultimoMensajeEn,
+        no_leidos: esPropio ? conv.no_leidos : (conv.no_leidos || 0) + 1
+      };
+      
+      // Mover la conversación al inicio
+      const [conversacionActualizada] = this.conversaciones.splice(convIndex, 1);
+      this.conversaciones.unshift(conversacionActualizada);
+      
+      this.aplicarFiltro();
+      this.cdr.detectChanges();
+    } else {
+      // Nueva conversación, recargar todas
+      this.cargarConversaciones();
+    }
   }
 
   /**
    * Actualizar una conversación cuando llega un nuevo mensaje
    */
   private actualizarConversacionConNuevoMensaje(mensaje: MensajeRealTime) {
+    console.log('Nuevo mensaje recibido en chat list:', mensaje);
+    console.log('currentUserId:', this.currentUserId);
+    
     const convIndex = this.conversaciones.findIndex(c => c.id === mensaje.conversacion_id);
     
     if (convIndex !== -1) {
       // Actualizar la conversación existente
       const conv = this.conversaciones[convIndex];
       const esPropio = mensaje.remitente_id === this.currentUserId;
+      
+      console.log('Conversación encontrada, esPropio:', esPropio);
       
       this.conversaciones[convIndex] = {
         ...conv,
@@ -94,8 +138,10 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
       this.conversaciones.unshift(conversacionActualizada);
       
       this.aplicarFiltro();
+      this.cdr.detectChanges();
     } else {
       // Si la conversación no existe en la lista, recargar todas
+      console.log('Conversación no encontrada, recargando todas');
       this.cargarConversaciones();
     }
   }

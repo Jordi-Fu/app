@@ -101,6 +101,9 @@ class ChatService {
       : conversacion.participante_1_id;
     
     socketService.notifyNewMessage(otroUsuarioId, conversacionId, mensajeConRemitente);
+    
+    // También notificar al remitente para actualizar su propia lista de conversaciones
+    socketService.notifyNewMessage(userId, conversacionId, mensajeConRemitente);
 
     // Retornar el mensaje con la información del remitente
     return {
