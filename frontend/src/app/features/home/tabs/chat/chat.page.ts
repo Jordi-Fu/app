@@ -110,6 +110,7 @@ export class ChatPage implements OnInit, OnDestroy {
       this.conversaciones = await this.chatService.obtenerConversaciones();
       this.aplicarFiltro();
     } catch (error) {
+      console.error('Error al cargar conversaciones:', error);
       this.error = 'Error al cargar las conversaciones';
     } finally {
       this.cargando = false;

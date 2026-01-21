@@ -50,6 +50,7 @@ export class ServiciosPage implements OnInit {
 
     
     } catch (error) {
+      console.error('Error al cargar datos:', error);
       this.servicios = [];
       this.serviciosFiltrados = [];
       this.categorias = [];
@@ -98,7 +99,12 @@ export class ServiciosPage implements OnInit {
       next: () => {
       },
       error: (error) => {
-        console.error('Error al incrementar vistas:', error);
+        console.error('Error al incrementar vistas:', {
+          message: error?.message || 'Error desconocido',
+          status: error?.status,
+          error: error?.error,
+          fullError: error
+        });
       }
     });
 

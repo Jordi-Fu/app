@@ -123,12 +123,14 @@ export class ServicioDetallePage implements OnInit {
       this.servicio = response?.data || null;
       
       if (!this.servicio) {
+        console.error('Servicio no encontrado');
         this.router.navigate(['/home/servicios']);
       } else {
         // Verificar si el servicio está en favoritos desde el backend
         this.checkIfFavorite(id);
       }
     } catch (error) {
+      console.error('Error al cargar servicio:', error);
       this.router.navigate(['/home/servicios']);
     } finally {
       this.isLoading = false;
@@ -147,6 +149,7 @@ export class ServicioDetallePage implements OnInit {
         }
       });
     } catch (error) {
+      console.error('Error al verificar favorito:', error);
       this.isFavorite = false;
     }
   }
@@ -225,6 +228,7 @@ export class ServicioDetallePage implements OnInit {
           await toast.present();
         },
         error: async (error) => {
+          console.error('Error al actualizar favorito:', error);
           // Revertir el cambio si hubo error
           this.isFavorite = previousState;
           
@@ -281,6 +285,8 @@ export class ServicioDetallePage implements OnInit {
     } catch (error: any) {
       // El usuario canceló o hubo un error
       if (error?.message !== 'Share canceled') {
+        console.error('Error al compartir:', error);
+        
         const toast = await this.toastController.create({
           message: 'No se pudo compartir el servicio',
           duration: 2500,
@@ -310,6 +316,7 @@ export class ServicioDetallePage implements OnInit {
         textArea.remove();
       }
     } catch (error) {
+      console.error('Error al copiar al portapapeles:', error);
       throw error;
     }
   }

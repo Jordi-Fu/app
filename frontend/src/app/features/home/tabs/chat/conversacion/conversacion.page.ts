@@ -243,6 +243,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       setTimeout(() => this.scrollToBottom(), 300);
       setTimeout(() => this.scrollToBottom(), 500);
     } catch (error) {
+      console.error('Error al cargar conversación:', error);
       this.error = 'Error al cargar la conversación';
     } finally {
       this.cargando = false;
@@ -320,6 +321,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       
       setTimeout(() => this.scrollToBottom(), 100);
     } catch (error) {
+      console.error('Error al enviar mensaje:', error);
       alert('Error al enviar el mensaje');
     } finally {
       this.enviando = false;

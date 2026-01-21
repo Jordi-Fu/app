@@ -84,6 +84,7 @@ export class AltaServicioPage implements OnInit {
         this.serviceImages[index] = `data:image/${image.format};base64,${image.base64String}`;
       }
     } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
       await this.showToast('Error al seleccionar la imagen', 'danger');
     }
   }

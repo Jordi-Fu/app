@@ -82,12 +82,14 @@ export class PerfilPublicoPage implements OnInit {
         this.userProfile = response?.data || null;
         
         if (!this.userProfile) {
+          console.error('Perfil de usuario no encontrado');
           this.showToast('Usuario no encontrado', 'danger');
           this.router.navigate(['/home/servicios']);
         }
         this.isLoading = false;
       },
       error: (error) => {
+        console.error('Error al cargar perfil de usuario:', error);
         this.showToast('Error al cargar el perfil del usuario', 'danger');
         this.router.navigate(['/home/servicios']);
         this.isLoading = false;
@@ -101,6 +103,7 @@ export class PerfilPublicoPage implements OnInit {
         this.userServices = response?.data || [];
       },
       error: (error) => {
+        console.error('Error al cargar servicios del usuario:', error);
         this.userServices = [];
       }
     });

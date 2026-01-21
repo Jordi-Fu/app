@@ -71,6 +71,7 @@ export class SocketService implements OnDestroy {
 
       this.setupEventListeners();
     } catch (error) {
+      console.error('🔴 Error al conectar socket:', error);
       // No lanzar error, solo loguear - la app puede funcionar sin socket
     }
   }
@@ -93,6 +94,7 @@ export class SocketService implements OnDestroy {
 
     // Error de conexión
     this.socket.on('connect_error', (error) => {
+      console.error('🔴 Error de conexión socket:', error.message);
       this.connectionStatusSubject.next(false);
     });
 
@@ -127,6 +129,7 @@ export class SocketService implements OnDestroy {
    */
   joinConversation(conversacionId: string): void {
     if (!this.socket?.connected) {
+      console.warn('🟡 Socket no conectado, intentando conectar...');
       this.connect().then(() => {
         setTimeout(() => {
           this.socket?.emit('join:conversation', conversacionId);

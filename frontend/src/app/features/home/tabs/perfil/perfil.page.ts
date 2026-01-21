@@ -45,6 +45,7 @@ export class PerfilPage implements OnInit {
   }
 
   onImageError() {
+    console.error('Error al cargar la imagen del avatar');
     this.imageError = true;
   }
 
