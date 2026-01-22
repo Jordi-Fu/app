@@ -18,7 +18,8 @@ import {
   IonAvatar,
   IonBadge,
   IonSpinner,
-  ToastController
+  ToastController,
+  NavController
 } from '@ionic/angular/standalone';
 import { Share } from '@capacitor/share';
 import { addIcons } from 'ionicons';
@@ -65,6 +66,7 @@ import { Service } from '../../../../../core/interfaces';
 export class ServicioDetallePage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private navController = inject(NavController);
   private serviceService = inject(ServiceService);
   private chatService = inject(ChatService);
   private toastController = inject(ToastController);
@@ -75,6 +77,7 @@ export class ServicioDetallePage implements OnInit {
   selectedImageIndex = 0;
   isFavorite = false;
   isSharingSupported = false;
+  
 
   constructor() {
     addIcons({
@@ -359,7 +362,7 @@ export class ServicioDetallePage implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/home/servicios']);
+    this.navController.back();
   }
 
   getProviderAvatar(): string {

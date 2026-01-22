@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave, NavController } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent, AuthService, getAvatarUrl } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
@@ -40,6 +40,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   error: string | null = null;
   otroUsuarioEscribiendo = false;
   
+  private navController = inject(NavController);
   // Subscripciones
   private subscriptions: Subscription[] = [];
   private typingTimeout: any = null;
@@ -531,6 +532,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   }
 
   goBack() {
-    this.router.navigate(['/home/chat']);
+    this.navController.back();
   }
 }

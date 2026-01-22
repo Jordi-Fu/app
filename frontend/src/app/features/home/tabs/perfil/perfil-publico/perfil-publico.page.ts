@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonHeader, 
@@ -8,7 +8,8 @@ import {
   IonIcon,
   IonSpinner,
   IonFabButton,
-  ToastController
+  ToastController,
+  NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -39,7 +40,7 @@ import { UserProfile, Review } from '../../../../../core/interfaces';
 export class PerfilPublicoPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private location = inject(Location);
+  private navController = inject(NavController);
   private userService = inject(UserService);
   private toastController = inject(ToastController);
 
@@ -174,9 +175,7 @@ export class PerfilPublicoPage implements OnInit {
   }
 
   goBack() {
-    // Usar Location.back() para volver a la página anterior
-    // Esto funcionará desde conversacion, servicio-detalle, o cualquier otra ruta
-    this.location.back();
+    this.navController.back();
   }
 
   getUserAvatar(): string {

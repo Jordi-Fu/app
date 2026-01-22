@@ -1,16 +1,16 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="servicios">
+    <ion-tab-button tab="servicios" (click)="goToTab('servicios')">
       <ion-icon name="grid-outline"></ion-icon>
       <ion-label>Servicios</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="chat">
+    <ion-tab-button tab="chat" (click)="goToTab('chat')">
       <ion-icon name="chatbubbles-outline"></ion-icon>
       <ion-label>Chat</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="perfil">
+    <ion-tab-button tab="perfil" (click)="goToTab('perfil')">
       <ion-icon name="person-outline"></ion-icon>
       <ion-label>Perfil</ion-label>
     </ion-tab-button>

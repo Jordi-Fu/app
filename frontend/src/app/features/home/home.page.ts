@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { 
   IonTabs, 
   IonTabBar, 
   IonTabButton, 
   IonIcon, 
-  IonLabel 
+  IonLabel,
+  NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -27,11 +28,20 @@ import {
   ]
 })
 export class HomePage {
+  private navController = inject(NavController);
+
   constructor() {
     addIcons({
       'grid-outline': gridOutline,
       'chatbubbles-outline': chatbubblesOutline,
       'person-outline': personOutline
     });
+  }
+
+  /**
+   * Navegar siempre a la raíz del tab
+   */
+  goToTab(tab: string) {
+    this.navController.navigateRoot(`/home/${tab}`);
   }
 }

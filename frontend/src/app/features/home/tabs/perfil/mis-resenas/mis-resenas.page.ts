@@ -150,8 +150,7 @@ export class MisResenasPage implements OnInit, OnDestroy {
   }
 
   goBack() {
-    // Navegar directamente al perfil con animación de retroceso
-    this.navController.navigateBack('/home/perfil');
+    this.navController.back();
   }
 
   private async showToast(message: string, color: string = 'medium') {
