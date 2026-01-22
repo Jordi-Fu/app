@@ -40,6 +40,30 @@ class UserService {
       throw error;
     }
   }
+
+  /**
+   * Buscar usuarios por nombre/username
+   */
+  async searchUsers(query: string, limit: number = 20): Promise<any[]> {
+    try {
+      return await userDatabase.searchUsers(query, limit);
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener todos los usuarios activos
+   */
+  async getAllActiveUsers(limit: number = 50): Promise<any[]> {
+    try {
+      return await userDatabase.getAllActiveUsers(limit);
+    } catch (error) {
+      console.error('Error al obtener usuarios activos:', error);
+      throw error;
+    }
+  }
 }
 
 export const userService = new UserService();

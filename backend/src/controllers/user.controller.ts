@@ -69,6 +69,60 @@ class UserController {
       });
     }
   }
+
+  /**
+   * Buscar usuarios por nombre/username
+   */
+  async searchUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const query = req.query.q as string || '';
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      if (query.length < 2) {
+        // Si no hay query, devolver usuarios populares
+        const users = await userService.getAllActiveUsers(limit);
+        res.json({
+          success: true,
+          data: users
+        });
+        return;
+      }
+
+      const users = await userService.searchUsers(query, limit);
+
+      res.json({
+        success: true,
+        data: users
+      });
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al buscar usuarios'
+      });
+    }
+  }
+
+  /**
+   * Obtener todos los usuarios activos
+   */
+  async getAllActiveUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const users = await userService.getAllActiveUsers(limit);
+
+      res.json({
+        success: true,
+        data: users
+      });
+    } catch (error) {
+      console.error('Error al obtener usuarios activos:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener usuarios'
+      });
+    }
+  }
 }
 
 export const userController = new UserController();

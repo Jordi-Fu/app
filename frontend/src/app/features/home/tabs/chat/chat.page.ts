@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent, IonSpinner, ViewDidEnter } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService, MensajeRealTime, ConversationUpdate } from '../../../../core/services';
+import { ChatService, ConversacionUsuario, SocketService, UserStatusEvent, AuthService, MensajeRealTime, ConversationUpdate, getAvatarUrl } from '../../../../core/services';
 
 @Component({
   selector: 'app-chat',
@@ -255,5 +255,10 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
 
   getNombreCompleto(usuario: any): string {
     return `${usuario.nombre} ${usuario.apellido}`;
+  }
+
+  getChatAvatar(chat: ConversacionUsuario): string {
+    const usuario = chat.otro_usuario;
+    return getAvatarUrl(usuario.url_avatar, usuario.nombre, usuario.apellido);
   }
 }

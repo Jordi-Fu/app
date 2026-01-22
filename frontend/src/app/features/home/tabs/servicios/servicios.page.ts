@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
-import { ServiceService } from '../../../../core/services';
+import { ServiceService, getAvatarUrl } from '../../../../core/services';
 import { Service, Category } from '../../../../core/interfaces';
 
 @Component({
@@ -146,5 +146,11 @@ export class ServiciosPage implements OnInit {
 
   abrirBusqueda() {
     this.router.navigate(['/home/buscar-servicio-persona']);
+  }
+
+  getProviderAvatar(servicio: Service): string {
+    const provider = servicio.provider;
+    if (!provider) return 'assets/avatar-default.png';
+    return getAvatarUrl(provider.url_avatar, provider.nombre, provider.apellido);
   }
 }

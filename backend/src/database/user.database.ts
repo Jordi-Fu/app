@@ -425,6 +425,72 @@ class UserDatabase {
       throw error;
     }
   }
+
+  /**
+   * Buscar usuarios por nombre/username
+   */
+  async searchUsers(query: string, limit: number = 20): Promise<any[]> {
+    try {
+      const searchQuery = `
+        SELECT 
+          id,
+          nombre,
+          apellido,
+          usuario,
+          url_avatar,
+          esta_verificado,
+          promedio_calificacion,
+          total_resenas
+        FROM usuarios
+        WHERE esta_activo = true
+          AND (
+            LOWER(nombre) LIKE $1
+            OR LOWER(apellido) LIKE $1
+            OR LOWER(usuario) LIKE $1
+            OR LOWER(CONCAT(nombre, ' ', apellido)) LIKE $1
+          )
+        ORDER BY promedio_calificacion DESC NULLS LAST, nombre ASC
+        LIMIT $2
+      `;
+      
+      const searchPattern = `%${query.toLowerCase()}%`;
+      const result = await pool.query(searchQuery, [searchPattern, limit]);
+      
+      return result.rows;
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener todos los usuarios activos (para búsqueda)
+   */
+  async getAllActiveUsers(limit: number = 50): Promise<any[]> {
+    try {
+      const query = `
+        SELECT 
+          id,
+          nombre,
+          apellido,
+          usuario,
+          url_avatar,
+          esta_verificado,
+          promedio_calificacion,
+          total_resenas
+        FROM usuarios
+        WHERE esta_activo = true
+        ORDER BY promedio_calificacion DESC NULLS LAST, nombre ASC
+        LIMIT $1
+      `;
+      
+      const result = await pool.query(query, [limit]);
+      return result.rows;
+    } catch (error) {
+      console.error('Error al obtener usuarios activos:', error);
+      throw error;
+    }
+  }
   
   /**
    * Convertir a usuario seguro (sin contraseña)

@@ -86,7 +86,7 @@
           <div class="servicio-proveedor">
             <div class="proveedor-avatar">
               <img
-                [src]="servicio.provider?.url_avatar || 'https://ui-avatars.com/api/?name=' + servicio.provider?.nombre + '+' + servicio.provider?.apellido"
+                [src]="getProviderAvatar(servicio)"
                 [alt]="servicio.provider?.nombre" />
             </div>
             <div class="proveedor-info">

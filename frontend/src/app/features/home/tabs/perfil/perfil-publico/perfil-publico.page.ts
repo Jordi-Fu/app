@@ -3,8 +3,6 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonHeader, 
-  IonToolbar, 
-  IonTitle, 
   IonContent,
   IonAvatar,
   IonIcon,
@@ -21,7 +19,7 @@ import {
   ellipse,
   optionsOutline
 } from 'ionicons/icons';
-import { UserService } from '../../../../../core/services';
+import { UserService, getAvatarUrl as getAvatarUrlHelper } from '../../../../../core/services';
 import { UserProfile, Review } from '../../../../../core/interfaces';
 
 @Component({
@@ -31,8 +29,6 @@ import { UserProfile, Review } from '../../../../../core/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonAvatar,
     IonIcon,
@@ -140,7 +136,7 @@ export class PerfilPublicoPage implements OnInit {
     if (!this.userProfile) return '';
     const nombre = this.userProfile.nombre.toLowerCase().replace(/\s/g, '');
     const apellido = this.userProfile.apellido.toLowerCase().replace(/\s/g, '');
-    return `${nombre}${apellido}_`;
+    return `${nombre}${apellido}`;
   }
 
   toggleDescripcion() {
@@ -181,6 +177,15 @@ export class PerfilPublicoPage implements OnInit {
     // Usar Location.back() para volver a la página anterior
     // Esto funcionará desde conversacion, servicio-detalle, o cualquier otra ruta
     this.location.back();
+  }
+
+  getUserAvatar(): string {
+    if (!this.userProfile) return 'assets/avatar-default.png';
+    return getAvatarUrlHelper(this.userProfile.url_avatar, this.userProfile.nombre, this.userProfile.apellido);
+  }
+
+  getReviewerAvatar(review: Review): string {
+    return getAvatarUrlHelper(review.reviewer_avatar, review.reviewer_name);
   }
 
   private async showToast(message: string, color: string = 'medium') {

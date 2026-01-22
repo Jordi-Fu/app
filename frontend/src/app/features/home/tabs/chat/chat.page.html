@@ -43,7 +43,7 @@
       <div class="chat-item" *ngFor="let chat of conversacionesFiltradas" (click)="abrirConversacion(chat)">
         <div class="chat-avatar">
           <img 
-            [src]="chat.otro_usuario.url_avatar || 'assets/avatar-default.png'" 
+            [src]="getChatAvatar(chat)" 
             [alt]="getNombreCompleto(chat.otro_usuario)" 
             onerror="this.src='assets/avatar-default.png'"
           />

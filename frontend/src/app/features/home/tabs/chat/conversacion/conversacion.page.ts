@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonSpinner, IonFooter, ViewDidEnter, ViewWillLeave } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
-import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent, AuthService } from '../../../../../core/services';
+import { ChatService, ConversacionUsuario, MensajeConRemitente, SocketService, MensajeRealTime, UserStatusEvent, AuthService, getAvatarUrl } from '../../../../../core/services';
 import { StorageService } from '../../../../../core/services';
 
 // Constante de clave de storage (igual que en auth.service.ts)
@@ -429,6 +429,20 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     if (!this.conversacion) return '';
     const usuario = this.conversacion.otro_usuario;
     return `${usuario.nombre} ${usuario.apellido}`;
+  }
+
+  getOtroUsuarioAvatar(): string {
+    if (!this.conversacion) return 'assets/avatar-default.png';
+    const usuario = this.conversacion.otro_usuario;
+    return getAvatarUrl(usuario.url_avatar, usuario.nombre, usuario.apellido);
+  }
+
+  getMensajeAvatar(mensaje: MensajeConRemitente): string {
+    const remitente = mensaje.remitente;
+    if (!remitente) {
+      return this.getOtroUsuarioAvatar();
+    }
+    return getAvatarUrl(remitente.url_avatar, remitente.nombre, remitente.apellido);
   }
 
   goToProvider() {

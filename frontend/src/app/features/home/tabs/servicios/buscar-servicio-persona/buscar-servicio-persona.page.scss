@@ -60,23 +60,27 @@ ion-content {
     --box-shadow: none;
     --placeholder-color: var(--gray-text, #999999);
     --color: var(--ion-text-color, #333333);
-    --icon-color: transparent;
     padding: 0;
     flex: 1;
     min-width: 0;
     
-    &::part(search-icon) {
-      background: $primary-gradient;
-      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
-      mask-size: contain;
-      mask-repeat: no-repeat;
-      mask-position: center;
-      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
-      -webkit-mask-size: contain;
-      -webkit-mask-repeat: no-repeat;
-      -webkit-mask-position: center;
-      width: 20px;
-      height: 20px;
+    ::ng-deep .searchbar-search-icon {
+      background: $primary-gradient !important;
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
+      -webkit-mask-size: 20px 20px !important;
+      -webkit-mask-repeat: no-repeat !important;
+      -webkit-mask-position: center !important;
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
+      mask-size: 20px 20px !important;
+      mask-repeat: no-repeat !important;
+      mask-position: center !important;
+      width: 20px !important;
+      height: 20px !important;
+      color: transparent !important;
+    }
+    
+    ::ng-deep .searchbar-search-icon svg {
+      display: none !important;
     }
   }
 }

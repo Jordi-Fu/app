@@ -6,6 +6,9 @@ export * from './chat.service';
 export * from './socket.service';
 export * from './user.service';
 
+// Re-exportar utilidades de URL
+export { getAvatarUrl, getAbsoluteImageUrl } from '../utils/url.utils';
+
 // Re-exportar interfaces para facilitar importación
 export { 
   ConversacionUsuario, 

@@ -105,7 +105,7 @@
         <div class="provider-header">
           <ion-avatar>
             <img 
-              [src]="servicio.provider?.url_avatar || 'https://ui-avatars.com/api/?name=' + servicio.provider?.nombre + '+' + servicio.provider?.apellido" 
+              [src]="getProviderAvatar()" 
               [alt]="servicio.provider?.nombre"
             />
           </ion-avatar>

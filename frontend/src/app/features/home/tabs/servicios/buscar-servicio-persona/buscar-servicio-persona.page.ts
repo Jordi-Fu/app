@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonSearchbar } from '@ionic/angular/standalone';
-import { ServiceService, UserService } from '../../../../../core/services';
+import { ServiceService, UserService, getAvatarUrl } from '../../../../../core/services';
 import { Service } from '../../../../../core/interfaces';
 
 interface ServiceResult {
@@ -55,13 +55,14 @@ export class BuscarServicioPersonaPage implements OnInit {
   
   // Datos para búsqueda
   private allServices: Service[] = [];
-  private allProviders: Map<string, any> = new Map();
+  private allUsers: any[] = [];
 
   ngOnInit() {
     this.cargarDatos();
   }
 
   cargarDatos() {
+    // Cargar servicios
     this.serviceService.getServices({ pagina: 1, limite: 50 }).subscribe({
       next: (response) => {
         this.allServices = response?.services || [];
@@ -75,16 +76,19 @@ export class BuscarServicioPersonaPage implements OnInit {
           precio: s.precio,
           rating: s.promedio_calificacion
         }));
-        
-        // Extraer todos los proveedores únicos
-        this.allServices.forEach((s: Service) => {
-          if (s.provider && !this.allProviders.has(s.provider.id)) {
-            this.allProviders.set(s.provider.id, s.provider);
-          }
-        });
       },
       error: (err) => {
-        console.error('Error al cargar datos:', err);
+        console.error('Error al cargar servicios:', err);
+      }
+    });
+
+    // Cargar todos los usuarios activos
+    this.userService.getAllActiveUsers(100).subscribe({
+      next: (response) => {
+        this.allUsers = response?.data || [];
+      },
+      error: (err) => {
+        console.error('Error al cargar usuarios:', err);
       }
     });
   }
@@ -130,8 +134,8 @@ export class BuscarServicioPersonaPage implements OnInit {
       rating: s.promedio_calificacion
     }));
 
-    // Buscar personas/proveedores en todos los proveedores
-    this.personasResultados = Array.from(this.allProviders.values())
+    // Buscar personas en todos los usuarios activos
+    this.personasResultados = this.allUsers
       .filter((p: any) => {
         const nombreCompleto = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
         const username = (p.usuario || '').toLowerCase();
@@ -140,7 +144,7 @@ export class BuscarServicioPersonaPage implements OnInit {
       .map((p: any) => ({
         id: p.id,
         nombre: `${p.nombre || ''} ${p.apellido || ''}`.trim(),
-        avatar: p.url_avatar || `https://ui-avatars.com/api/?name=${p.nombre}+${p.apellido}&background=13B5B5&color=fff`,
+        avatar: getAvatarUrl(p.url_avatar, p.nombre, p.apellido),
         rating: p.promedio_calificacion
       }));
 

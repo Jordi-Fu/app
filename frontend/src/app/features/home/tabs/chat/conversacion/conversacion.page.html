@@ -5,7 +5,7 @@
     <div class="header-content" *ngIf="conversacion" (click)="goToProvider()">
       <div class="contact-avatar">
         <img 
-          [src]="conversacion.otro_usuario.url_avatar || 'assets/avatar-default.png'" 
+          [src]="getOtroUsuarioAvatar()" 
           [alt]="getNombreCompleto()"
           onerror="this.src='assets/avatar-default.png'"
         />
@@ -51,7 +51,7 @@
         <!-- Avatar solo en el último mensaje consecutivo del otro usuario -->
         <div class="mensaje-avatar" *ngIf="esUltimoMensajeDelOtro(i)">
           <img 
-            [src]="mensaje.remitente.url_avatar || conversacion?.otro_usuario?.url_avatar || 'assets/avatar-default.png'"
+            [src]="getMensajeAvatar(mensaje)"
             [alt]="mensaje.remitente.nombre"
             onerror="this.src='assets/avatar-default.png'"
           />

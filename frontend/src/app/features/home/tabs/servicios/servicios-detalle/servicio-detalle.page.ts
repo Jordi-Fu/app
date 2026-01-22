@@ -35,7 +35,7 @@ import {
   checkmarkCircleOutline,
   calendarOutline
 } from 'ionicons/icons';
-import { ServiceService } from '../../../../../core/services';
+import { ServiceService, getAvatarUrl } from '../../../../../core/services';
 import { Service } from '../../../../../core/interfaces';
 
 @Component({
@@ -59,7 +59,6 @@ import { Service } from '../../../../../core/interfaces';
     IonCardTitle,
     IonCardContent,
     IonAvatar,
-    IonBadge,
     IonSpinner
   ]
 })
@@ -326,5 +325,11 @@ export class ServicioDetallePage implements OnInit {
 
   goBack() {
     this.router.navigate(['/home/servicios']);
+  }
+
+  getProviderAvatar(): string {
+    const provider = this.servicio?.provider;
+    if (!provider) return 'assets/avatar-default.png';
+    return getAvatarUrl(provider.url_avatar, provider.nombre, provider.apellido);
   }
 }
