@@ -283,12 +283,17 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   }
 
   aplicarFiltro() {
+    // Primero filtrar solo conversaciones que tienen al menos un mensaje
+    const conversacionesConMensajes = this.conversaciones.filter(chat => 
+      chat.texto_ultimo_mensaje && chat.texto_ultimo_mensaje.trim() !== ''
+    );
+
     if (!this.searchQuery) {
-      this.conversacionesFiltradas = this.conversaciones;
+      this.conversacionesFiltradas = conversacionesConMensajes;
       return;
     }
 
-    this.conversacionesFiltradas = this.conversaciones.filter(chat => {
+    this.conversacionesFiltradas = conversacionesConMensajes.filter(chat => {
       const nombreCompleto = this.getNombreCompleto(chat.otro_usuario).toLowerCase();
       const ultimoMensaje = (chat.texto_ultimo_mensaje || '').toLowerCase();
       const usuario = (chat.otro_usuario.usuario || '').toLowerCase();

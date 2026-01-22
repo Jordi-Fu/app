@@ -99,7 +99,7 @@ CREATE TABLE usuarios (
   porcentaje_respuesta DECIMAL(5,2) DEFAULT 0.00,
   idioma VARCHAR(10) DEFAULT 'es',
   zona_horaria VARCHAR(50) DEFAULT 'UTC',
-  moneda VARCHAR(3) DEFAULT 'EUR',
+  moneda VARCHAR(3) DEFAULT '€',
   stripe_cliente_id VARCHAR(255),
   stripe_cuenta_id VARCHAR(255),
   token_fcm TEXT, -- Para notificaciones push
@@ -181,7 +181,7 @@ CREATE TABLE servicios (
   descripcion TEXT NOT NULL,
   tipo_precio tipo_precio_enum NOT NULL,
   precio DECIMAL(10,2),
-  moneda VARCHAR(3) DEFAULT 'EUR',
+  moneda VARCHAR(3) DEFAULT '€',
   tipo_ubicacion VARCHAR(50) NOT NULL,
   direccion TEXT,
   ciudad VARCHAR(100),
@@ -450,7 +450,7 @@ CREATE TABLE pagos (
   pagador_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,
   receptor_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,
   monto DECIMAL(10,2) NOT NULL,
-  moneda VARCHAR(3) DEFAULT 'EUR',
+  moneda VARCHAR(3) DEFAULT '€',
   metodo_pago metodo_pago_enum NOT NULL,
   id_transaccion VARCHAR(255), -- ID de la pasarela de pago
   id_pago_externo VARCHAR(255), -- ID externo (Stripe, PayPal, etc.)
@@ -898,7 +898,7 @@ INSERT INTO configuracion_app (clave, valor, tipo_dato, descripcion, es_publico)
 ('horas_cancelacion_reserva', '24', 'number', 'Horas antes para cancelar sin penalización', true),
 ('nombre_app', 'AplicacionServicios', 'string', 'Nombre de la aplicación', true),
 ('email_soporte', 'soporte@aplicacionservicios.com', 'string', 'Email de soporte', true),
-('moneda_predeterminada', 'EUR', 'string', 'Moneda por defecto', true),
+('moneda_predeterminada', '€', 'string', 'Moneda por defecto', true),
 ('idioma_predeterminado', 'es', 'string', 'Idioma por defecto', true);
 
 -- Insertar categorías principales
@@ -972,7 +972,7 @@ INSERT INTO usuarios (
   125,
   'es',
   'Europe/Madrid',
-  'EUR',
+  '€',
   true,
   true,
   false,

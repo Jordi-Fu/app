@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonSearchbar } from '@ionic/angular/standalone';
-import { ServiceService, UserService, getAvatarUrl } from '../../../../../core/services';
+import { ServiceService, UserService, SearchUser, getAvatarUrl, getAbsoluteImageUrl } from '../../../../../core/services';
 import { Service } from '../../../../../core/interfaces';
+import { forkJoin } from 'rxjs';
 
 interface ServiceResult {
   id: string;
@@ -18,6 +19,7 @@ interface ServiceResult {
 interface PersonResult {
   id: string;
   nombre: string;
+  usuario: string;
   avatar: string;
   rating?: number;
 }
@@ -71,7 +73,7 @@ export class BuscarServicioPersonaPage implements OnInit {
           id: s.id,
           titulo: s.titulo,
           descripcion: s.descripcion_corta || s.descripcion?.substring(0, 60) + '...' || '',
-          imagen: s.images?.[0]?.url_imagen || '',
+          imagen: getAbsoluteImageUrl(s.images?.[0]?.url_imagen),
           precio: s.precio,
           rating: s.promedio_calificacion
         }));
@@ -115,7 +117,7 @@ export class BuscarServicioPersonaPage implements OnInit {
     this.isSearching = true;
     this.hasSearched = true;
 
-    // Buscar servicios por título/descripción
+    // Buscar servicios localmente por título/descripción
     const serviciosFiltrados = this.allServices.filter((s: Service) => 
       s.titulo.toLowerCase().includes(query) ||
       s.descripcion?.toLowerCase().includes(query)
@@ -125,26 +127,46 @@ export class BuscarServicioPersonaPage implements OnInit {
       id: s.id,
       titulo: s.titulo,
       descripcion: s.descripcion_corta || s.descripcion?.substring(0, 60) + '...' || '',
-      imagen: s.images?.[0]?.url_imagen || '',
+      imagen: getAbsoluteImageUrl(s.images?.[0]?.url_imagen),
       precio: s.precio,
       rating: s.promedio_calificacion
     }));
 
-    // Buscar personas/proveedores en todos los proveedores
-    this.personasResultados = Array.from(this.allProviders.values())
-      .filter((p: any) => {
-        const nombreCompleto = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
-        const username = (p.usuario || '').toLowerCase();
-        return nombreCompleto.includes(query) || username.includes(query);
-      })
-      .map((p: any) => ({
-        id: p.id,
-        nombre: `${p.nombre || ''} ${p.apellido || ''}`.trim(),
-        avatar: getAvatarUrl(p.url_avatar),
-        rating: p.promedio_calificacion
-      }));
-
-    this.isSearching = false;
+    // Buscar personas usando el servicio del backend (por nombre, apellido o usuario)
+    this.userService.searchUsers(query, 30).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.personasResultados = response.data.map((user: SearchUser) => ({
+            id: user.id,
+            nombre: `${user.nombre || ''} ${user.apellido || ''}`.trim(),
+            usuario: user.usuario || '',
+            avatar: getAvatarUrl(user.url_avatar),
+            rating: user.promedio_calificacion ?? undefined
+          }));
+        } else {
+          this.personasResultados = [];
+        }
+        this.isSearching = false;
+      },
+      error: (err) => {
+        console.error('Error al buscar usuarios:', err);
+        // Fallback: buscar en proveedores locales
+        this.personasResultados = Array.from(this.allProviders.values())
+          .filter((p: any) => {
+            const nombreCompleto = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
+            const username = (p.usuario || '').toLowerCase();
+            return nombreCompleto.includes(query) || username.includes(query);
+          })
+          .map((p: any) => ({
+            id: p.id,
+            nombre: `${p.nombre || ''} ${p.apellido || ''}`.trim(),
+            usuario: p.usuario || '',
+            avatar: getAvatarUrl(p.url_avatar),
+            rating: p.promedio_calificacion
+          }));
+        this.isSearching = false;
+      }
+    });
   }
 
   get tieneResultados(): boolean {
@@ -167,10 +189,13 @@ export class BuscarServicioPersonaPage implements OnInit {
   }
 
   verPersona(persona: PersonResult) {
-    this.router.navigate(['/home/perfil-publico', persona.id]);
+    this.router.navigate(['/home/usuario', persona.id]);
   }
 
   goBack() {
+    this.searchQuery = '';
+    this.limpiarResultados();
+    this.hasSearched = false;
     this.router.navigate(['/home/servicios']);
   }
 }

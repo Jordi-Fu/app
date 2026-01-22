@@ -5,6 +5,7 @@ export * from './theme.service';
 export * from './chat.service';
 export * from './socket.service';
 export * from './user.service';
+export { SearchUser } from './user.service';
 
 // Re-exportar utilidades de URL
 export { getAvatarUrl, getAbsoluteImageUrl } from '../utils/url.utils';

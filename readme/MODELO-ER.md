@@ -37,7 +37,7 @@
     │ • tiempo_respuesta_minutos  │  │
     │ • porcentaje_respuesta      │  │
     │ • idioma, zona_horaria      │  │
-    │ • moneda (EUR)              │  │
+    │ • moneda (€)              │  │
     │ • token_fcm (Push)          │  │
     │ • notificaciones_email      │  │
     │ • notificaciones_push       │  │

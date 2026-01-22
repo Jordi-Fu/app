@@ -63,7 +63,7 @@ CREATE TABLE usuarios (
   porcentaje_respuesta DECIMAL(5,2) DEFAULT 0.00,
   idioma VARCHAR(10) DEFAULT 'es',
   zona_horaria VARCHAR(50) DEFAULT 'UTC',
-  moneda VARCHAR(3) DEFAULT 'EUR',
+  moneda VARCHAR(3) DEFAULT '€',
   stripe_cliente_id VARCHAR(255),
   stripe_cuenta_id VARCHAR(255),
   token_fcm TEXT, -- Para notificaciones push
@@ -146,7 +146,7 @@ CREATE TABLE servicios (
   descripcion TEXT NOT NULL,
   tipo_precio tipo_precio_enum NOT NULL,
   precio DECIMAL(10,2),
-  moneda VARCHAR(3) DEFAULT 'EUR',
+  moneda VARCHAR(3) DEFAULT '€',
   tipo_ubicacion VARCHAR(50) NOT NULL,
   direccion TEXT,
   ciudad VARCHAR(100),
@@ -782,7 +782,7 @@ INSERT INTO configuracion_app (clave, valor, tipo_dato, descripcion, es_publico)
 ('horas_cancelacion_reserva', '24', 'number', 'Horas antes para cancelar sin penalizaciÃ³n', true),
 ('nombre_app', 'AplicacionServicios', 'string', 'Nombre de la aplicaciÃ³n', true),
 ('email_soporte', 'soporte@aplicacionservicios.com', 'string', 'Email de soporte', true),
-('moneda_predeterminada', 'EUR', 'string', 'Moneda por defecto', true),
+('moneda_predeterminada', '€', 'string', 'Moneda por defecto', true),
 ('idioma_predeterminado', 'es', 'string', 'Idioma por defecto', true);
 
 -- Insertar categorÃ­as principales
@@ -849,7 +849,7 @@ INSERT INTO usuarios (
   125,
   'es',
   'Europe/Madrid',
-  'EUR',
+  '€',
   true,
   true,
   false,
@@ -1054,7 +1054,7 @@ BEGIN
     ('juan@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'juan_electricista', 'Juan', 'Martínez', '34666111222', '+34',
      'https://ui-avatars.com/api/?name=Juan&background=FF9800&color=fff&size=200',
-     'Electricista profesional con 10 años de experiencia', '1985-03-15', true, true, 4.8, 45, 'es', 'Europe/Madrid', 'EUR')
+     'Electricista profesional con 10 años de experiencia', '1985-03-15', true, true, 4.8, 45, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   INSERT INTO usuarios (
@@ -1065,7 +1065,7 @@ BEGIN
     ('maria@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'maria_limpieza', 'María', 'García', '34666222333', '+34',
      'https://ui-avatars.com/api/?name=Maria&background=4CAF50&color=fff&size=200',
-     'Servicio profesional de limpieza con productos ecológicos', '1990-07-22', true, true, 4.9, 78, 'es', 'Europe/Madrid', 'EUR')
+     'Servicio profesional de limpieza con productos ecológicos', '1990-07-22', true, true, 4.9, 78, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   INSERT INTO usuarios (
@@ -1076,7 +1076,7 @@ BEGIN
     ('carlos@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'carlos_plomero', 'Carlos', 'López', '34666333444', '+34',
      'https://ui-avatars.com/api/?name=Carlos&background=2196F3&color=fff&size=200',
-     'Plomero certificado - Emergencias 24/7', '1988-11-10', true, true, 4.7, 92, 'es', 'Europe/Madrid', 'EUR')
+     'Plomero certificado - Emergencias 24/7', '1988-11-10', true, true, 4.7, 92, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   INSERT INTO usuarios (
@@ -1087,7 +1087,7 @@ BEGIN
     ('ana@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'ana_cliente', 'Ana', 'Rodríguez', '34666444555', '+34',
      'https://ui-avatars.com/api/?name=Ana&background=E91E63&color=fff&size=200',
-     'Cliente activa de la plataforma', '1992-05-18', true, true, 'es', 'Europe/Madrid', 'EUR')
+     'Cliente activa de la plataforma', '1992-05-18', true, true, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   INSERT INTO usuarios (
@@ -1098,7 +1098,7 @@ BEGIN
     ('pedro@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'pedro_cliente', 'Pedro', 'Fernández', '34666555666', '+34',
      'https://ui-avatars.com/api/?name=Pedro&background=9C27B0&color=fff&size=200',
-     'Buscando servicios de calidad', '1987-09-25', true, true, 'es', 'Europe/Madrid', 'EUR')
+     'Buscando servicios de calidad', '1987-09-25', true, true, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   INSERT INTO usuarios (
@@ -1109,7 +1109,7 @@ BEGIN
     ('sofia@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'sofia_profesional', 'Sofía', 'Torres', '34666777888', '+34',
      'https://ui-avatars.com/api/?name=Sofia&background=00BCD4&color=fff&size=200',
-     'Profesora certificada de inglés y matemáticas', '1991-12-08', true, true, 4.85, 34, 'es', 'Europe/Madrid', 'EUR')
+     'Profesora certificada de inglés y matemáticas', '1991-12-08', true, true, 4.85, 34, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
   -- Obtener IDs de usuarios
@@ -1163,7 +1163,7 @@ BEGIN
     v_juan_id, v_cat_reparaciones,
     'Instalación y Reparación Eléctrica Residencial',
     'Servicio profesional de electricidad para tu hogar. Incluye: instalación de contactos, apagadores, lámparas, ventiladores de techo, reparación de cortocircuitos, actualización de tableros eléctricos, instalación de timbres y porteros eléctricos. Trabajo garantizado y materiales de primera calidad. Atención 24/7 para emergencias.',
-    'por_hora', 35.00, 'EUR',
+    'por_hora', 35.00, '€',
     'domicilio_cliente', 'Madrid', 'Madrid', 'España', 40.4168, -3.7038,
     true, true, 245, 4.8, 45
   ) RETURNING id INTO v_service1_id;
@@ -1178,7 +1178,7 @@ BEGIN
     v_maria_id, v_cat_limpieza,
     'Limpieza Profunda de Hogar y Oficina',
     'Servicio completo de limpieza profesional. Incluye: barrido y fregado de suelos, limpieza de baños y cocina, desempolvado de muebles, limpieza de ventanas, aspirado de alfombras. Llevamos nuestros propios productos de limpieza ecológicos. Personal capacitado y confiable. Disponible fines de semana.',
-    'fijo', 80.00, 'EUR',
+    'fijo', 80.00, '€',
     'domicilio_cliente', 'Barcelona', 'Barcelona', 'España', 41.3851, 2.1734,
     true, true, 387, 4.9, 78
   ) RETURNING id INTO v_service2_id;
@@ -1193,7 +1193,7 @@ BEGIN
     v_carlos_id, v_cat_reparaciones,
     'Plomería Residencial y Comercial',
     'Servicios completos de plomería: reparación de fugas, desatasco de tuberías, instalación de grifos y sanitarios, reparación de calentadores, instalación de depósitos, mantenimiento preventivo. Servicio de emergencia disponible. Presupuesto sin compromiso.',
-    'por_hora', 40.00, 'EUR',
+    'por_hora', 40.00, '€',
     'domicilio_cliente', 'Barcelona', 'Barcelona', 'España', 41.3887, 2.1590,
     true, 198, 4.7, 92
   ) RETURNING id INTO v_service3_id;
@@ -1208,7 +1208,7 @@ BEGIN
     v_sofia_id, v_cat_clases,
     'Clases Particulares de Inglés Online',
     'Clases personalizadas de inglés para todos los niveles (A1-C2). Preparación para exámenes TOEFL, IELTS, Cambridge. Conversación, gramática, escritura. Material didáctico incluido. Horarios flexibles. Primera clase de prueba gratis. Metodología comunicativa y dinámica.',
-    'por_hora', 25.00, 'EUR',
+    'por_hora', 25.00, '€',
     'remoto', 'Valencia', 'Valencia', 'España', 39.4699, -0.3763,
     true, true, 156, 4.85, 34
   ) RETURNING id INTO v_service4_id;
@@ -1223,7 +1223,7 @@ BEGIN
     v_sofia_id, v_cat_clases,
     'Asesorías de Matemáticas - Todos los Niveles',
     'Asesorías personalizadas de matemáticas: primaria, secundaria, bachillerato y universidad. Álgebra, cálculo, geometría, trigonometría, estadística. Explicaciones claras y pacientes. Resolución de ejercicios paso a paso. Material de apoyo incluido.',
-    'por_hora', 28.00, 'EUR',
+    'por_hora', 28.00, '€',
     'flexible', 'Valencia', 'Valencia', 'España',
     true, 89
   ) RETURNING id INTO v_service5_id;
@@ -1238,7 +1238,7 @@ BEGIN
     v_juan_id, v_cat_reparaciones,
     'Mantenimiento Preventivo Eléctrico',
     'Servicio de mantenimiento preventivo para tu instalación eléctrica. Incluye: revisión de cuadro eléctrico, verificación de conexiones, prueba de circuitos, informe de condiciones. Previene accidentes y ahorra energía.',
-    'fijo', 120.00, 'EUR',
+    'fijo', 120.00, '€',
     'domicilio_cliente', 'Madrid', 'Madrid', 'España',
     true, 67
   ) RETURNING id INTO v_service6_id;

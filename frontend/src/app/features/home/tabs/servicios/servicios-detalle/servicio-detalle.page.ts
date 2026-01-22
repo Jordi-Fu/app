@@ -35,7 +35,7 @@ import {
   checkmarkCircleOutline,
   calendarOutline
 } from 'ionicons/icons';
-import { ServiceService, getAvatarUrl, getAbsoluteImageUrl } from '../../../../../core/services';
+import { ServiceService, getAvatarUrl, getAbsoluteImageUrl, ChatService } from '../../../../../core/services';
 import { Service } from '../../../../../core/interfaces';
 
 @Component({
@@ -66,10 +66,12 @@ export class ServicioDetallePage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private serviceService = inject(ServiceService);
+  private chatService = inject(ChatService);
   private toastController = inject(ToastController);
 
   servicio: Service | null = null;
   isLoading = true;
+  isContactingProvider = false;
   selectedImageIndex = 0;
   isFavorite = false;
   isSharingSupported = false;
@@ -194,9 +196,42 @@ export class ServicioDetallePage implements OnInit {
     }
   }
 
-  contactProvider() {
-    if (this.servicio?.proveedor_id) {
-      // TODO: Abrir chat con el proveedor
+  async contactProvider() {
+    if (!this.servicio?.proveedor_id) return;
+    
+    // Evitar múltiples clics
+    if (this.isContactingProvider) return;
+    this.isContactingProvider = true;
+
+    try {
+      // Obtener o crear la conversación con el proveedor
+      const conversacion = await this.chatService.obtenerOCrearConversacion(
+        this.servicio.proveedor_id,
+        this.servicio.id
+      );
+      
+      if (conversacion?.id) {
+        // Navegar a la conversación (ruta correcta: /home/conversacion/:id)
+        this.router.navigate(['/home/conversacion', conversacion.id]);
+      } else {
+        throw new Error('No se pudo crear la conversación');
+      }
+    } catch (error: any) {
+      console.error('Error al contactar proveedor:', error);
+      
+      const errorMsg = error?.error?.message || error?.message || 'Error al iniciar chat';
+      
+      const toast = await this.toastController.create({
+        message: errorMsg.includes('autenticado') || errorMsg.includes('sesión')
+          ? 'Debes iniciar sesión para contactar al proveedor' 
+          : 'Error al iniciar el chat. Intenta de nuevo.',
+        duration: 3000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await toast.present();
+    } finally {
+      this.isContactingProvider = false;
     }
   }
 
