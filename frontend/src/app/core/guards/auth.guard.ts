@@ -22,6 +22,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 /**
  * Guard para rutas que NO requieren autenticación (login, register)
+ * Redirige al home si el usuario ya está autenticado
  */
 export const noAuthGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -31,7 +32,7 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Si ya está logueado, redirigir al home
-  router.navigate(['/register']);
+  // Si ya está logueado, redirigir al home y reemplazar la URL en el historial
+  router.navigate(['/home'], { replaceUrl: true });
   return false;
 };

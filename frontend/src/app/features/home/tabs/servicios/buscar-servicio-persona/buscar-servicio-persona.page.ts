@@ -55,14 +55,13 @@ export class BuscarServicioPersonaPage implements OnInit {
   
   // Datos para búsqueda
   private allServices: Service[] = [];
-  private allUsers: any[] = [];
+  private allProviders: Map<string, any> = new Map();
 
   ngOnInit() {
     this.cargarDatos();
   }
 
   cargarDatos() {
-    // Cargar servicios
     this.serviceService.getServices({ pagina: 1, limite: 50 }).subscribe({
       next: (response) => {
         this.allServices = response?.services || [];
@@ -72,23 +71,20 @@ export class BuscarServicioPersonaPage implements OnInit {
           id: s.id,
           titulo: s.titulo,
           descripcion: s.descripcion_corta || s.descripcion?.substring(0, 60) + '...' || '',
-          imagen: s.images?.[0]?.url_imagen || 'assets/placeholder-service.png',
+          imagen: s.images?.[0]?.url_imagen || '',
           precio: s.precio,
           rating: s.promedio_calificacion
         }));
+        
+        // Extraer todos los proveedores únicos
+        this.allServices.forEach((s: Service) => {
+          if (s.provider && !this.allProviders.has(s.provider.id)) {
+            this.allProviders.set(s.provider.id, s.provider);
+          }
+        });
       },
       error: (err) => {
-        console.error('Error al cargar servicios:', err);
-      }
-    });
-
-    // Cargar todos los usuarios activos
-    this.userService.getAllActiveUsers(100).subscribe({
-      next: (response) => {
-        this.allUsers = response?.data || [];
-      },
-      error: (err) => {
-        console.error('Error al cargar usuarios:', err);
+        console.error('Error al cargar datos:', err);
       }
     });
   }
@@ -129,13 +125,13 @@ export class BuscarServicioPersonaPage implements OnInit {
       id: s.id,
       titulo: s.titulo,
       descripcion: s.descripcion_corta || s.descripcion?.substring(0, 60) + '...' || '',
-      imagen: s.images?.[0]?.url_imagen || 'assets/placeholder-service.png',
+      imagen: s.images?.[0]?.url_imagen || '',
       precio: s.precio,
       rating: s.promedio_calificacion
     }));
 
-    // Buscar personas en todos los usuarios activos
-    this.personasResultados = this.allUsers
+    // Buscar personas/proveedores en todos los proveedores
+    this.personasResultados = Array.from(this.allProviders.values())
       .filter((p: any) => {
         const nombreCompleto = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
         const username = (p.usuario || '').toLowerCase();

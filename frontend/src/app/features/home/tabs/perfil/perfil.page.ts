@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, NavController } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { environment } from '../../../../../environments/environment';
@@ -26,7 +26,8 @@ export class PerfilPage implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private navController: NavController
   ) {}
 
   ngOnInit() {
@@ -114,7 +115,9 @@ export class PerfilPage implements OnInit {
 
   cerrarSesion() {
     this.authService.logout().subscribe(() => {
-      this.router.navigate(['/login']);
+      // Usar navigateRoot para limpiar el historial de navegación
+      // Esto evita que el botón atrás del dispositivo vuelva a la app
+      this.navController.navigateRoot('/login', { animated: true, animationDirection: 'back' });
     });
   }
 }

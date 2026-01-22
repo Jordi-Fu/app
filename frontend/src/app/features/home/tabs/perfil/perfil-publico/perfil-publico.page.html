@@ -11,7 +11,7 @@
     <!-- Header con usuario y flecha -->
     <div class="custom-header">
       <div class="back-arrow" (click)="goBack()"></div>
-      <h1 class="username-title">{{ userProfile.nombre ? getUsername() : 'Perfil' }}</h1>
+      <h1 class="username-title">{{ userProfile?.nombre ? getUsername() : 'Perfil' }}</h1>
     </div>
 
     <!-- Cabecera del perfil con avatar e info lado a lado -->
@@ -76,7 +76,7 @@
           (click)="goToService(service.id)">
           <div class="service-image">
             <img 
-              [src]="service.images && service.images.length > 0 ? service.images[0].url_imagen : 'assets/placeholder-service.png'" 
+              [src]="service.images && service.images.length > 0 ? service.images[0].url_imagen : ''" 
               [alt]="service.titulo"
             />
           </div>

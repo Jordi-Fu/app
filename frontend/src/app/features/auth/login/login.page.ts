@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AlertController, LoadingController, IonContent } from '@ionic/angular/standalone';
+import { Router, NavigationExtras } from '@angular/router';
+import { AlertController, LoadingController, IonContent, NavController } from '@ionic/angular/standalone';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -25,7 +25,8 @@ export class LoginPage implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private authService: AuthService
+    private authService: AuthService,
+    private navController: NavController
   ) { }
 
   ngOnInit() {
@@ -72,7 +73,9 @@ export class LoginPage implements OnInit, OnDestroy {
           this.isLoading = false;
           
           if (response.success) {
-            this.router.navigate(['/home']);
+            // Usar navigateRoot para limpiar el historial de navegación
+            // Esto evita que el botón atrás del dispositivo vuelva al login
+            this.navController.navigateRoot('/home', { animated: true, animationDirection: 'forward' });
           } else {
             await this.mostrarError(response.message);
           }
