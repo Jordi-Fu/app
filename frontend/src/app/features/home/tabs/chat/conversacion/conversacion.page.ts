@@ -35,6 +35,7 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   nuevoMensaje: string = '';
   usuarioActualId: string = '';
   cargando = false;
+  cargandoEnSegundoPlano = false; // Nueva variable para carga en segundo plano
   enviando = false;
   error: string | null = null;
   otroUsuarioEscribiendo = false;
@@ -58,6 +59,10 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   ) {}
 
   async ngOnInit() {
+    // Obtener ID del usuario actual primero
+    const user = await this.storageService.getObject<any>(USER_KEY);
+    this.usuarioActualId = user?.id || '';
+    
     // Suscribirse a cambios en los parámetros de ruta
     this.route.paramMap.subscribe(async params => {
       const newChatId = params.get('id') || '';
@@ -77,7 +82,11 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         this.chatId = newChatId;
         
         if (this.chatId) {
-          await this.cargarConversacion();
+          // 1. Mostrar datos del caché inmediatamente
+          await this.mostrarDatosDelCache();
+          
+          // 2. Cargar datos frescos del servidor en segundo plano
+          this.cargarConversacionEnSegundoPlano();
           
           // Unirse a la nueva conversación
           this.socketService.joinConversation(this.chatId);
@@ -85,15 +94,84 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       }
     });
     
-    // Obtener ID del usuario actual
-    const user = await this.storageService.getObject<any>(USER_KEY);
-    this.usuarioActualId = user?.id || '';
-    
     // Inicializar WebSocket
     await this.initializeSocket();
     
     // Escuchar cambios de autenticación
     this.listenToAuthChanges();
+  }
+
+  /**
+   * Mostrar datos del caché inmediatamente (carga instantánea)
+   */
+  private async mostrarDatosDelCache(): Promise<void> {
+    // Cargar conversación del caché
+    const conversacionCache = await this.chatService.obtenerConversacionDelCache(this.chatId);
+    if (conversacionCache) {
+      this.conversacion = conversacionCache;
+    }
+    
+    // Cargar mensajes del caché
+    const mensajesCache = await this.chatService.obtenerMensajesDelCache(this.chatId);
+    if (mensajesCache.length > 0) {
+      this.mensajes = mensajesCache;
+      this.cdr.detectChanges();
+      
+      // Scroll al fondo con los mensajes cacheados
+      setTimeout(() => this.scrollToBottom(), 50);
+    }
+  }
+
+  /**
+   * Cargar conversación del servidor en segundo plano (sin mostrar loading)
+   */
+  private async cargarConversacionEnSegundoPlano(): Promise<void> {
+    try {
+      this.cargandoEnSegundoPlano = true;
+      
+      // Cargar datos de la conversación
+      const conversacion = await this.chatService.obtenerConversacion(this.chatId);
+      this.conversacion = conversacion;
+      
+      // Cargar mensajes
+      const mensajes = await this.chatService.obtenerMensajes(this.chatId);
+      
+      // Solo actualizar si hay nuevos mensajes o es diferente
+      if (this.hayNuevosMensajes(mensajes)) {
+        this.mensajes = mensajes;
+        this.cdr.detectChanges();
+        
+        // Scroll al fondo si el usuario está cerca
+        if (this.isNearBottom) {
+          setTimeout(() => this.scrollToBottom(), 100);
+        }
+      }
+      
+      // Marcar mensajes como leídos
+      await this.chatService.marcarComoLeido(this.chatId);
+    } catch (error) {
+      console.error('Error al cargar conversación en segundo plano:', error);
+      // Solo mostrar error si no hay datos cacheados
+      if (!this.conversacion && this.mensajes.length === 0) {
+        this.error = 'Error al cargar la conversación';
+      }
+    } finally {
+      this.cargandoEnSegundoPlano = false;
+    }
+  }
+
+  /**
+   * Verificar si hay mensajes nuevos comparando con el caché
+   */
+  private hayNuevosMensajes(mensajesNuevos: MensajeConRemitente[]): boolean {
+    if (this.mensajes.length !== mensajesNuevos.length) return true;
+    if (this.mensajes.length === 0) return mensajesNuevos.length > 0;
+    
+    // Comparar el último mensaje
+    const ultimoActual = this.mensajes[this.mensajes.length - 1];
+    const ultimoNuevo = mensajesNuevos[mensajesNuevos.length - 1];
+    
+    return ultimoActual.id !== ultimoNuevo.id;
   }
 
   ngAfterViewInit() {
@@ -103,9 +181,12 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
 
   async ionViewDidEnter() {
     // Recargar mensajes cada vez que se entra a la vista
-    // Esto asegura que se muestren los mensajes nuevos
-    if (this.chatId && !this.cargando) {
-      await this.cargarConversacion();
+    if (this.chatId) {
+      // 1. Mostrar datos del caché inmediatamente
+      await this.mostrarDatosDelCache();
+      
+      // 2. Actualizar en segundo plano
+      this.cargarConversacionEnSegundoPlano();
       
       // Volver a unirse a la conversación en el socket
       this.socketService.joinConversation(this.chatId);
@@ -113,8 +194,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     
     // Scroll al fondo cada vez que se entra a la vista
     setTimeout(() => this.scrollToBottom(), 100);
-    setTimeout(() => this.scrollToBottom(), 300);
-    setTimeout(() => this.scrollToBottom(), 500);
   }
 
   ionViewWillLeave() {
@@ -190,6 +269,9 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
             this.otroUsuarioEscribiendo = false;
             this.cdr.detectChanges();
             
+            // Guardar en caché para que esté disponible instantáneamente la próxima vez
+            this.chatService.agregarMensajeAlCache(this.chatId, nuevoMensaje);
+            
             // Solo hacer scroll si el usuario está cerca del fondo
             if (this.isNearBottom) {
               setTimeout(() => this.scrollToBottom(), 100);
@@ -242,7 +324,10 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
 
   async cargarConversacion() {
     try {
-      this.cargando = true;
+      // Solo mostrar loading si no hay mensajes cacheados
+      if (this.mensajes.length === 0) {
+        this.cargando = true;
+      }
       this.error = null;
 
       // Cargar datos de la conversación
@@ -251,11 +336,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       // Cargar mensajes
       this.mensajes = await this.chatService.obtenerMensajes(this.chatId);
       
-      // Debug: mostrar cada mensaje y si es propio
-      this.mensajes.forEach((m, i) => {
-        // console.log(`Mensaje ${i}: remitente_id=${m.remitente_id}, usuarioActual=${this.usuarioActualId}, esPropio=${m.remitente_id === this.usuarioActualId}, contenido=${m.contenido?.substring(0, 30)}`);
-      });
-      
       // Marcar mensajes como leídos
       await this.chatService.marcarComoLeido(this.chatId);
 
@@ -263,17 +343,16 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
       this.cdr.detectChanges();
       
       // Scroll al fondo después de que la vista esté completamente renderizada
-      // Usamos múltiples timeouts para asegurar que funcione
       setTimeout(() => {
         this.scrollToBottom();
         this.isNearBottom = true; // Marcar que estamos abajo al cargar
       }, 100);
-      
-      setTimeout(() => this.scrollToBottom(), 300);
-      setTimeout(() => this.scrollToBottom(), 500);
     } catch (error) {
       console.error('Error al cargar conversación:', error);
-      this.error = 'Error al cargar la conversación';
+      // Solo mostrar error si no hay datos cacheados
+      if (this.mensajes.length === 0) {
+        this.error = 'Error al cargar la conversación';
+      }
     } finally {
       this.cargando = false;
       this.cdr.detectChanges();
@@ -343,6 +422,9 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         };
         
         this.mensajes.push(nuevoMensajeObj);
+        
+        // Guardar en caché para carga instantánea
+        this.chatService.agregarMensajeAlCache(this.chatId, nuevoMensajeObj);
       }
       
       // Forzar detección de cambios
@@ -432,17 +514,14 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   }
 
   getOtroUsuarioAvatar(): string {
-    if (!this.conversacion) return 'assets/avatar-default.png';
-    const usuario = this.conversacion.otro_usuario;
-    return getAvatarUrl(usuario.url_avatar, usuario.nombre, usuario.apellido);
+    return getAvatarUrl(this.conversacion?.otro_usuario?.url_avatar);
   }
 
   getMensajeAvatar(mensaje: MensajeConRemitente): string {
-    const remitente = mensaje.remitente;
-    if (!remitente) {
+    if (!mensaje.remitente) {
       return this.getOtroUsuarioAvatar();
     }
-    return getAvatarUrl(remitente.url_avatar, remitente.nombre, remitente.apellido);
+    return getAvatarUrl(mensaje.remitente.url_avatar);
   }
 
   goToProvider() {

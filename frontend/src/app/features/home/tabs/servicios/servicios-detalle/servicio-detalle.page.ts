@@ -35,7 +35,7 @@ import {
   checkmarkCircleOutline,
   calendarOutline
 } from 'ionicons/icons';
-import { ServiceService, getAvatarUrl } from '../../../../../core/services';
+import { ServiceService, getAvatarUrl, getAbsoluteImageUrl } from '../../../../../core/services';
 import { Service } from '../../../../../core/interfaces';
 
 @Component({
@@ -328,8 +328,24 @@ export class ServicioDetallePage implements OnInit {
   }
 
   getProviderAvatar(): string {
-    const provider = this.servicio?.provider;
-    if (!provider) return 'assets/avatar-default.png';
-    return getAvatarUrl(provider.url_avatar, provider.nombre, provider.apellido);
+    return getAvatarUrl(this.servicio?.provider?.url_avatar);
+  }
+
+  /**
+   * Obtiene la URL absoluta de la imagen principal del servicio
+   */
+  getMainImageUrl(): string {
+    if (this.servicio?.images && this.servicio.images.length > 0) {
+      return getAbsoluteImageUrl(this.servicio.images[this.selectedImageIndex].url_imagen, 'https://via.placeholder.com/800x400?text=Sin+imagen');
+    }
+    return 'https://via.placeholder.com/800x400?text=Sin+imagen';
+  }
+
+  /**
+   * Obtiene la URL absoluta de una miniatura de imagen
+   */
+  getThumbnailUrl(image: any): string {
+    const url = image.url_miniatura || image.url_imagen;
+    return getAbsoluteImageUrl(url, 'https://via.placeholder.com/100x100?text=Sin+imagen');
   }
 }

@@ -45,7 +45,7 @@
           <img 
             [src]="getChatAvatar(chat)" 
             [alt]="getNombreCompleto(chat.otro_usuario)" 
-            onerror="this.src='assets/avatar-default.png'"
+            onerror="this.src='https://ui-avatars.com/api/?name=U&background=13B5B5&color=fff&size=128'"
           />
           <span class="online-indicator" *ngIf="chat.otro_usuario.esta_en_linea"></span>
         </div>

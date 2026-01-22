@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
-import { ServiceService, getAvatarUrl } from '../../../../core/services';
+import { ServiceService, getAvatarUrl, getAbsoluteImageUrl, AuthService } from '../../../../core/services';
 import { Service, Category } from '../../../../core/interfaces';
 
 @Component({
@@ -19,6 +19,7 @@ import { Service, Category } from '../../../../core/interfaces';
 })
 export class ServiciosPage implements OnInit {
   private serviceService = inject(ServiceService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   servicios: Service[] = [];
@@ -28,7 +29,9 @@ export class ServiciosPage implements OnInit {
   isLoading = true;
   searchQuery = '';
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Esperar a que la autenticación esté inicializada
+    await this.authService.waitForAuthInit();
     this.loadData();
   }
 
@@ -149,8 +152,16 @@ export class ServiciosPage implements OnInit {
   }
 
   getProviderAvatar(servicio: Service): string {
-    const provider = servicio.provider;
-    if (!provider) return 'assets/avatar-default.png';
-    return getAvatarUrl(provider.url_avatar, provider.nombre, provider.apellido);
+    return getAvatarUrl(servicio.provider?.url_avatar);
+  }
+
+  /**
+   * Obtiene la URL absoluta de la imagen del servicio
+   */
+  getServiceImageUrl(servicio: Service): string {
+    if (servicio.images && servicio.images.length > 0) {
+      return getAbsoluteImageUrl(servicio.images[0].url_imagen, 'https://via.placeholder.com/400x200?text=Sin+imagen');
+    }
+    return 'https://via.placeholder.com/400x200?text=Sin+imagen';
   }
 }

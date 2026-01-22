@@ -55,7 +55,7 @@
       <div class="servicio-card" *ngFor="let servicio of serviciosFiltrados" (click)="verDetalle(servicio)">
         <div class="servicio-image">
           <img
-            [src]="servicio.images && servicio.images.length > 0 ? servicio.images[0].url_imagen : 'https://via.placeholder.com/400x200'"
+            [src]="getServiceImageUrl(servicio)"
             [alt]="servicio.titulo" />
           <div class="servicio-categoria" [style.background-color]="servicio.category?.color">
             {{ servicio.category?.url_icono }} {{ servicio.category?.nombre }}

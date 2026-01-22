@@ -33,7 +33,7 @@
     <div class="image-gallery">
       <div class="main-image">
         <img 
-          [src]="servicio.images && servicio.images.length > 0 ? servicio.images[selectedImageIndex].url_imagen : 'https://via.placeholder.com/800x400'" 
+          [src]="getMainImageUrl()" 
           [alt]="servicio.titulo"
         />
         <div class="image-badges">
@@ -58,7 +58,7 @@
           class="thumbnail"
           [class.active]="i === selectedImageIndex"
           (click)="selectImage(i)">
-          <img [src]="image.url_miniatura || image.url_imagen" [alt]="image.pie_de_foto || servicio.titulo" />
+          <img [src]="getThumbnailUrl(image)" [alt]="image.pie_de_foto || servicio.titulo" />
         </div>
       </div>
     </div>

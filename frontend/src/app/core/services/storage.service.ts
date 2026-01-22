@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
+import { Preferences } from '@capacitor/preferences';
 
 /**
- * Servicio de almacenamiento seguro que abstrae el uso de:
- * - Secure Storage para plataformas móviles (iOS/Android)
+ * Servicio de almacenamiento persistente que usa:
+ * - Capacitor Preferences para plataformas móviles (iOS/Android) - Persiste incluso al cerrar la app
  * - localStorage como fallback para web
  */
 @Injectable({
@@ -15,6 +15,7 @@ export class StorageService {
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
+    console.log('StorageService inicializado - Plataforma nativa:', this.isNativePlatform);
   }
 
   /**
@@ -23,12 +24,14 @@ export class StorageService {
   async set(key: string, value: string): Promise<void> {
     try {
       if (this.isNativePlatform) {
-        await SecureStoragePlugin.set({ key, value });
+        await Preferences.set({ key, value });
+        console.log(`[Storage] Guardado ${key} en Preferences`);
       } else {
         localStorage.setItem(key, value);
+        console.log(`[Storage] Guardado ${key} en localStorage`);
       }
     } catch (error) {
-      console.error(`Error guardando ${key}:`, error);
+      console.error(`[Storage] Error guardando ${key}:`, error);
       throw error;
     }
   }
@@ -39,14 +42,16 @@ export class StorageService {
   async get(key: string): Promise<string | null> {
     try {
       if (this.isNativePlatform) {
-        const result = await SecureStoragePlugin.get({ key });
+        const result = await Preferences.get({ key });
+        console.log(`[Storage] Leído ${key} de Preferences:`, result.value ? 'tiene valor' : 'null');
         return result.value;
       } else {
-        return localStorage.getItem(key);
+        const value = localStorage.getItem(key);
+        console.log(`[Storage] Leído ${key} de localStorage:`, value ? 'tiene valor' : 'null');
+        return value;
       }
     } catch (error) {
-      // Si la clave no existe, Secure Storage lanza error
-      console.warn(`Clave ${key} no encontrada:`, error);
+      console.error(`[Storage] Error leyendo ${key}:`, error);
       return null;
     }
   }
@@ -57,12 +62,13 @@ export class StorageService {
   async remove(key: string): Promise<void> {
     try {
       if (this.isNativePlatform) {
-        await SecureStoragePlugin.remove({ key });
+        await Preferences.remove({ key });
       } else {
         localStorage.removeItem(key);
       }
+      console.log(`[Storage] Eliminado ${key}`);
     } catch (error) {
-      console.error(`Error eliminando ${key}:`, error);
+      console.error(`[Storage] Error eliminando ${key}:`, error);
     }
   }
 
@@ -72,12 +78,13 @@ export class StorageService {
   async clear(): Promise<void> {
     try {
       if (this.isNativePlatform) {
-        await SecureStoragePlugin.clear();
+        await Preferences.clear();
       } else {
         localStorage.clear();
       }
+      console.log('[Storage] Storage limpiado');
     } catch (error) {
-      console.error('Error limpiando storage:', error);
+      console.error('[Storage] Error limpiando storage:', error);
     }
   }
 
@@ -105,7 +112,8 @@ export class StorageService {
     
     try {
       return JSON.parse(value) as T;
-    } catch {
+    } catch (error) {
+      console.error(`[Storage] Error parseando JSON de ${key}:`, error);
       return null;
     }
   }

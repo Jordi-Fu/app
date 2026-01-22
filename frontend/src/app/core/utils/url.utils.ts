@@ -3,10 +3,10 @@ import { environment } from '../../../environments/environment';
 /**
  * Transforma una URL relativa de imagen a una URL absoluta
  * @param url URL de la imagen (puede ser relativa o absoluta)
- * @param fallback URL de fallback si la imagen es null/undefined
+ * @param fallback URL de fallback si la imagen es null/undefined (opcional)
  * @returns URL absoluta
  */
-export function getAbsoluteImageUrl(url: string | null | undefined, fallback: string = 'assets/avatar-default.png'): string {
+export function getAbsoluteImageUrl(url: string | null | undefined, fallback: string = ''): string {
   if (!url) {
     return fallback;
   }
@@ -23,23 +23,10 @@ export function getAbsoluteImageUrl(url: string | null | undefined, fallback: st
 
 /**
  * Obtiene la URL del avatar de un usuario
+ * El backend siempre asigna un avatar, por lo que simplemente convertimos la URL a absoluta
  * @param avatarUrl URL del avatar
- * @param nombre Nombre para generar avatar con iniciales
- * @param apellido Apellido para generar avatar con iniciales
- * @returns URL del avatar
+ * @returns URL absoluta del avatar
  */
-export function getAvatarUrl(
-  avatarUrl: string | null | undefined, 
-  nombre?: string, 
-  apellido?: string
-): string {
-  if (!avatarUrl) {
-    // Generar avatar con iniciales si hay nombre
-    if (nombre) {
-      return `https://ui-avatars.com/api/?name=${nombre}+${apellido || ''}&background=13B5B5&color=fff`;
-    }
-    return 'assets/avatar-default.png';
-  }
-  
+export function getAvatarUrl(avatarUrl: string | null | undefined): string {
   return getAbsoluteImageUrl(avatarUrl);
 }

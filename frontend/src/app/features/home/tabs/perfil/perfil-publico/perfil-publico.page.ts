@@ -19,7 +19,7 @@ import {
   ellipse,
   optionsOutline
 } from 'ionicons/icons';
-import { UserService, getAvatarUrl as getAvatarUrlHelper } from '../../../../../core/services';
+import { UserService, getAvatarUrl as getAvatarUrlHelper, getAbsoluteImageUrl } from '../../../../../core/services';
 import { UserProfile, Review } from '../../../../../core/interfaces';
 
 @Component({
@@ -180,12 +180,21 @@ export class PerfilPublicoPage implements OnInit {
   }
 
   getUserAvatar(): string {
-    if (!this.userProfile) return 'assets/avatar-default.png';
-    return getAvatarUrlHelper(this.userProfile.url_avatar, this.userProfile.nombre, this.userProfile.apellido);
+    return getAvatarUrlHelper(this.userProfile?.url_avatar);
   }
 
   getReviewerAvatar(review: Review): string {
-    return getAvatarUrlHelper(review.reviewer_avatar, review.reviewer_name);
+    return getAvatarUrlHelper(review.reviewer_avatar);
+  }
+
+  /**
+   * Obtiene la URL absoluta de la imagen del servicio
+   */
+  getServiceImageUrl(service: any): string {
+    if (service.images && service.images.length > 0) {
+      return getAbsoluteImageUrl(service.images[0].url_imagen, 'https://via.placeholder.com/200x150?text=Sin+imagen');
+    }
+    return 'https://via.placeholder.com/200x150?text=Sin+imagen';
   }
 
   private async showToast(message: string, color: string = 'medium') {

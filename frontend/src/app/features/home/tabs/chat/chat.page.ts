@@ -22,6 +22,7 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   conversaciones: ConversacionUsuario[] = [];
   conversacionesFiltradas: ConversacionUsuario[] = [];
   cargando = false;
+  cargandoEnSegundoPlano = false; // Nueva variable para carga en segundo plano
   error: string | null = null;
   searchQuery = '';
   
@@ -36,10 +37,22 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Esperar a que la autenticación esté inicializada
+    await this.authService.waitForAuthInit();
+    
     // Obtener el usuario actual primero
     this.listenToAuthChanges();
-    this.cargarConversaciones();
+    
+    // 1. Mostrar datos del caché inmediatamente
+    this.mostrarConversacionesDelCache();
+    
+    // 2. Cargar datos frescos del servidor en segundo plano
+    this.cargarConversacionesEnSegundoPlano();
+    
+    // 3. Suscribirse a cambios en tiempo real
+    this.suscribirseACambiosDeConversaciones();
+    
     this.initializeSocket();
   }
 
@@ -48,10 +61,58 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   }
 
   /**
+   * Mostrar conversaciones del caché inmediatamente (carga instantánea)
+   */
+  private mostrarConversacionesDelCache(): void {
+    const conversacionesCache = this.chatService.getConversacionesCache();
+    if (conversacionesCache.length > 0) {
+      this.conversaciones = conversacionesCache;
+      this.aplicarFiltro();
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Suscribirse a cambios de conversaciones (actualizaciones en tiempo real desde el servicio)
+   */
+  private suscribirseACambiosDeConversaciones(): void {
+    const sub = this.chatService.conversaciones$.subscribe(conversaciones => {
+      if (conversaciones.length > 0) {
+        this.conversaciones = conversaciones;
+        this.aplicarFiltro();
+        this.cdr.detectChanges();
+      }
+    });
+    this.subscriptions.push(sub);
+  }
+
+  /**
+   * Cargar conversaciones del servidor en segundo plano (sin mostrar loading)
+   */
+  private async cargarConversacionesEnSegundoPlano(): Promise<void> {
+    try {
+      this.cargandoEnSegundoPlano = true;
+      await this.chatService.obtenerConversaciones();
+      // El servicio ya actualiza el BehaviorSubject, así que se actualiza automáticamente
+    } catch (error) {
+      console.error('Error al cargar conversaciones en segundo plano:', error);
+      // Si hay error y no hay caché, mostrar el error
+      if (this.conversaciones.length === 0) {
+        this.error = 'Error al cargar las conversaciones';
+      }
+    } finally {
+      this.cargandoEnSegundoPlano = false;
+    }
+  }
+
+  /**
    * Recargar conversaciones cada vez que se entra a la vista
    */
   ionViewDidEnter() {
-    this.cargarConversaciones();
+    // Mostrar caché primero
+    this.mostrarConversacionesDelCache();
+    // Luego actualizar en segundo plano
+    this.cargarConversacionesEnSegundoPlano();
   }
 
   /**
@@ -193,13 +254,21 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
 
   async cargarConversaciones(event?: any) {
     try {
-      this.cargando = true;
+      // Solo mostrar loading si es pull-to-refresh o si no hay datos cacheados
+      if (event || this.conversaciones.length === 0) {
+        this.cargando = true;
+      }
       this.error = null;
-      this.conversaciones = await this.chatService.obtenerConversaciones();
+      
+      const conversaciones = await this.chatService.obtenerConversaciones();
+      this.conversaciones = conversaciones;
       this.aplicarFiltro();
     } catch (error) {
       console.error('Error al cargar conversaciones:', error);
-      this.error = 'Error al cargar las conversaciones';
+      // Solo mostrar error si no hay datos cacheados
+      if (this.conversaciones.length === 0) {
+        this.error = 'Error al cargar las conversaciones';
+      }
     } finally {
       this.cargando = false;
       if (event) {
@@ -258,7 +327,6 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   }
 
   getChatAvatar(chat: ConversacionUsuario): string {
-    const usuario = chat.otro_usuario;
-    return getAvatarUrl(usuario.url_avatar, usuario.nombre, usuario.apellido);
+    return getAvatarUrl(chat.otro_usuario.url_avatar);
   }
 }

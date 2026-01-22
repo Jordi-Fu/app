@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IonContent, NavController } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
+import { ChatService } from '../../../../core/services/chat.service';
 import { environment } from '../../../../../environments/environment';
 import { Service } from '../../../../core/interfaces';
 
@@ -26,11 +27,15 @@ export class PerfilPage implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private chatService: ChatService,
     private router: Router,
     private navController: NavController
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Esperar a que la autenticación esté inicializada
+    await this.authService.waitForAuthInit();
+    
     this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
       if (user?.id) {
@@ -114,6 +119,9 @@ export class PerfilPage implements OnInit {
   }
 
   cerrarSesion() {
+    // Limpiar caché de chat antes de cerrar sesión
+    this.chatService.limpiarCache();
+    
     this.authService.logout().subscribe(() => {
       // Usar navigateRoot para limpiar el historial de navegación
       // Esto evita que el botón atrás del dispositivo vuelva a la app

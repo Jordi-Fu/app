@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of, timeout, TimeoutError, from } from 'rxjs';
-import { catchError, tap, map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, of, timeout, TimeoutError, from, ReplaySubject, firstValueFrom } from 'rxjs';
+import { catchError, tap, map, switchMap, filter, take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, SafeUser, LoginRequest, RegisterRequest, AuthTokens } from '../interfaces';
 import { StorageService } from './storage.service';
@@ -21,6 +21,11 @@ export class AuthService {
   
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  
+  // Indicador de que la autenticación ha sido inicializada (cargada del storage)
+  private authInitializedSubject = new ReplaySubject<boolean>(1);
+  public authInitialized$ = this.authInitializedSubject.asObservable();
+  private _authInitialized = false;
 
   constructor(
     private http: HttpClient,
@@ -30,19 +35,43 @@ export class AuthService {
   }
 
   /**
+   * Espera a que la autenticación esté inicializada
+   * Útil para componentes que necesitan esperar a que se cargue el usuario del storage
+   */
+  async waitForAuthInit(): Promise<void> {
+    if (this._authInitialized) return;
+    await firstValueFrom(this.authInitialized$.pipe(filter(v => v), take(1)));
+  }
+
+  /**
    * Cargar autenticación almacenada
+   * Este método es más permisivo con errores para no cerrar sesión innecesariamente
    */
   private async loadStoredAuth(): Promise<void> {
     try {
+      console.log('[Auth] Cargando autenticación del storage...');
       const token = await this.storage.get(TOKEN_KEY);
       const user = await this.storage.getObject<SafeUser>(USER_KEY);
+      
+      console.log('[Auth] Token encontrado:', !!token);
+      console.log('[Auth] Usuario encontrado:', !!user);
       
       if (token && user) {
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
+        console.log('[Auth] Sesión restaurada desde storage');
+      } else {
+        console.log('[Auth] No hay sesión guardada en storage');
       }
     } catch (error) {
-      await this.clearAuth();
+      // NO llamar a clearAuth() aquí - solo loguear el error
+      // El storage podría estar temporalmente inaccesible
+      console.warn('[Auth] Error al cargar autenticación del storage:', error);
+    } finally {
+      // Marcar la autenticación como inicializada (independientemente del resultado)
+      this._authInitialized = true;
+      this.authInitializedSubject.next(true);
+      console.log('[Auth] Inicialización completada');
     }
   }
 
@@ -223,6 +252,13 @@ export class AuthService {
    */
   getRefreshToken(): Promise<string | null> {
     return this.storage.get(REFRESH_TOKEN_KEY);
+  }
+
+  /**
+   * Obtener usuario actual del storage (sin llamar al servidor)
+   */
+  getCurrentUserFromStorage(): Promise<SafeUser | null> {
+    return this.storage.getObject<SafeUser>(USER_KEY);
   }
 
   /**

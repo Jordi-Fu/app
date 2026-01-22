@@ -140,7 +140,7 @@ export class BuscarServicioPersonaPage implements OnInit {
       .map((p: any) => ({
         id: p.id,
         nombre: `${p.nombre || ''} ${p.apellido || ''}`.trim(),
-        avatar: getAvatarUrl(p.url_avatar, p.nombre, p.apellido),
+        avatar: getAvatarUrl(p.url_avatar),
         rating: p.promedio_calificacion
       }));
 

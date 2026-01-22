@@ -76,7 +76,7 @@
           (click)="goToService(service.id)">
           <div class="service-image">
             <img 
-              [src]="service.images && service.images.length > 0 ? service.images[0].url_imagen : ''" 
+              [src]="getServiceImageUrl(service)" 
               [alt]="service.titulo"
             />
           </div>
