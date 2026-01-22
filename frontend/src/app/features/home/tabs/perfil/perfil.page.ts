@@ -99,8 +99,7 @@ export class PerfilPage implements OnInit {
   }
 
   irResenasRecibidas() {
-    // TODO: Implementar navegación a reseñas
-    console.log('Ir a reseñas recibidas');
+    this.router.navigate(['/home/mis-resenas']);
   }
 
   irServiciosFavoritos() {

@@ -1,5 +1,5 @@
 ng serve
-cd "C:\Users\usr023\Desktop\Proyectos\E521-Nieves\Nueva carpeta\app\frontend";npm run build;npx cap sync android;npx cap open android
+cd "C:\Users\usr023\Desktop\Proyectos\E521-Nieves\etc\Nueva carpeta\app\frontend";npm run build;npx cap sync android;npx cap open android
 
 
 

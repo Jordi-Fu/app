@@ -1,4 +1,4 @@
-cd "C:\Users\usr023\Desktop\Proyectos\E521-Nieves\Nueva carpeta\app\backend";npm run dev
+ cd "C:\Users\usr023\Desktop\Proyectos\E521-Nieves\etc\Nueva carpeta\app\backend";npm run dev
 
 # 🔐 Sistema de Autenticación - Backend
 

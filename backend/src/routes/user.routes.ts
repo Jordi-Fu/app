@@ -11,6 +11,7 @@ const router = Router();
  * GET /api/users/active       - Obtener usuarios activos
  * GET /api/users/:id          - Obtener perfil público de usuario
  * GET /api/users/:id/services - Obtener servicios de un usuario
+ * GET /api/users/:id/reviews  - Obtener reseñas recibidas de un usuario
  */
 
 
@@ -19,5 +20,6 @@ router.get('/search', authMiddleware, userController.searchUsers.bind(userContro
 router.get('/active', authMiddleware, userController.getAllActiveUsers.bind(userController));
 router.get('/:id', authMiddleware, userController.getUserById.bind(userController));
 router.get('/:id/services', authMiddleware, userController.getUserServices.bind(userController));
+router.get('/:id/reviews', authMiddleware, userController.getUserReviews.bind(userController));
 
 export default router;

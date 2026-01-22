@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { userService } from '../services';
+import { reviewDatabase } from '../database';
 
 class UserController {
   /**
@@ -120,6 +121,40 @@ class UserController {
       res.status(500).json({
         success: false,
         message: 'Error al obtener usuarios'
+      });
+    }
+  }
+
+  /**
+   * Obtener reseñas recibidas por un usuario
+   */
+  async getUserReviews(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.id;
+      const sortBy = (req.query.sort as 'recent' | 'oldest' | 'rating-desc' | 'rating-asc') || 'recent';
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      if (!userId || userId.trim() === '') {
+        res.status(400).json({
+          success: false,
+          message: 'ID de usuario inválido'
+        });
+        return;
+      }
+
+      const reviews = await reviewDatabase.getReviewsForUser(userId, sortBy, limit);
+      const total = await reviewDatabase.countReviewsForUser(userId);
+
+      res.json({
+        success: true,
+        data: reviews,
+        total
+      });
+    } catch (error) {
+      console.error('Error al obtener reseñas del usuario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener reseñas del usuario'
       });
     }
   }

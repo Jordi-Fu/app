@@ -27,6 +27,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },
       {
+        path: 'mis-resenas',
+        loadComponent: () => import('./tabs/perfil/mis-resenas/mis-resenas.page').then(m => m.MisResenasPage)
+      },
+      {
         path: 'usuario/:id',
         loadComponent: () => import('./tabs/perfil/perfil-publico/perfil-publico.page').then(m => m.PerfilPublicoPage)
       },

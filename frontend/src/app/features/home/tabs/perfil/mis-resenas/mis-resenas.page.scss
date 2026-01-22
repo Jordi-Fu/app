@@ -1,0 +1,472 @@
+// ===============================================
+// MIS RESEÑAS - ESTILOS
+// ===============================================
+
+$primary-green: #10B981;
+$primary-green-light: #2DD4BF;
+$primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
+$star-color: #ffc107;
+
+// ===============================================
+// LOADING
+// ===============================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  
+  p {
+    color: var(--ion-text-color);
+  }
+}
+
+// ===============================================
+// CONTENEDOR PRINCIPAL
+// ===============================================
+.resenas-container {
+  padding: 0;
+  padding-bottom: 100px;
+  background: var(--ion-background-color);
+  min-height: 100%;
+}
+
+// ===============================================
+// HEADER
+// ===============================================
+.custom-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 1rem;
+  background: var(--ion-background-color);
+  
+  .back-arrow {
+    position: absolute;
+    left: 16px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.3s;
+    background: $primary-gradient;
+    mask-image: url('/assets/back.svg');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url('/assets/back.svg');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+
+    &:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  .page-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+}
+
+// ===============================================
+// BOTÓN DE ORDENAR
+// ===============================================
+.sort-container {
+  position: relative;
+  padding: 0.5rem 1rem 1rem;
+  
+  .sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--ion-text-color);
+    
+    .sort-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--ion-text-color);
+    }
+    
+    &:active {
+      opacity: 0.7;
+    }
+  }
+  
+  // ===============================================
+  // MENÚ DESPLEGABLE DE ORDENACIÓN
+  // ===============================================
+  .sort-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f5f5f5;
+    border-radius: 24px 24px 0 0;
+    padding: 1.5rem 1rem 2rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    animation: slideUp 0.3s ease-out;
+    
+    .sort-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      
+      &:active {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+      
+      .option-label {
+        font-size: 1rem;
+        color: #333;
+      }
+      
+      .option-radio {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        position: relative;
+        transition: border-color 0.2s;
+        
+        &.active {
+          border-color: $primary-green;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: $primary-gradient;
+          }
+        }
+      }
+      
+      &.selected {
+        .option-label {
+          color: $primary-green;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// Overlay para cerrar el menú
+.sort-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ===============================================
+// LISTA DE RESEÑAS
+// ===============================================
+.reviews-list {
+  padding: 0 1rem;
+  
+  .review-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    // Header de la reseña
+    .review-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      
+      .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        
+        .reviewer-avatar {
+          width: 48px;
+          height: 48px;
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        
+        .reviewer-details {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
+          
+          .reviewer-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ion-text-color);
+          }
+          
+          .reviewer-time {
+            font-size: 0.8rem;
+            color: var(--ion-color-medium);
+          }
+        }
+      }
+      
+      .report-button {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: $primary-green;
+        background: transparent;
+        border: 2px solid $primary-green;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &:hover {
+          background: rgba($primary-green, 0.1);
+        }
+        
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+    
+    // Rating y fecha
+    .review-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      
+      .stars {
+        display: flex;
+        gap: 0.15rem;
+        
+        .star-icon {
+          width: 16px;
+          height: 16px;
+        }
+      }
+      
+      .review-date {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+    }
+    
+    // Comentario
+    .review-text {
+      margin: 0 0 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--ion-color-medium);
+    }
+    
+    // Servicio relacionado
+    .review-service {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      
+      .service-label {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+      
+      .service-link {
+        font-size: 0.85rem;
+        color: $primary-green;
+        text-decoration: underline;
+        cursor: pointer;
+        
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}
+
+// ===============================================
+// SIN RESEÑAS
+// ===============================================
+.no-reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  
+  .no-reviews-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 1rem;
+  }
+  
+  .no-reviews-text {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+  
+  .no-reviews-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+    max-width: 280px;
+  }
+}
+
+// ===============================================
+// MODO OSCURO
+// ===============================================
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: #1a1a1a;
+  }
+  
+  .resenas-container {
+    background: #1a1a1a;
+  }
+  
+  .custom-header {
+    background: #1a1a1a;
+    
+    .page-title {
+      color: #ffffff;
+    }
+  }
+  
+  .sort-container {
+    .sort-button {
+      color: #ffffff;
+      
+      .sort-icon {
+        color: #ffffff;
+      }
+    }
+    
+    .sort-menu {
+      background: #2a2a2a;
+      
+      .sort-option {
+        &:active {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .option-label {
+          color: #ffffff;
+        }
+        
+        .option-radio {
+          border-color: #666;
+        }
+      }
+    }
+  }
+  
+  .reviews-list {
+    .review-item {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+      
+      .review-header {
+        .reviewer-info {
+          .reviewer-details {
+            .reviewer-name {
+              color: #ffffff;
+            }
+            
+            .reviewer-time {
+              color: #b3b3b3;
+            }
+          }
+        }
+      }
+      
+      .review-rating {
+        .review-date {
+          color: #b3b3b3;
+        }
+      }
+      
+      .review-text {
+        color: #b3b3b3;
+      }
+      
+      .review-service {
+        .service-label {
+          color: #b3b3b3;
+        }
+      }
+    }
+  }
+  
+  .no-reviews {
+    .no-reviews-icon {
+      color: #b3b3b3;
+    }
+    
+    .no-reviews-text {
+      color: #ffffff;
+    }
+    
+    .no-reviews-subtitle {
+      color: #b3b3b3;
+    }
+  }
+}

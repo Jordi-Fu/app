@@ -15,6 +15,26 @@ export interface SearchUser {
   total_resenas: number;
 }
 
+export interface ReviewResponse {
+  id: string;
+  reviewer_id: string;
+  reviewer_name: string;
+  reviewer_avatar: string | null;
+  reviewer_time_in_app: string;
+  rating: number;
+  title: string | null;
+  time_ago: string;
+  comment: string | null;
+  advantages: string | null;
+  disadvantages: string | null;
+  is_anonymous: boolean;
+  service_id: string;
+  service_name: string;
+  created_at: string;
+}
+
+export type ReviewSortOption = 'recent' | 'oldest' | 'rating-desc' | 'rating-asc';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,6 +48,20 @@ export class UserService {
 
   getUserServices(userId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${userId}/services`);
+  }
+
+  /**
+   * Obtener reseñas recibidas de un usuario
+   */
+  getUserReviews(
+    userId: string, 
+    sort: ReviewSortOption = 'recent', 
+    limit: number = 50
+  ): Observable<{ success: boolean; data: ReviewResponse[]; total: number }> {
+    return this.http.get<{ success: boolean; data: ReviewResponse[]; total: number }>(
+      `${this.apiUrl}/${userId}/reviews`,
+      { params: { sort, limit: limit.toString() } }
+    );
   }
 
   /**

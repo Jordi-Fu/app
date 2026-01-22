@@ -1,0 +1,96 @@
+<ion-content>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando reseñas...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="resenas-container">
+    <!-- Header -->
+    <div class="custom-header">
+      <div class="back-arrow" (click)="goBack()"></div>
+      <h1 class="page-title">Mis reseñas</h1>
+    </div>
+
+    <!-- Botón de ordenar -->
+    <div class="sort-container">
+      <button class="sort-button" (click)="toggleSortMenu(); $event.stopPropagation()">
+        <svg class="sort-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="12" x2="14" y2="12"></line>
+          <line x1="4" y1="18" x2="9" y2="18"></line>
+        </svg>
+        <span>Ordenar</span>
+      </button>
+
+      <!-- Menú desplegable de ordenación -->
+      <div class="sort-menu" *ngIf="showSortMenu" (click)="$event.stopPropagation()">
+        <div 
+          *ngFor="let option of sortOptions" 
+          class="sort-option"
+          [class.selected]="currentSort === option.value"
+          (click)="selectSort(option.value)">
+          <span class="option-label">{{ option.label }}</span>
+          <span class="option-radio" [class.active]="currentSort === option.value"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay para cerrar menú -->
+    <div class="sort-overlay" *ngIf="showSortMenu" (click)="closeSortMenu()"></div>
+
+    <!-- Lista de reseñas -->
+    <div class="reviews-list" *ngIf="reviews && reviews.length > 0">
+      <div *ngFor="let review of reviews" class="review-item">
+        <!-- Header de la reseña -->
+        <div class="review-header">
+          <div class="reviewer-info" (click)="goToReviewerProfile(review.reviewer_id)">
+            <ion-avatar class="reviewer-avatar">
+              <img [src]="getReviewerAvatar(review)" [alt]="review.reviewer_name" />
+            </ion-avatar>
+            <div class="reviewer-details">
+              <span class="reviewer-name">{{ review.reviewer_name }}</span>
+              <span class="reviewer-time">{{ review.reviewer_time_in_app }} en Kurro</span>
+            </div>
+          </div>
+          <button class="report-button" (click)="reportReview(review)">DENUNCIAR</button>
+        </div>
+
+        <!-- Rating y fecha -->
+        <div class="review-rating">
+          <div class="stars">
+            <svg *ngFor="let star of getStarsArray()" 
+              class="star-icon"
+              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+              [attr.fill]="star <= review.rating ? '#ffc107' : 'none'" 
+              [attr.stroke]="star <= review.rating ? '#ffc107' : '#ccc'" 
+              stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <span class="review-date">Hace {{ review.time_ago }}</span>
+        </div>
+
+        <!-- Comentario -->
+        <p class="review-text">{{ review.comment }}</p>
+
+        <!-- Servicio relacionado -->
+        <div class="review-service" *ngIf="review.service_name">
+          <span class="service-label">Servicio:</span>
+          <a class="service-link" (click)="goToService(review.service_id)">{{ review.service_name }}</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin reseñas -->
+    <div class="no-reviews" *ngIf="!reviews || reviews.length === 0">
+      <svg class="no-reviews-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <line x1="9" y1="9" x2="15" y2="9"></line>
+        <line x1="9" y1="13" x2="13" y2="13"></line>
+      </svg>
+      <p class="no-reviews-text">Aún no tienes reseñas</p>
+      <p class="no-reviews-subtitle">Las reseñas aparecerán aquí cuando otros usuarios valoren tus servicios</p>
+    </div>
+  </div>
+</ion-content>
