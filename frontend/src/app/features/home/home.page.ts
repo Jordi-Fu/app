@@ -1,11 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { 
   IonTabs, 
   IonTabBar, 
   IonTabButton, 
   IonIcon, 
-  IonLabel,
-  NavController
+  IonLabel
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -28,7 +27,7 @@ import {
   ]
 })
 export class HomePage {
-  private navController = inject(NavController);
+  @ViewChild(IonTabs) tabs!: IonTabs;
 
   constructor() {
     addIcons({
@@ -39,9 +38,10 @@ export class HomePage {
   }
 
   /**
-   * Navegar siempre a la raíz del tab
+   * Navegar a la raíz del tab usando el método nativo de IonTabs
    */
   goToTab(tab: string) {
-    this.navController.navigateRoot(`/home/${tab}`);
+    // Usar select que es más rápido que navigateRoot
+    this.tabs.select(tab);
   }
 }

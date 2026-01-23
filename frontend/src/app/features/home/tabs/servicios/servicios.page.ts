@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef, TrackByFunction } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
@@ -10,6 +10,7 @@ import { Service, Category } from '../../../../core/interfaces';
   templateUrl: './servicios.page.html',
   styleUrls: ['./servicios.page.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonContent,
@@ -21,6 +22,7 @@ export class ServiciosPage implements OnInit {
   private serviceService = inject(ServiceService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   servicios: Service[] = [];
   serviciosFiltrados: Service[] = [];
@@ -28,6 +30,14 @@ export class ServiciosPage implements OnInit {
   categoriaSeleccionada: string | null = null;
   isLoading = true;
   searchQuery = '';
+
+  // Cache de URLs para evitar recálculos
+  private imageUrlCache = new Map<string, string>();
+  private avatarUrlCache = new Map<string, string>();
+
+  // TrackBy functions para optimizar ngFor
+  trackByServicio: TrackByFunction<Service> = (index, servicio) => servicio.id;
+  trackByCategoria: TrackByFunction<Category> = (index, categoria) => categoria.id;
 
   async ngOnInit() {
     // Esperar a que la autenticación esté inicializada
@@ -37,6 +47,8 @@ export class ServiciosPage implements OnInit {
 
   async loadData() {
     this.isLoading = true;
+    this.cdr.markForCheck();
+    
     try {
       // Cargar servicios y categorías en paralelo
       const [serviciosResp, categoriasResp] = await Promise.all([
@@ -51,6 +63,8 @@ export class ServiciosPage implements OnInit {
       this.serviciosFiltrados = this.servicios;
       this.categorias = categoriasResp?.data || [];
 
+      // Pre-cachear URLs de imágenes
+      this.precacheImageUrls();
     
     } catch (error) {
       console.error('Error al cargar datos:', error);
@@ -59,6 +73,27 @@ export class ServiciosPage implements OnInit {
       this.categorias = [];
     } finally {
       this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Pre-cachear URLs de imágenes para evitar recálculos en el template
+   */
+  private precacheImageUrls(): void {
+    this.imageUrlCache.clear();
+    this.avatarUrlCache.clear();
+    
+    for (const servicio of this.servicios) {
+      // Cachear imagen del servicio
+      if (servicio.images && servicio.images.length > 0) {
+        this.imageUrlCache.set(servicio.id, getAbsoluteImageUrl(servicio.images[0].url_imagen, 'https://via.placeholder.com/400x200?text=Sin+imagen'));
+      } else {
+        this.imageUrlCache.set(servicio.id, '');
+      }
+      
+      // Cachear avatar del proveedor
+      this.avatarUrlCache.set(servicio.id, getAvatarUrl(servicio.provider?.url_avatar));
     }
   }
 
@@ -94,6 +129,7 @@ export class ServiciosPage implements OnInit {
 
       return matchSearch && matchCategoria;
     });
+    this.cdr.markForCheck();
   }
 
   verDetalle(servicio: Service) {
@@ -152,16 +188,13 @@ export class ServiciosPage implements OnInit {
   }
 
   getProviderAvatar(servicio: Service): string {
-    return getAvatarUrl(servicio.provider?.url_avatar);
+    return this.avatarUrlCache.get(servicio.id) || getAvatarUrl(servicio.provider?.url_avatar);
   }
 
   /**
-   * Obtiene la URL absoluta de la imagen del servicio
+   * Obtiene la URL absoluta de la imagen del servicio (desde cache)
    */
   getServiceImageUrl(servicio: Service): string {
-    if (servicio.images && servicio.images.length > 0) {
-      return getAbsoluteImageUrl(servicio.images[0].url_imagen, 'https://via.placeholder.com/400x200?text=Sin+imagen');
-    }
-    return 'https://via.placeholder.com/400x200?text=Sin+imagen';
+    return this.imageUrlCache.get(servicio.id) || 'https://via.placeholder.com/400x200?text=Sin+imagen';
   }
 }

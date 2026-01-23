@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, NavController } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ChatService } from '../../../../core/services/chat.service';
@@ -13,45 +14,57 @@ import { Service } from '../../../../core/interfaces';
   templateUrl: './perfil.page.html',
   styleUrls: ['./perfil.page.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonContent
   ]
 })
-export class PerfilPage implements OnInit {
+export class PerfilPage implements OnInit, OnDestroy {
   usuario: any = null;
   imageError = false;
   isDescripcionExpanded = false;
   serviciosActivos: Service[] = [];
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private chatService: ChatService,
     private router: Router,
-    private navController: NavController
+    private navController: NavController,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
   async ngOnInit() {
     // Esperar a que la autenticación esté inicializada
     await this.authService.waitForAuthInit();
     
-    this.authService.currentUser$.subscribe(user => {
+    const sub = this.authService.currentUser$.subscribe(user => {
       this.usuario = user;
       if (user?.id) {
         this.cargarServicios(user.id);
       }
+      this.cdr.markForCheck();
     });
+    this.subscriptions.push(sub);
   }
 
   cargarServicios(userId: string) {
     this.userService.getUserServices(userId).subscribe({
       next: (response: any) => {
         this.serviciosActivos = response.data || response || [];
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error al cargar servicios:', err);
         this.serviciosActivos = [];
+        this.cdr.markForCheck();
       }
     });
   }

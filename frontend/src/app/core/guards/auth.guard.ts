@@ -4,10 +4,14 @@ import { AuthService } from '../services/auth.service';
 
 /**
  * Guard para rutas que requieren autenticación
+ * Espera a que la autenticación esté inicializada antes de decidir
  */
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+
+  // CRÍTICO: Esperar a que se cargue la sesión del storage
+  await authService.waitForAuthInit();
 
   if (authService.isLoggedIn()) {
     return true;
@@ -24,9 +28,12 @@ export const authGuard: CanActivateFn = (route, state) => {
  * Guard para rutas que NO requieren autenticación (login, register)
  * Redirige al home si el usuario ya está autenticado
  */
-export const noAuthGuard: CanActivateFn = (route, state) => {
+export const noAuthGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+
+  // CRÍTICO: Esperar a que se cargue la sesión del storage
+  await authService.waitForAuthInit();
 
   if (!authService.isLoggedIn()) {
     return true;

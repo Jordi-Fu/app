@@ -21,7 +21,7 @@
         <div class="categoria-chip" [class.active]="categoriaSeleccionada === null" (click)="filtrarPorCategoria(null)">
           <span>Todos</span>
         </div>
-        <div *ngFor="let categoria of categorias" class="categoria-chip"
+        <div *ngFor="let categoria of categorias; trackBy: trackByCategoria" class="categoria-chip"
           [class.active]="categoriaSeleccionada === categoria.id" [style.--categoria-color]="categoria.color"
           (click)="filtrarPorCategoria(categoria.id)">
           <span>{{ categoria.url_icono }} {{ categoria.nombre }}</span>
@@ -52,11 +52,12 @@
       </div>
 
       <!-- Cards de servicios -->
-      <div class="servicio-card" *ngFor="let servicio of serviciosFiltrados" (click)="verDetalle(servicio)">
+      <div class="servicio-card" *ngFor="let servicio of serviciosFiltrados; trackBy: trackByServicio" (click)="verDetalle(servicio)">
         <div class="servicio-image">
           <img
             [src]="getServiceImageUrl(servicio)"
-            [alt]="servicio.titulo" />
+            [alt]="servicio.titulo"
+            loading="lazy" />
           <div class="servicio-categoria" [style.background-color]="servicio.category?.color">
             {{ servicio.category?.url_icono }} {{ servicio.category?.nombre }}
           </div>
@@ -87,7 +88,8 @@
             <div class="proveedor-avatar">
               <img
                 [src]="getProviderAvatar(servicio)"
-                [alt]="servicio.provider?.nombre" />
+                [alt]="servicio.provider?.nombre"
+                loading="lazy" />
             </div>
             <div class="proveedor-info">
               <span class="proveedor-nombre">
