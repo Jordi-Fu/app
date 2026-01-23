@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 import { AuthService } from './core/services';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { NavController } from '@ionic/angular/standalone';
+import { App } from '@capacitor/app';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -9,13 +12,103 @@ import { Router } from '@angular/router';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
+  private navigationHistory: string[] = [];
+  private isAuthenticated = false;
+
   constructor(
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private platform: Platform,
+    private navController: NavController
+  ) {
+    this.initializeBackButton();
+    this.trackNavigation();
+    this.trackAuthState();
+  }
   
   ngOnInit(): void {
     this.initializeAuth();
+  }
+
+  /**
+   * Rastrear el estado de autenticación
+   */
+  private trackAuthState(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.isAuthenticated = !!user;
+    });
+  }
+
+  /**
+   * Rastrear el historial de navegación
+   */
+  private trackNavigation(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      // No agregar rutas públicas al historial si está autenticado
+      const publicRoutes = ['/login', '/register', '/forgot-password'];
+      
+      if (this.isAuthenticated && publicRoutes.some(route => event.urlAfterRedirects.startsWith(route))) {
+        return;
+      }
+      
+      // Evitar duplicados consecutivos
+      if (this.navigationHistory[this.navigationHistory.length - 1] !== event.urlAfterRedirects) {
+        this.navigationHistory.push(event.urlAfterRedirects);
+        // Mantener un historial limitado
+        if (this.navigationHistory.length > 20) {
+          this.navigationHistory.shift();
+        }
+      }
+    });
+  }
+
+  /**
+   * Inicializar el manejo global del botón de retroceso
+   */
+  private initializeBackButton(): void {
+    this.platform.backButton.subscribeWithPriority(10, async () => {
+      const currentUrl = this.router.url;
+      
+      // Rutas públicas (no autenticadas)
+      const publicRoutes = ['/login', '/register', '/forgot-password'];
+      
+      // Rutas raíz de la app (donde minimizar)
+      const rootRoutes = ['/home', '/home/servicios', '/home/chat', '/home/perfil'];
+      
+      // Si está autenticado, nunca volver a rutas públicas
+      if (this.isAuthenticated) {
+        // Si estamos en una ruta raíz del home, minimizar
+        if (rootRoutes.some(route => currentUrl === route || currentUrl.startsWith(route + '?'))) {
+          App.minimizeApp();
+          return;
+        }
+        
+        // Buscar la última ruta válida en el historial (que no sea pública)
+        const historyWithoutCurrent = this.navigationHistory.slice(0, -1);
+        const lastValidRoute = [...historyWithoutCurrent].reverse().find(
+          route => !publicRoutes.some(pr => route.startsWith(pr))
+        );
+        
+        if (lastValidRoute && lastValidRoute !== currentUrl) {
+          // Navegar a la última ruta válida
+          this.navigationHistory.pop();
+          this.navController.back();
+        } else {
+          // No hay más historial válido, minimizar
+          App.minimizeApp();
+        }
+      } else {
+        // No autenticado
+        if (publicRoutes.some(route => currentUrl.startsWith(route))) {
+          // En rutas públicas, minimizar
+          App.minimizeApp();
+        } else {
+          this.navController.back();
+        }
+      }
+    });
   }
   
   /**
