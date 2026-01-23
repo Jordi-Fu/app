@@ -131,8 +131,8 @@ export class PerfilPage implements OnInit, OnDestroy {
   }
 
   cerrarSesion() {
-    // Limpiar caché de chat antes de cerrar sesión
-    this.chatService.limpiarCache();
+    // Limpiar conversaciones en memoria antes de cerrar sesión
+    this.chatService.limpiarMemoria();
     
     this.authService.logout().subscribe(() => {
       // Usar navigateRoot para limpiar el historial de navegación

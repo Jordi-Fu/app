@@ -43,8 +43,8 @@ export class StorageService {
     if (this.webCryptoInitialized) return;
     
     try {
-      // Intentar recuperar clave existente de sessionStorage (solo la clave, no los datos)
-      const exportedKey = sessionStorage.getItem(this.WEB_CRYPTO_KEY_NAME);
+      // Intentar recuperar clave existente de localStorage (persistente entre recargas)
+      const exportedKey = localStorage.getItem(this.WEB_CRYPTO_KEY_NAME);
       
       if (exportedKey) {
         const keyData = Uint8Array.from(atob(exportedKey), c => c.charCodeAt(0));
@@ -63,10 +63,10 @@ export class StorageService {
           ['encrypt', 'decrypt']
         );
         
-        // Exportar y guardar la clave en sessionStorage
+        // Exportar y guardar la clave en localStorage (persistente)
         const exportedKeyData = await crypto.subtle.exportKey('raw', this.webCryptoKey);
         const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKeyData)));
-        sessionStorage.setItem(this.WEB_CRYPTO_KEY_NAME, keyBase64);
+        localStorage.setItem(this.WEB_CRYPTO_KEY_NAME, keyBase64);
       }
       
       this.webCryptoInitialized = true;

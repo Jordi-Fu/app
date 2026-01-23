@@ -1,5 +1,5 @@
 // ===============================================
-// PERFIL PÚBLICO - ESTILOS MODO CLARO Y OSCURO
+// PERFIL PÚBLICO - ESTILOS IDÉNTICOS AL PRIVADO
 // ===============================================
 
 // Variables de color
@@ -7,6 +7,16 @@ $primary-green: #10B981;
 $primary-green-light: #2DD4BF;
 $star-color: #fbbf24;
 $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+ion-content {
+  --background: #ffffff;
+}
 
 // ===============================================
 // HEADER PERSONALIZADO
@@ -17,7 +27,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   justify-content: center;
   position: relative;
   padding: 1rem;
-  background: var(--ion-background-color);
+  background: var(--ion-background-color, #ffffff);
   
   .back-arrow {
     position: absolute;
@@ -50,7 +60,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--ion-text-color);
+    color: var(--ion-text-color, #000000);
   }
 }
 
@@ -63,14 +73,14 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   gap: 1rem;
   
   p {
-    color: var(--ion-text-color);
+    color: var(--ion-text-color, #000000);
   }
 }
 
 .profile-container {
   padding: 0;
   padding-bottom: 80px;
-  background: var(--ion-background-color);
+  background: var(--ion-background-color, #ffffff);
 }
 
 // ===============================================
@@ -81,7 +91,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: var(--ion-background-color);
+  background: var(--ion-background-color, #ffffff);
   
   .avatar-container {
     flex-shrink: 0;
@@ -104,19 +114,19 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       margin: 0;
       font-size: 1.1rem;
       font-weight: 600;
-      color: var(--ion-text-color);
+      color: var(--ion-text-color, #000000);
     }
     
     .location-text {
       margin: 0;
       font-size: 0.875rem;
-      color: var(--ion-color-medium);
+      color: var(--ion-color-medium, #999999);
     }
     
     .member-since {
       margin: 0;
       font-size: 0.75rem;
-      color: var(--ion-color-medium);
+      color: var(--ion-color-medium, #999999);
       
       &.gradient-text {
         background: $primary-gradient;
@@ -138,13 +148,13 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   .section-title {
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--ion-text-color);
+    color: var(--ion-text-color, #000000);
     margin: 0 0 0.5rem 0;
   }
   
   .descripcion-text {
     font-size: 0.875rem;
-    color: var(--ion-color-medium);
+    color: var(--ion-color-medium, #666666);
     line-height: 1.5;
     margin: 0;
     
@@ -168,7 +178,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--card-light-bg);
+  background: var(--card-light-bg, #f8f8f8);
   margin: 0 1rem 1.5rem;
   padding: 1rem 1.5rem;
   border-radius: 16px;
@@ -182,12 +192,12 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
     .stat-value {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #1F2937;
+      color: var(--stat-value-color, #1F2937);
     }
     
     .stat-label {
       font-size: 0.75rem;
-      color: #6B7280;
+      color: var(--stat-label-color, #6B7280);
       margin-top: 0.25rem;
     }
     
@@ -201,13 +211,17 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
         height: 1.25rem;
         color: $star-color;
       }
+      
+      .stat-value {
+        font-size: 1.5rem;
+      }
     }
   }
   
   .stat-divider {
     width: 1px;
     height: 40px;
-    background: #D1D5DB;
+    background: var(--stat-divider-color, #D1D5DB);
     margin: 0 1rem;
   }
 }
@@ -229,7 +243,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       margin: 0;
       font-size: 1.1rem;
       font-weight: 600;
-      color: var(--ion-text-color);
+      color: var(--ion-text-color, #000000);
     }
     
     .see-more {
@@ -244,7 +258,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       align-items: center;
       gap: 0.35rem;
       font-size: 0.875rem;
-      color: var(--ion-color-medium);
+      color: var(--ion-color-medium, #999999);
       cursor: pointer;
       
       ion-icon {
@@ -287,7 +301,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
     min-width: 280px;
     max-width: 280px;
     padding: 0.75rem;
-    background: var(--card-light-bg);
+    background: var(--card-light-bg, #f8f8f8);
     border-radius: 12px;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -304,7 +318,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       border-radius: 10px;
       overflow: hidden;
       flex-shrink: 0;
-      background: var(--ion-color-light);
+      background: var(--ion-color-light, #e0e0e0);
       
       img {
         width: 100%;
@@ -324,7 +338,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
         margin: 0;
         font-size: 0.95rem;
         font-weight: 500;
-        color: var(--ion-text-color);
+        color: var(--ion-text-color, #000000);
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
@@ -343,7 +357,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
         align-items: center;
         gap: 0.35rem;
         font-size: 0.8rem;
-        color: var(--ion-color-medium);
+        color: var(--ion-color-medium, #999999);
         
         ion-icon {
           font-size: 0.5rem;
@@ -371,7 +385,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   
   .review-item {
     padding: 1rem;
-    background: var(--card-light-bg);
+    background: var(--card-light-bg, #f8f8f8);
     border-radius: 12px;
     border: none;
     
@@ -393,12 +407,12 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
         .reviewer-name {
           font-size: 0.9rem;
           font-weight: 600;
-          color: var(--ion-text-color);
+          color: var(--ion-text-color, #000000);
         }
         
         .reviewer-time {
           font-size: 0.75rem;
-          color: var(--ion-color-medium);
+          color: var(--ion-color-medium, #999999);
         }
       }
     }
@@ -421,14 +435,14 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       
       .review-date {
         font-size: 0.75rem;
-        color: var(--ion-color-medium);
+        color: var(--ion-color-medium, #999999);
       }
     }
     
     .review-text {
       margin: 0 0 0.75rem 0;
       font-size: 0.875rem;
-      color: var(--ion-text-color);
+      color: var(--ion-text-color, #000000);
       line-height: 1.5;
     }
     
@@ -438,7 +452,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
       
       .review-service-label {
         font-size: 0.8rem;
-        color: var(--ion-color-medium);
+        color: var(--ion-color-medium, #999999);
       }
       
       .review-service-link {
@@ -457,7 +471,7 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
   
   p {
     margin: 0;
-    color: var(--ion-color-medium);
+    color: var(--ion-color-medium, #999999);
     font-size: 0.9rem;
   }
 }
@@ -478,25 +492,148 @@ $primary-gradient: linear-gradient(90deg, #3DD598, #13B5B5);
 }
 
 // ===============================================
-// ESTILOS ESPECÍFICOS MODO OSCURO
+// MODO OSCURO - IDÉNTICO AL PERFIL PRIVADO
 // ===============================================
-:host-context(body.dark) {
-  .profile-header {
-    background: var(--ion-background-color);
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: #1a1a1a;
+  }
+
+  .profile-container {
+    background: #1a1a1a;
+  }
+  
+  .custom-header {
+    background: #1a1a1a;
     
-    .avatar-ring {
-      .profile-avatar {
-        border-color: var(--ion-background-color);
+    .username-title {
+      color: #ffffff;
+    }
+  }
+  
+  .loading-container {
+    p {
+      color: #ffffff;
+    }
+  }
+  
+  .profile-header {
+    background: #1a1a1a;
+    
+    .avatar-container {
+      .avatar-ring {
+        .profile-avatar {
+          border-color: #1a1a1a;
+        }
+      }
+    }
+    
+    .profile-info {
+      .user-name {
+        color: #ffffff;
+      }
+      
+      .location-text {
+        color: #b3b3b3;
       }
     }
   }
   
-  .service-item {
-    background: var(--ion-color-step-100);
+  .descripcion-section {
+    .section-title {
+      color: #ffffff;
+    }
+    
+    .descripcion-text {
+      color: #b3b3b3;
+    }
   }
   
-  .review-item {
-    background: var(--ion-color-step-100);
-    border-color: var(--ion-color-step-200);
+  .stats-card {
+    background: #2a2a2a;
+    
+    .stat-item {
+      .stat-value {
+        color: #ffffff;
+      }
+      
+      .stat-label {
+        color: #b3b3b3;
+      }
+    }
+    
+    .stat-divider {
+      background: #404040;
+    }
+  }
+  
+  .section {
+    .section-header {
+      h2 {
+        color: #ffffff;
+      }
+      
+      .sort-button {
+        color: #b3b3b3;
+      }
+    }
+  }
+  
+  .services-list {
+    .service-item {
+      background: #2a2a2a;
+      
+      .service-details {
+        .service-title {
+          color: #ffffff;
+        }
+        
+        .service-status {
+          color: #b3b3b3;
+        }
+      }
+    }
+  }
+  
+  .reviews-list {
+    .review-item {
+      background: #2a2a2a;
+      
+      .review-header {
+        .reviewer-info {
+          .reviewer-name {
+            color: #ffffff;
+          }
+          
+          .reviewer-time {
+            color: #b3b3b3;
+          }
+        }
+      }
+      
+      .review-rating {
+        .review-date {
+          color: #b3b3b3;
+        }
+      }
+      
+      .review-text {
+        color: #ffffff;
+      }
+      
+      .review-service {
+        border-top-color: rgba(255, 255, 255, 0.1);
+        
+        .review-service-label {
+          color: #b3b3b3;
+        }
+      }
+    }
+  }
+  
+  .no-reviews {
+    p {
+      color: #b3b3b3;
+    }
   }
 }

@@ -35,7 +35,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   nuevoMensaje: string = '';
   usuarioActualId: string = '';
   cargando = false;
-  cargandoEnSegundoPlano = false; // Nueva variable para carga en segundo plano
   enviando = false;
   error: string | null = null;
   otroUsuarioEscribiendo = false;
@@ -83,11 +82,8 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         this.chatId = newChatId;
         
         if (this.chatId) {
-          // 1. Mostrar datos del caché inmediatamente
-          await this.mostrarDatosDelCache();
-          
-          // 2. Cargar datos frescos del servidor en segundo plano
-          this.cargarConversacionEnSegundoPlano();
+          // Cargar datos frescos del servidor
+          await this.cargarConversacion();
           
           // Unirse a la nueva conversación
           this.socketService.joinConversation(this.chatId);
@@ -102,79 +98,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
     this.listenToAuthChanges();
   }
 
-  /**
-   * Mostrar datos del caché inmediatamente (carga instantánea)
-   */
-  private async mostrarDatosDelCache(): Promise<void> {
-    // Cargar conversación del caché
-    const conversacionCache = await this.chatService.obtenerConversacionDelCache(this.chatId);
-    if (conversacionCache) {
-      this.conversacion = conversacionCache;
-    }
-    
-    // Cargar mensajes del caché
-    const mensajesCache = await this.chatService.obtenerMensajesDelCache(this.chatId);
-    if (mensajesCache.length > 0) {
-      this.mensajes = mensajesCache;
-      this.cdr.detectChanges();
-      
-      // Scroll al fondo con los mensajes cacheados
-      setTimeout(() => this.scrollToBottom(), 50);
-    }
-  }
-
-  /**
-   * Cargar conversación del servidor en segundo plano (sin mostrar loading)
-   */
-  private async cargarConversacionEnSegundoPlano(): Promise<void> {
-    try {
-      this.cargandoEnSegundoPlano = true;
-      
-      // Cargar datos de la conversación
-      const conversacion = await this.chatService.obtenerConversacion(this.chatId);
-      this.conversacion = conversacion;
-      
-      // Cargar mensajes
-      const mensajes = await this.chatService.obtenerMensajes(this.chatId);
-      
-      // Solo actualizar si hay nuevos mensajes o es diferente
-      if (this.hayNuevosMensajes(mensajes)) {
-        this.mensajes = mensajes;
-        this.cdr.detectChanges();
-        
-        // Scroll al fondo si el usuario está cerca
-        if (this.isNearBottom) {
-          setTimeout(() => this.scrollToBottom(), 100);
-        }
-      }
-      
-      // Marcar mensajes como leídos
-      await this.chatService.marcarComoLeido(this.chatId);
-    } catch (error) {
-      console.error('Error al cargar conversación en segundo plano:', error);
-      // Solo mostrar error si no hay datos cacheados
-      if (!this.conversacion && this.mensajes.length === 0) {
-        this.error = 'Error al cargar la conversación';
-      }
-    } finally {
-      this.cargandoEnSegundoPlano = false;
-    }
-  }
-
-  /**
-   * Verificar si hay mensajes nuevos comparando con el caché
-   */
-  private hayNuevosMensajes(mensajesNuevos: MensajeConRemitente[]): boolean {
-    if (this.mensajes.length !== mensajesNuevos.length) return true;
-    if (this.mensajes.length === 0) return mensajesNuevos.length > 0;
-    
-    // Comparar el último mensaje
-    const ultimoActual = this.mensajes[this.mensajes.length - 1];
-    const ultimoNuevo = mensajesNuevos[mensajesNuevos.length - 1];
-    
-    return ultimoActual.id !== ultimoNuevo.id;
-  }
-
   ngAfterViewInit() {
     // Scroll al fondo cuando la vista está lista
     setTimeout(() => this.scrollToBottom(), 200);
@@ -183,11 +106,8 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
   async ionViewDidEnter() {
     // Recargar mensajes cada vez que se entra a la vista
     if (this.chatId) {
-      // 1. Mostrar datos del caché inmediatamente
-      await this.mostrarDatosDelCache();
-      
-      // 2. Actualizar en segundo plano
-      this.cargarConversacionEnSegundoPlano();
+      // Cargar datos frescos del servidor
+      await this.cargarConversacion();
       
       // Volver a unirse a la conversación en el socket
       this.socketService.joinConversation(this.chatId);
@@ -269,9 +189,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
             this.mensajes.push(nuevoMensaje);
             this.otroUsuarioEscribiendo = false;
             this.cdr.detectChanges();
-            
-            // Guardar en caché para que esté disponible instantáneamente la próxima vez
-            this.chatService.agregarMensajeAlCache(this.chatId, nuevoMensaje);
             
             // Solo hacer scroll si el usuario está cerca del fondo
             if (this.isNearBottom) {
@@ -423,9 +340,6 @@ export class ConversacionPage implements OnInit, OnDestroy, AfterViewInit, ViewD
         };
         
         this.mensajes.push(nuevoMensajeObj);
-        
-        // Guardar en caché para carga instantánea
-        this.chatService.agregarMensajeAlCache(this.chatId, nuevoMensajeObj);
       }
       
       // Forzar detección de cambios

@@ -23,7 +23,6 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   conversaciones: ConversacionUsuario[] = [];
   conversacionesFiltradas: ConversacionUsuario[] = [];
   cargando = false;
-  cargandoEnSegundoPlano = false; // Nueva variable para carga en segundo plano
   error: string | null = null;
   searchQuery = '';
   
@@ -45,32 +44,17 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
     // Obtener el usuario actual primero
     this.listenToAuthChanges();
     
-    // 1. Mostrar datos del caché inmediatamente
-    this.mostrarConversacionesDelCache();
-    
-    // 2. Cargar datos frescos del servidor en segundo plano
-    this.cargarConversacionesEnSegundoPlano();
-    
-    // 3. Suscribirse a cambios en tiempo real
+    // 1. Suscribirse a cambios en tiempo real (BehaviorSubject)
     this.suscribirseACambiosDeConversaciones();
+    
+    // 2. Cargar datos frescos del servidor
+    await this.cargarConversaciones();
     
     this.initializeSocket();
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  /**
-   * Mostrar conversaciones del caché inmediatamente (carga instantánea)
-   */
-  private mostrarConversacionesDelCache(): void {
-    const conversacionesCache = this.chatService.getConversacionesCache();
-    if (conversacionesCache.length > 0) {
-      this.conversaciones = conversacionesCache;
-      this.aplicarFiltro();
-      this.cdr.detectChanges();
-    }
   }
 
   /**
@@ -88,32 +72,11 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   }
 
   /**
-   * Cargar conversaciones del servidor en segundo plano (sin mostrar loading)
-   */
-  private async cargarConversacionesEnSegundoPlano(): Promise<void> {
-    try {
-      this.cargandoEnSegundoPlano = true;
-      await this.chatService.obtenerConversaciones();
-      // El servicio ya actualiza el BehaviorSubject, así que se actualiza automáticamente
-    } catch (error) {
-      console.error('Error al cargar conversaciones en segundo plano:', error);
-      // Si hay error y no hay caché, mostrar el error
-      if (this.conversaciones.length === 0) {
-        this.error = 'Error al cargar las conversaciones';
-      }
-    } finally {
-      this.cargandoEnSegundoPlano = false;
-    }
-  }
-
-  /**
    * Recargar conversaciones cada vez que se entra a la vista
    */
   ionViewDidEnter() {
-    // Mostrar caché primero
-    this.mostrarConversacionesDelCache();
-    // Luego actualizar en segundo plano
-    this.cargarConversacionesEnSegundoPlano();
+    // Cargar conversaciones frescas del servidor
+    this.cargarConversaciones();
   }
 
   /**
