@@ -15,6 +15,7 @@ export interface UserProfile {
   promedio_calificacion?: number;
   total_servicios?: number;
   total_resenas?: number;
+  usuario?: string;
 }
 
 export interface Review {

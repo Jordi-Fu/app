@@ -11,7 +11,7 @@
     <!-- Header con usuario y flecha -->
     <div class="custom-header">
       <div class="back-arrow" (click)="goBack()"></div>
-      <h1 class="username-title">{{ userProfile.nombre ? getUsername() : 'Perfil' }}</h1>
+      <h1 class="username-title">{{ userProfile.usuario || 'Perfil' }}</h1>
     </div>
 
     <!-- Cabecera del perfil con avatar e info lado a lado -->

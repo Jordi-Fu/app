@@ -14,14 +14,23 @@ class AuthController {
     try {
       const { credential, password } = req.body;
       
-      const result = await authService.login({ credential, password });
+      const result = await authService.login({ credencial: credential, password });
       
-      if (!result.success) {
-        res.status(401).json(result);
+      if (!result.exito) {
+        res.status(401).json({
+          success: result.exito,
+          message: result.mensaje,
+        });
         return;
       }
       
-      res.status(200).json(result);
+      // Mapear respuesta al formato esperado por el frontend
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+        user: result.usuario,
+        tokens: result.tokens,
+      });
     } catch (error) {
       console.error('[AUTH] Error en login:', error);
       res.status(500).json({
@@ -44,19 +53,28 @@ class AuthController {
         apellidos,
         telefono,
         fechaNacimiento,
-        username,
-        email,
+        usuario: username,
+        correo: email,
         password,
-        bio,
-        profilePhoto,
+        biografia: bio,
+        fotoPerfilBase64: profilePhoto,
       });
       
-      if (!result.success) {
-        res.status(400).json(result);
+      if (!result.exito) {
+        res.status(400).json({
+          success: result.exito,
+          message: result.mensaje,
+        });
         return;
       }
       
-      res.status(201).json(result);
+      // Mapear respuesta al formato esperado por el frontend
+      res.status(201).json({
+        success: result.exito,
+        message: result.mensaje,
+        user: result.usuario,
+        tokens: result.tokens,
+      });
     } catch (error) {
       console.error('[AUTH] Error en registro:', error);
       res.status(500).json({
@@ -76,12 +94,20 @@ class AuthController {
       
       const result = await authService.refreshTokens(refreshToken);
       
-      if (!result.success) {
-        res.status(401).json(result);
+      if (!result.exito) {
+        res.status(401).json({
+          success: result.exito,
+          message: result.mensaje,
+        });
         return;
       }
       
-      res.status(200).json(result);
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+        user: result.usuario,
+        tokens: result.tokens,
+      });
     } catch (error) {
       console.error('[AUTH] Error en refresh:', error);
       res.status(500).json({
@@ -98,11 +124,14 @@ class AuthController {
   async logout(req: Request, res: Response): Promise<void> {
     try {
       const { refreshToken } = req.body;
-      const userId = req.user?.userId;
+      const idUsuario = req.user?.idUsuario;
       
-      const result = await authService.logout(refreshToken, userId);
+      const result = await authService.logout(refreshToken, idUsuario);
       
-      res.status(200).json(result);
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+      });
     } catch (error) {
       console.error('[AUTH] Error en logout:', error);
       res.status(500).json({
@@ -118,9 +147,9 @@ class AuthController {
    */
   async me(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const idUsuario = req.user?.idUsuario;
       
-      if (!userId) {
+      if (!idUsuario) {
         res.status(401).json({
           success: false,
           message: 'Usuario no autenticado',
@@ -128,9 +157,9 @@ class AuthController {
         return;
       }
       
-      const user = authService.getCurrentUser(userId);
+      const usuario = await authService.getCurrentUser(idUsuario);
       
-      if (!user) {
+      if (!usuario) {
         res.status(404).json({
           success: false,
           message: 'Usuario no encontrado',
@@ -140,7 +169,7 @@ class AuthController {
       
       res.status(200).json({
         success: true,
-        user,
+        user: usuario,
       });
     } catch (error) {
       console.error('[AUTH] Error en me:', error);
@@ -173,7 +202,11 @@ class AuthController {
       
       const result = await authService.requestPasswordReset(email);
       
-      res.status(200).json(result);
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+        debug: result.debug,
+      });
     } catch (error) {
       console.error('[AUTH] Error en forgot-password:', error);
       res.status(500).json({
@@ -193,12 +226,19 @@ class AuthController {
       
       const result = await authService.verifyResetCode(email, code);
       
-      if (!result.success) {
-        res.status(400).json(result);
+      if (!result.exito) {
+        res.status(400).json({
+          success: result.exito,
+          message: result.mensaje,
+        });
         return;
       }
       
-      res.status(200).json(result);
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+        resetToken: result.tokenReset,
+      });
     } catch (error) {
       console.error('[AUTH] Error en verify-reset-code:', error);
       res.status(500).json({
@@ -218,12 +258,18 @@ class AuthController {
       
       const result = await authService.resetPassword(resetToken, newPassword);
       
-      if (!result.success) {
-        res.status(400).json(result);
+      if (!result.exito) {
+        res.status(400).json({
+          success: result.exito,
+          message: result.mensaje,
+        });
         return;
       }
       
-      res.status(200).json(result);
+      res.status(200).json({
+        success: result.exito,
+        message: result.mensaje,
+      });
     } catch (error) {
       console.error('[AUTH] Error en reset-password:', error);
       res.status(500).json({

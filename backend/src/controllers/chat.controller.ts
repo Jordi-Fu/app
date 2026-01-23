@@ -12,7 +12,7 @@ class ChatController {
    */
   async obtenerConversaciones(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       
 
       
@@ -42,7 +42,7 @@ class ChatController {
    */
   async obtenerConversacion(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { id } = req.params;
       
       if (!userId) {
@@ -78,7 +78,7 @@ class ChatController {
    */
   async obtenerOCrearConversacion(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { usuario_id, servicio_id } = req.body;
       
       if (!userId) {
@@ -114,7 +114,7 @@ class ChatController {
    */
   async obtenerMensajes(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { id } = req.params;
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
@@ -144,7 +144,7 @@ class ChatController {
    */
   async enviarMensaje(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const datos = req.body;
       
       if (!userId) {
@@ -188,7 +188,7 @@ class ChatController {
    */
   async marcarComoLeido(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { id } = req.params;
       
       if (!userId) {
@@ -216,7 +216,7 @@ class ChatController {
    */
   async eliminarMensaje(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { id } = req.params;
       
       if (!userId) {
@@ -252,7 +252,7 @@ class ChatController {
    */
   async archivarConversacion(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.idUsuario;
       const { id } = req.params;
       
       if (!userId) {

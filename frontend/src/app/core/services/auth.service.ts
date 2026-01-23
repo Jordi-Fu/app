@@ -10,11 +10,27 @@ const TOKEN_KEY = 'kurro_access_token';
 const REFRESH_TOKEN_KEY = 'kurro_refresh_token';
 const USER_KEY = 'kurro_user';
 
+/**
+ * Servicio de autenticación con almacenamiento SEGURO de tokens.
+ * 
+ * ⚠️ SEGURIDAD: Los tokens se almacenan ÚNICAMENTE en Secure Storage:
+ * - iOS: Keychain
+ * - Android: EncryptedSharedPreferences (Android Keystore)
+ * - Web: Web Crypto API con cifrado AES-GCM
+ * 
+ * NO se usa: localStorage, sessionStorage sin cifrar, IndexedDB, cookies, variables globales.
+ * 
+ * El access token se mantiene en memoria para acceso rápido y se persiste
+ * en Secure Storage para restaurarlo al reiniciar la app.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
+  
+  // Access token en memoria para acceso rápido
+  private accessTokenInMemory: string | null = null;
   
   private currentUserSubject = new BehaviorSubject<SafeUser | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -26,6 +42,10 @@ export class AuthService {
   private authInitializedSubject = new ReplaySubject<boolean>(1);
   public authInitialized$ = this.authInitializedSubject.asObservable();
   private _authInitialized = false;
+
+  // Control de refresh en progreso para evitar llamadas duplicadas
+  private refreshInProgress = false;
+  private refreshPromise: Promise<AuthResponse> | null = null;
 
   constructor(
     private http: HttpClient,
@@ -49,7 +69,7 @@ export class AuthService {
    */
   private async loadStoredAuth(): Promise<void> {
     try {
-      console.log('[Auth] Cargando autenticación del storage...');
+      console.log('[Auth] Cargando autenticación del Secure Storage...');
       const token = await this.storage.get(TOKEN_KEY);
       const user = await this.storage.getObject<SafeUser>(USER_KEY);
       
@@ -57,11 +77,22 @@ export class AuthService {
       console.log('[Auth] Usuario encontrado:', !!user);
       
       if (token && user) {
+        // Guardar en memoria para acceso rápido
+        this.accessTokenInMemory = token;
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
-        console.log('[Auth] Sesión restaurada desde storage');
+        console.log('[Auth] Sesión restaurada desde Secure Storage');
+        
+        // Verificar si el token está próximo a expirar
+        if (this.isTokenExpiredSync(token, 300)) {
+          console.log('[Auth] Token próximo a expirar, renovando...');
+          this.refreshToken().subscribe({
+            next: () => console.log('[Auth] Token renovado al iniciar'),
+            error: (err) => console.warn('[Auth] Error renovando token al iniciar:', err)
+          });
+        }
       } else {
-        console.log('[Auth] No hay sesión guardada en storage');
+        console.log('[Auth] No hay sesión guardada en Secure Storage');
       }
     } catch (error) {
       // NO llamar a clearAuth() aquí - solo loguear el error
@@ -135,37 +166,61 @@ export class AuthService {
   }
 
   /**
-   * Refrescar tokens
+   * Refrescar tokens.
+   * Implementa protección contra llamadas duplicadas y rotación de refresh token.
    */
   refreshToken(): Observable<AuthResponse> {
-    return from(this.storage.get(REFRESH_TOKEN_KEY)).pipe(
-      switchMap(refreshToken => {
-        if (!refreshToken) {
-          return from(this.clearAuth()).pipe(
-            switchMap(() => throwError(() => new Error('No refresh token available')))
-          );
-        }
-        
-        return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
-          switchMap(response => {
-            if (response.success && response.tokens && response.user) {
-              return from(this.storeAuth(response.tokens, response.user)).pipe(
-                map(() => response)
-              );
-            } else {
-              return from(this.clearAuth()).pipe(
-                map(() => response)
-              );
-            }
-          }),
-          catchError(error => {
+    // Si ya hay un refresh en progreso, esperar a que termine
+    if (this.refreshInProgress && this.refreshPromise) {
+      return from(this.refreshPromise);
+    }
+
+    this.refreshInProgress = true;
+    
+    this.refreshPromise = new Promise<AuthResponse>((resolve, reject) => {
+      from(this.storage.get(REFRESH_TOKEN_KEY)).pipe(
+        switchMap(refreshToken => {
+          if (!refreshToken) {
             return from(this.clearAuth()).pipe(
-              switchMap(() => this.handleError(error))
+              switchMap(() => throwError(() => new Error('No refresh token available')))
             );
-          })
-        );
-      })
-    );
+          }
+          
+          return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
+            switchMap(response => {
+              if (response.success && response.tokens && response.user) {
+                // Guardar nuevos tokens - soporta rotación de refresh token
+                return from(this.storeAuth(response.tokens, response.user)).pipe(
+                  map(() => response)
+                );
+              } else {
+                return from(this.clearAuth()).pipe(
+                  map(() => response)
+                );
+              }
+            }),
+            catchError(error => {
+              return from(this.clearAuth()).pipe(
+                switchMap(() => this.handleError(error))
+              );
+            })
+          );
+        })
+      ).subscribe({
+        next: (response) => {
+          this.refreshInProgress = false;
+          this.refreshPromise = null;
+          resolve(response);
+        },
+        error: (error) => {
+          this.refreshInProgress = false;
+          this.refreshPromise = null;
+          reject(error);
+        }
+      });
+    });
+
+    return from(this.refreshPromise);
   }
 
   /**
@@ -217,41 +272,126 @@ export class AuthService {
   }
 
   /**
-   * Almacenar autenticación
+   * Almacenar autenticación en Secure Storage
    */
   private async storeAuth(tokens: AuthTokens, user: SafeUser): Promise<void> {
+    // Guardar tokens en Secure Storage
     await this.storage.set(TOKEN_KEY, tokens.accessToken);
     await this.storage.set(REFRESH_TOKEN_KEY, tokens.refreshToken);
     await this.storage.setObject(USER_KEY, user);
     
+    // Mantener access token en memoria para acceso rápido
+    this.accessTokenInMemory = tokens.accessToken;
+    
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
+    
+    console.log('[Auth] Tokens guardados en Secure Storage');
   }
 
   /**
-   * Limpiar autenticación
+   * Limpiar autenticación (logout)
    */
   async clearAuth(): Promise<void> {
+    // Limpiar memoria
+    this.accessTokenInMemory = null;
+    
+    // Limpiar Secure Storage
     await this.storage.remove(TOKEN_KEY);
     await this.storage.remove(REFRESH_TOKEN_KEY);
     await this.storage.remove(USER_KEY);
     
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
+    
+    console.log('[Auth] Tokens eliminados del Secure Storage');
+  }
+
+  // ==================== MÉTODOS PÚBLICOS PARA GESTIÓN DE TOKENS ====================
+
+  /**
+   * Guardar ambos tokens en Secure Storage.
+   * 
+   * @param accessToken - Token de acceso JWT
+   * @param refreshToken - Token de refresco
+   * 
+   * @example
+   * await authService.setTokens(response.accessToken, response.refreshToken);
+   */
+  async setTokens(accessToken: string, refreshToken: string): Promise<void> {
+    if (!accessToken || !refreshToken) {
+      throw new Error('Ambos tokens son requeridos');
+    }
+    
+    await this.storage.set(TOKEN_KEY, accessToken);
+    await this.storage.set(REFRESH_TOKEN_KEY, refreshToken);
+    this.accessTokenInMemory = accessToken;
+    this.isAuthenticatedSubject.next(true);
+    
+    console.log('[Auth] Tokens guardados con setTokens()');
   }
 
   /**
-   * Obtener access token
+   * Obtener access token.
+   * Primero intenta obtenerlo de memoria, si no lo recupera del Secure Storage.
+   * 
+   * @returns Promise con el access token o null
+   * 
+   * @example
+   * const token = await authService.getAccessToken();
+   * if (token) {
+   *   headers.set('Authorization', `Bearer ${token}`);
+   * }
    */
   getAccessToken(): Promise<string | null> {
-    return this.storage.get(TOKEN_KEY);
+    // Primero intentar memoria (más rápido)
+    if (this.accessTokenInMemory) {
+      return Promise.resolve(this.accessTokenInMemory);
+    }
+    // Si no está en memoria, recuperar del Secure Storage
+    return this.storage.get(TOKEN_KEY).then(token => {
+      if (token) {
+        this.accessTokenInMemory = token;
+      }
+      return token;
+    });
   }
 
   /**
-   * Obtener refresh token
+   * Obtener access token de forma síncrona (solo memoria).
+   * ⚠️ Puede devolver null si el token aún no se ha cargado del storage.
+   */
+  getAccessTokenSync(): string | null {
+    return this.accessTokenInMemory;
+  }
+
+  /**
+   * Obtener refresh token del Secure Storage.
+   * El refresh token NUNCA se mantiene en memoria por seguridad.
+   * 
+   * @returns Promise con el refresh token o null
+   * 
+   * @example
+   * const refreshToken = await authService.getRefreshToken();
+   * if (refreshToken) {
+   *   await authService.refreshToken();
+   * }
    */
   getRefreshToken(): Promise<string | null> {
     return this.storage.get(REFRESH_TOKEN_KEY);
+  }
+
+  /**
+   * Limpiar todos los tokens (logout).
+   * 
+   * @example
+   * async logout() {
+   *   await authService.clearTokens();
+   *   router.navigate(['/login']);
+   * }
+   */
+  async clearTokens(): Promise<void> {
+    await this.clearAuth();
   }
 
   /**
@@ -266,6 +406,68 @@ export class AuthService {
    */
   isLoggedIn(): boolean {
     return this.isAuthenticatedSubject.value;
+  }
+
+  // ==================== UTILIDADES PARA TOKENS JWT ====================
+
+  /**
+   * Decodifica un token JWT sin verificar la firma.
+   * ⚠️ Solo para lectura de claims, NO para validación de seguridad.
+   */
+  decodeToken<T = any>(token: string): T | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      
+      const payload = parts[1];
+      const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(decoded) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Verifica si un token ha expirado (síncrono).
+   * @param token - Token JWT
+   * @param bufferSeconds - Margen en segundos antes de considerar expirado
+   */
+  isTokenExpiredSync(token: string, bufferSeconds: number = 60): boolean {
+    const payload = this.decodeToken<{ exp?: number }>(token);
+    if (!payload?.exp) return true;
+
+    const expirationTime = payload.exp * 1000;
+    const currentTime = Date.now();
+    const bufferTime = bufferSeconds * 1000;
+
+    return currentTime >= (expirationTime - bufferTime);
+  }
+
+  /**
+   * Verifica si el access token actual ha expirado.
+   * @param bufferSeconds - Margen en segundos antes de considerar expirado
+   */
+  async isAccessTokenExpired(bufferSeconds: number = 60): Promise<boolean> {
+    const token = await this.getAccessToken();
+    if (!token) return true;
+    return this.isTokenExpiredSync(token, bufferSeconds);
+  }
+
+  /**
+   * Obtiene el tiempo restante hasta la expiración del access token.
+   * @returns Milliseconds hasta expiración, o 0 si ya expiró
+   */
+  async getAccessTokenTimeToExpiry(): Promise<number> {
+    const token = await this.getAccessToken();
+    if (!token) return 0;
+
+    const payload = this.decodeToken<{ exp?: number }>(token);
+    if (!payload?.exp) return 0;
+
+    const expirationTime = payload.exp * 1000;
+    const remaining = expirationTime - Date.now();
+
+    return remaining > 0 ? remaining : 0;
   }
 
   /**

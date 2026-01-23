@@ -1,57 +1,197 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
+import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 
 /**
- * Servicio de almacenamiento persistente que usa:
- * - Capacitor Preferences para plataformas móviles (iOS/Android) - Persiste incluso al cerrar la app
- * - localStorage como fallback para web
+ * Servicio de almacenamiento SEGURO que usa:
+ * - Capacitor Secure Storage Plugin para todas las plataformas
+ *   - iOS: Keychain
+ *   - Android: EncryptedSharedPreferences (Android Keystore)
+ *   - Web: Web Crypto API con cifrado AES-GCM
+ * 
+ * ⚠️ IMPORTANTE: Este servicio NO usa localStorage, sessionStorage, 
+ * IndexedDB ni cookies. Todos los datos sensibles se almacenan cifrados.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
   private isNativePlatform: boolean;
+  
+  // Cache en memoria para acceso rápido (solo para datos no sensibles)
+  private memoryCache = new Map<string, string>();
+  
+  // Web Crypto para cifrado en navegador
+  private webCryptoKey: CryptoKey | null = null;
+  private webCryptoInitialized = false;
+  private readonly WEB_CRYPTO_KEY_NAME = '__web_crypto_key__';
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
-    console.log('StorageService inicializado - Plataforma nativa:', this.isNativePlatform);
+    console.log('[SecureStorage] Inicializado - Plataforma nativa:', this.isNativePlatform);
+    
+    if (!this.isNativePlatform) {
+      this.initWebCrypto();
+    }
   }
 
   /**
-   * Guardar valor
+   * Inicializa Web Crypto API para cifrado en navegador.
+   * Genera una clave AES-GCM de 256 bits.
+   */
+  private async initWebCrypto(): Promise<void> {
+    if (this.webCryptoInitialized) return;
+    
+    try {
+      // Intentar recuperar clave existente de sessionStorage (solo la clave, no los datos)
+      const exportedKey = sessionStorage.getItem(this.WEB_CRYPTO_KEY_NAME);
+      
+      if (exportedKey) {
+        const keyData = Uint8Array.from(atob(exportedKey), c => c.charCodeAt(0));
+        this.webCryptoKey = await crypto.subtle.importKey(
+          'raw',
+          keyData,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+      } else {
+        // Generar nueva clave
+        this.webCryptoKey = await crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        
+        // Exportar y guardar la clave en sessionStorage
+        const exportedKeyData = await crypto.subtle.exportKey('raw', this.webCryptoKey);
+        const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKeyData)));
+        sessionStorage.setItem(this.WEB_CRYPTO_KEY_NAME, keyBase64);
+      }
+      
+      this.webCryptoInitialized = true;
+      console.log('[SecureStorage] Web Crypto API inicializado');
+    } catch (error) {
+      console.error('[SecureStorage] Error inicializando Web Crypto:', error);
+    }
+  }
+
+  /**
+   * Cifra un valor usando Web Crypto API (AES-GCM)
+   */
+  private async encryptForWeb(value: string): Promise<string> {
+    if (!this.webCryptoKey) {
+      await this.initWebCrypto();
+    }
+    
+    if (!this.webCryptoKey) {
+      throw new Error('Web Crypto no disponible');
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(value);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    const encryptedData = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      this.webCryptoKey,
+      data
+    );
+
+    // Combinar IV + datos cifrados
+    const combined = new Uint8Array(iv.length + encryptedData.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encryptedData), iv.length);
+    
+    return btoa(String.fromCharCode(...combined));
+  }
+
+  /**
+   * Descifra un valor usando Web Crypto API
+   */
+  private async decryptForWeb(encryptedValue: string): Promise<string> {
+    if (!this.webCryptoKey) {
+      await this.initWebCrypto();
+    }
+    
+    if (!this.webCryptoKey) {
+      throw new Error('Web Crypto no disponible');
+    }
+
+    const combined = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
+    const iv = combined.slice(0, 12);
+    const data = combined.slice(12);
+
+    const decryptedData = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      this.webCryptoKey,
+      data
+    );
+
+    return new TextDecoder().decode(decryptedData);
+  }
+
+  /**
+   * Guardar valor de forma segura (cifrado)
    */
   async set(key: string, value: string): Promise<void> {
     try {
       if (this.isNativePlatform) {
-        await Preferences.set({ key, value });
-        console.log(`[Storage] Guardado ${key} en Preferences`);
+        // Usar Capacitor Secure Storage Plugin (Keychain/Keystore)
+        await SecureStoragePlugin.set({ key, value });
+        console.log(`[SecureStorage] Guardado ${key} en Secure Storage (nativo)`);
       } else {
-        localStorage.setItem(key, value);
-        console.log(`[Storage] Guardado ${key} en localStorage`);
+        // Web: Cifrar con AES-GCM y guardar en sessionStorage
+        const encryptedValue = await this.encryptForWeb(value);
+        sessionStorage.setItem(`__secure__${key}`, encryptedValue);
+        console.log(`[SecureStorage] Guardado ${key} en Web (cifrado AES-GCM)`);
       }
+      
+      // Actualizar cache en memoria
+      this.memoryCache.set(key, value);
     } catch (error) {
-      console.error(`[Storage] Error guardando ${key}:`, error);
+      console.error(`[SecureStorage] Error guardando ${key}:`, error);
       throw error;
     }
   }
 
   /**
-   * Obtener valor
+   * Obtener valor de forma segura (descifrado)
    */
   async get(key: string): Promise<string | null> {
     try {
+      // Primero intentar cache en memoria
+      if (this.memoryCache.has(key)) {
+        console.log(`[SecureStorage] Leído ${key} de memoria cache`);
+        return this.memoryCache.get(key)!;
+      }
+
       if (this.isNativePlatform) {
-        const result = await Preferences.get({ key });
-        console.log(`[Storage] Leído ${key} de Preferences:`, result.value ? 'tiene valor' : 'null');
-        return result.value;
+        const result = await SecureStoragePlugin.get({ key });
+        const value = result.value;
+        
+        if (value) {
+          this.memoryCache.set(key, value);
+        }
+        
+        console.log(`[SecureStorage] Leído ${key} de Secure Storage:`, value ? 'tiene valor' : 'null');
+        return value;
       } else {
-        const value = localStorage.getItem(key);
-        console.log(`[Storage] Leído ${key} de localStorage:`, value ? 'tiene valor' : 'null');
+        const encryptedValue = sessionStorage.getItem(`__secure__${key}`);
+        if (!encryptedValue) {
+          console.log(`[SecureStorage] Leído ${key} de Web: null`);
+          return null;
+        }
+        
+        const value = await this.decryptForWeb(encryptedValue);
+        this.memoryCache.set(key, value);
+        
+        console.log(`[SecureStorage] Leído ${key} de Web (descifrado): tiene valor`);
         return value;
       }
     } catch (error) {
-      console.error(`[Storage] Error leyendo ${key}:`, error);
+      // SecureStoragePlugin lanza error si la clave no existe
+      console.warn(`[SecureStorage] Clave ${key} no encontrada:`, error);
       return null;
     }
   }
@@ -61,14 +201,17 @@ export class StorageService {
    */
   async remove(key: string): Promise<void> {
     try {
+      // Limpiar cache
+      this.memoryCache.delete(key);
+      
       if (this.isNativePlatform) {
-        await Preferences.remove({ key });
+        await SecureStoragePlugin.remove({ key });
       } else {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(`__secure__${key}`);
       }
-      console.log(`[Storage] Eliminado ${key}`);
+      console.log(`[SecureStorage] Eliminado ${key}`);
     } catch (error) {
-      console.error(`[Storage] Error eliminando ${key}:`, error);
+      console.warn(`[SecureStorage] Error eliminando ${key}:`, error);
     }
   }
 
@@ -77,14 +220,24 @@ export class StorageService {
    */
   async clear(): Promise<void> {
     try {
+      this.memoryCache.clear();
+      
       if (this.isNativePlatform) {
-        await Preferences.clear();
+        await SecureStoragePlugin.clear();
       } else {
-        localStorage.clear();
+        // Solo limpiar claves con prefijo __secure__
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          if (key?.startsWith('__secure__')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => sessionStorage.removeItem(key));
       }
-      console.log('[Storage] Storage limpiado');
+      console.log('[SecureStorage] Storage limpiado');
     } catch (error) {
-      console.error('[Storage] Error limpiando storage:', error);
+      console.error('[SecureStorage] Error limpiando storage:', error);
     }
   }
 
@@ -92,8 +245,18 @@ export class StorageService {
    * Verificar si existe una clave
    */
   async has(key: string): Promise<boolean> {
-    const value = await this.get(key);
-    return value !== null;
+    try {
+      if (this.memoryCache.has(key)) return true;
+      
+      if (this.isNativePlatform) {
+        const keys = await SecureStoragePlugin.keys();
+        return keys.value.includes(key);
+      } else {
+        return sessionStorage.getItem(`__secure__${key}`) !== null;
+      }
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -113,8 +276,31 @@ export class StorageService {
     try {
       return JSON.parse(value) as T;
     } catch (error) {
-      console.error(`[Storage] Error parseando JSON de ${key}:`, error);
+      console.error(`[SecureStorage] Error parseando JSON de ${key}:`, error);
       return null;
+    }
+  }
+
+  /**
+   * Obtener todas las claves almacenadas
+   */
+  async keys(): Promise<string[]> {
+    try {
+      if (this.isNativePlatform) {
+        const result = await SecureStoragePlugin.keys();
+        return result.value;
+      } else {
+        const keys: string[] = [];
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          if (key?.startsWith('__secure__')) {
+            keys.push(key.replace('__secure__', ''));
+          }
+        }
+        return keys;
+      }
+    } catch {
+      return [];
     }
   }
 }

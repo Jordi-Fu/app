@@ -10,12 +10,12 @@ class TokenModel {
   /**
    * Guardar refresh token
    */
-  store(token: string, userId: string, expiresAt: Date): void {
+  store(token: string, idUsuario: string, expiraEn: Date): void {
     this.refreshTokens.set(token, {
       token,
-      userId,
-      expiresAt,
-      createdAt: new Date(),
+      idUsuario,
+      expiraEn,
+      creadoEn: new Date(),
     });
   }
   
@@ -36,11 +36,11 @@ class TokenModel {
   /**
    * Eliminar todos los tokens de un usuario
    */
-  deleteAllByUserId(userId: string): number {
+  deleteAllByUserId(idUsuario: string): number {
     let deletedCount = 0;
     
     for (const [key, value] of this.refreshTokens.entries()) {
-      if (value.userId === userId) {
+      if (value.idUsuario === idUsuario) {
         this.refreshTokens.delete(key);
         deletedCount++;
       }
@@ -52,18 +52,18 @@ class TokenModel {
   /**
    * Revocar todos los tokens de un usuario (alias para deleteAllByUserId)
    */
-  revokeAllByUserId(userId: string): number {
-    return this.deleteAllByUserId(userId);
+  revokeAllByUserId(idUsuario: string): number {
+    return this.deleteAllByUserId(idUsuario);
   }
   
   /**
    * Obtener todos los tokens de un usuario
    */
-  findByUserId(userId: string): StoredRefreshToken[] {
+  findByUserId(idUsuario: string): StoredRefreshToken[] {
     const tokens: StoredRefreshToken[] = [];
     
     for (const value of this.refreshTokens.values()) {
-      if (value.userId === userId) {
+      if (value.idUsuario === idUsuario) {
         tokens.push(value);
       }
     }
@@ -79,7 +79,7 @@ class TokenModel {
     let deletedCount = 0;
     
     for (const [key, value] of this.refreshTokens.entries()) {
-      if (value.expiresAt < now) {
+      if (value.expiraEn < now) {
         this.refreshTokens.delete(key);
         deletedCount++;
       }
@@ -94,7 +94,7 @@ class TokenModel {
   isValid(token: string): boolean {
     const stored = this.refreshTokens.get(token);
     if (!stored) return false;
-    return stored.expiresAt > new Date();
+    return stored.expiraEn > new Date();
   }
   
   /**
@@ -112,7 +112,7 @@ class TokenModel {
     let count = 0;
     
     for (const value of this.refreshTokens.values()) {
-      if (value.expiresAt > now) {
+      if (value.expiraEn > now) {
         count++;
       }
     }

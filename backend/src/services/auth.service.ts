@@ -19,50 +19,50 @@ class AuthService {
    * Login de usuario
    */
   async login(loginData: LoginRequest): Promise<AuthResponse> {
-    const { credential, password } = loginData;
+    const { credencial, password } = loginData;
     
     // Buscar usuario por credencial
-    const user = await userModel.findByCredential(credential);
+    const user = await userModel.findByCredential(credencial);
     
     if (!user) {
       // Respuesta genérica para no revelar si el usuario existe
       return {
-        success: false,
-        message: 'Credenciales inválidas',
+        exito: false,
+        mensaje: 'Credenciales inválidas',
       };
     }
     
     // Verificar si la cuenta está bloqueada
     if (userModel.isLocked(user)) {
-      const minutesLeft = userModel.getLockTimeRemaining(user);
+      const minutosRestantes = userModel.getLockTimeRemaining(user);
       return {
-        success: false,
-        message: `Cuenta bloqueada temporalmente. Intenta en ${minutesLeft} minutos.`,
+        exito: false,
+        mensaje: `Cuenta bloqueada temporalmente. Intenta en ${minutosRestantes} minutos.`,
       };
     }
     
     // Verificar si la cuenta está activa
-    if (!user.isActive) {
+    if (!user.esta_activo) {
       return {
-        success: false,
-        message: 'Cuenta desactivada. Contacta al soporte.',
+        exito: false,
+        mensaje: 'Cuenta desactivada. Contacta al soporte.',
       };
     }
     
     // Verificar contraseña
-    const isPasswordValid = await userModel.verifyPassword(password, user.password);
+    const esPasswordValida = await userModel.verifyPassword(password, user.hash_password);
     
-    if (!isPasswordValid) {
+    if (!esPasswordValida) {
       // Incrementar intentos fallidos
       await userModel.incrementFailedAttempts(user.id);
       
-      const updatedUser = await userModel.findById(user.id);
-      const attemptsLeft = 5 - (updatedUser?.failedLoginAttempts || 0);
+      const usuarioActualizado = await userModel.findById(user.id);
+      const intentosRestantes = 5 - (usuarioActualizado?.intentos_fallidos_login || 0);
       
       return {
-        success: false,
-        message: attemptsLeft > 0 
-          ? `Credenciales inválidas. ${attemptsLeft} intentos restantes.`
+        exito: false,
+        mensaje: intentosRestantes > 0 
+          ? `Credenciales inválidas. ${intentosRestantes} intentos restantes.`
           : 'Cuenta bloqueada por múltiples intentos fallidos.',
       };
     }
@@ -71,16 +71,16 @@ class AuthService {
     await userModel.resetFailedAttempts(user.id);
     
     // Generar tokens
-    const tokens = this.generateTokens(user.id, user.username, user.email);
+    const tokens = this.generateTokens(user.id, user.usuario, user.correo);
     
     // Guardar refresh token
-    const refreshExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
-    tokenModel.store(tokens.refreshToken, user.id, refreshExpiry);
+    const expiraRefresh = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
+    tokenModel.store(tokens.refreshToken, user.id, expiraRefresh);
     
     return {
-      success: true,
-      message: 'Login exitoso',
-      user: userModel.toSafeUser(user),
+      exito: true,
+      mensaje: 'Login exitoso',
+      usuario: userModel.toSafeUser(user),
       tokens,
     };
   }
@@ -90,53 +90,53 @@ class AuthService {
    */
   async register(registerData: RegisterRequest): Promise<AuthResponse> {
     // Validar que el username no esté en uso
-    const usernameExists = await userModel.existsByUsername(registerData.username);
-    if (usernameExists) {
+    const existeUsuario = await userModel.existsByUsername(registerData.usuario);
+    if (existeUsuario) {
       return {
-        success: false,
-        message: 'El nombre de usuario ya está en uso',
+        exito: false,
+        mensaje: 'El nombre de usuario ya está en uso',
       };
     }
 
     // Validar que el email no esté en uso
-    const emailExists = await userModel.existsByEmail(registerData.email);
-    if (emailExists) {
+    const existeEmail = await userModel.existsByEmail(registerData.correo);
+    if (existeEmail) {
       return {
-        success: false,
-        message: 'El email ya está registrado',
+        exito: false,
+        mensaje: 'El email ya está registrado',
       };
     }
 
     // Validar que el teléfono no esté en uso
-    const phoneExists = await userModel.existsByPhone(registerData.telefono);
-    if (phoneExists) {
+    const existeTelefono = await userModel.existsByPhone(registerData.telefono);
+    if (existeTelefono) {
       return {
-        success: false,
-        message: 'El teléfono ya está registrado',
+        exito: false,
+        mensaje: 'El teléfono ya está registrado',
       };
     }
 
     // Crear usuario
-    const newUser = await userModel.create(registerData);
+    const nuevoUsuario = await userModel.create(registerData);
 
-    if (!newUser) {
+    if (!nuevoUsuario) {
       return {
-        success: false,
-        message: 'Error al crear el usuario. Intenta nuevamente.',
+        exito: false,
+        mensaje: 'Error al crear el usuario. Intenta nuevamente.',
       };
     }
 
     // Generar tokens automáticamente
-    const tokens = this.generateTokens(newUser.id, newUser.username, newUser.email);
+    const tokens = this.generateTokens(nuevoUsuario.id, nuevoUsuario.usuario, nuevoUsuario.correo);
 
     // Guardar refresh token
-    const refreshExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
-    tokenModel.store(tokens.refreshToken, newUser.id, refreshExpiry);
+    const expiraRefresh = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 días
+    tokenModel.store(tokens.refreshToken, nuevoUsuario.id, expiraRefresh);
 
     return {
-      success: true,
-      message: 'Usuario registrado exitosamente',
-      user: userModel.toSafeUser(newUser),
+      exito: true,
+      mensaje: 'Usuario registrado exitosamente',
+      usuario: userModel.toSafeUser(nuevoUsuario),
       tokens,
     };
   }
@@ -149,8 +149,8 @@ class AuthService {
       // Verificar que el refresh token existe y es válido
       if (!tokenModel.isValid(refreshToken)) {
         return {
-          success: false,
-          message: 'Token de refresco inválido o expirado',
+          exito: false,
+          mensaje: 'Token de refresco inválido o expirado',
         };
       }
       
@@ -158,13 +158,13 @@ class AuthService {
       const decoded = jwt.verify(refreshToken, ENV.JWT_REFRESH_SECRET) as JwtPayload;
       
       // Buscar usuario
-      const user = await userModel.findById(decoded.userId);
+      const user = await userModel.findById(decoded.idUsuario);
       
-      if (!user || !user.isActive) {
+      if (!user || !user.esta_activo) {
         tokenModel.delete(refreshToken);
         return {
-          success: false,
-          message: 'Usuario no encontrado o inactivo',
+          exito: false,
+          mensaje: 'Usuario no encontrado o inactivo',
         };
       }
       
@@ -172,23 +172,23 @@ class AuthService {
       tokenModel.delete(refreshToken);
       
       // Generar nuevos tokens
-      const tokens = this.generateTokens(user.id, user.username, user.email);
+      const tokens = this.generateTokens(user.id, user.usuario, user.correo);
       
       // Guardar nuevo refresh token
-      const refreshExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      tokenModel.store(tokens.refreshToken, user.id, refreshExpiry);
+      const expiraRefresh = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      tokenModel.store(tokens.refreshToken, user.id, expiraRefresh);
       
       return {
-        success: true,
-        message: 'Tokens renovados',
-        user: userModel.toSafeUser(user),
+        exito: true,
+        mensaje: 'Tokens renovados',
+        usuario: userModel.toSafeUser(user),
         tokens,
       };
     } catch (error) {
       tokenModel.delete(refreshToken);
       return {
-        success: false,
-        message: 'Token de refresco inválido',
+        exito: false,
+        mensaje: 'Token de refresco inválido',
       };
     }
   }
@@ -196,20 +196,20 @@ class AuthService {
   /**
    * Logout - Invalidar tokens
    */
-  async logout(refreshToken: string, userId?: string): Promise<AuthResponse> {
+  async logout(refreshToken: string, idUsuario?: string): Promise<AuthResponse> {
     // Eliminar refresh token específico
     if (refreshToken) {
       tokenModel.delete(refreshToken);
     }
     
     // Opcionalmente eliminar todos los tokens del usuario
-    if (userId) {
-      tokenModel.deleteAllByUserId(userId);
+    if (idUsuario) {
+      tokenModel.deleteAllByUserId(idUsuario);
     }
     
     return {
-      success: true,
-      message: 'Sesión cerrada correctamente',
+      exito: true,
+      mensaje: 'Sesión cerrada correctamente',
     };
   }
   
@@ -228,8 +228,8 @@ class AuthService {
   /**
    * Obtener usuario actual
    */
-  async getCurrentUser(userId: string): Promise<SafeUser | null> {
-    const user = await userModel.findById(userId);
+  async getCurrentUser(idUsuario: string): Promise<SafeUser | null> {
+    const user = await userModel.findById(idUsuario);
     if (!user) return null;
     return userModel.toSafeUser(user);
   }
@@ -245,8 +245,8 @@ class AuthService {
     // Esto previene que se pueda verificar qué emails están registrados
     if (!user) {
       return {
-        success: true,
-        message: 'Si el email existe, recibirás un código de verificación',
+        exito: true,
+        mensaje: 'Si el email existe, recibirás un código de verificación',
       };
     }
 
@@ -255,9 +255,9 @@ class AuthService {
 
     // Enviar email con el código
     try {
-      const emailSent = await emailService.sendPasswordResetCode(email, code);
+      const emailEnviado = await emailService.sendPasswordResetCode(email, code);
       
-      if (!emailSent) {
+      if (!emailEnviado) {
         console.error('[PASSWORD RESET] Error al enviar email');
         // En caso de error al enviar, mostramos el código en consola en desarrollo
         if (ENV.isDevelopment) {
@@ -269,8 +269,8 @@ class AuthService {
     }
 
     return {
-      success: true,
-      message: 'Código de verificación enviado a tu email',
+      exito: true,
+      mensaje: 'Código de verificación enviado a tu email',
       // En desarrollo, devolvemos el código como fallback
       debug: ENV.isDevelopment ? { code } : undefined,
     };
@@ -280,73 +280,73 @@ class AuthService {
    * Verificar código de recuperación
    */
   async verifyResetCode(email: string, code: string): Promise<AuthResponse> {
-    const result = passwordResetModel.verifyCode(email, code);
+    const resultado = passwordResetModel.verifyCode(email, code);
 
-    if (!result.valid) {
+    if (!resultado.valid) {
       return {
-        success: false,
-        message: result.message || 'Código inválido',
+        exito: false,
+        mensaje: resultado.message || 'Código inválido',
       };
     }
 
     return {
-      success: true,
-      message: 'Código verificado correctamente',
-      resetToken: result.resetToken,
+      exito: true,
+      mensaje: 'Código verificado correctamente',
+      tokenReset: resultado.resetToken,
     };
   }
 
   /**
    * Restablecer contraseña con token
    */
-  async resetPassword(resetToken: string, newPassword: string): Promise<AuthResponse> {
+  async resetPassword(tokenReset: string, nuevaPassword: string): Promise<AuthResponse> {
     // Validar token
-    const tokenValidation = passwordResetModel.validateResetToken(resetToken);
+    const validacionToken = passwordResetModel.validateResetToken(tokenReset);
 
-    if (!tokenValidation.valid || !tokenValidation.email) {
+    if (!validacionToken.valid || !validacionToken.email) {
       return {
-        success: false,
-        message: tokenValidation.message || 'Token inválido',
+        exito: false,
+        mensaje: validacionToken.message || 'Token inválido',
       };
     }
 
     // Buscar usuario
-    const user = await userModel.findByCredential(tokenValidation.email);
+    const user = await userModel.findByCredential(validacionToken.email);
 
     if (!user) {
       return {
-        success: false,
-        message: 'Usuario no encontrado',
+        exito: false,
+        mensaje: 'Usuario no encontrado',
       };
     }
 
     // Actualizar contraseña
-    const updated = await userModel.updatePassword(user.id, newPassword);
+    const actualizado = await userModel.updatePassword(user.id, nuevaPassword);
 
-    if (!updated) {
+    if (!actualizado) {
       return {
-        success: false,
-        message: 'Error al actualizar la contraseña',
+        exito: false,
+        mensaje: 'Error al actualizar la contraseña',
       };
     }
 
     // Consumir token (ya no se puede usar de nuevo)
-    passwordResetModel.consumeResetToken(resetToken);
+    passwordResetModel.consumeResetToken(tokenReset);
 
     // Invalidar todos los tokens de sesión actuales
     tokenModel.revokeAllByUserId(user.id);
 
     return {
-      success: true,
-      message: 'Contraseña actualizada exitosamente',
+      exito: true,
+      mensaje: 'Contraseña actualizada exitosamente',
     };
   }
   
   /**
    * Generar par de tokens
    */
-  private generateTokens(userId: string, username: string, email: string): AuthTokens {
-    const payload: JwtPayload = { userId, username, email };
+  private generateTokens(idUsuario: string, usuario: string, correo: string): AuthTokens {
+    const payload: JwtPayload = { idUsuario, usuario, correo };
     
     const accessToken = jwt.sign(
       payload, 
@@ -363,7 +363,7 @@ class AuthService {
     return {
       accessToken,
       refreshToken,
-      expiresIn: ENV.JWT_EXPIRES_IN,
+      expiraEn: ENV.JWT_EXPIRES_IN,
     };
   }
 }

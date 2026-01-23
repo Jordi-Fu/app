@@ -21,21 +21,21 @@ export interface RegisterRequest {
 
 export interface SafeUser {
   id: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string | null;
-  countryCode: string;
-  avatarUrl: string | null;
-  bio: string | null;
-  userType: 'client' | 'provider' | 'both';
-  userRole: 'user' | 'provider' | 'admin' | 'moderator';
-  isVerified: boolean;
-  isActive: boolean;
-  ratingAverage: number;
-  totalReviews: number;
-  createdAt: Date;
+  usuario: string;
+  correo: string;
+  nombre: string;
+  apellido: string;
+  telefono: string | null;
+  codigo_pais: string;
+  url_avatar: string | null;
+  biografia: string | null;
+  tipo_usuario: 'cliente' | 'proveedor' | 'ambos';
+  rol_usuario: 'usuario' | 'proveedor' | 'admin' | 'moderador';
+  esta_verificado: boolean;
+  esta_activo: boolean;
+  promedio_calificacion: number;
+  total_resenas: number;
+  creado_en: Date;
 }
 
 export interface AuthTokens {

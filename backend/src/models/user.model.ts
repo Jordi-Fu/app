@@ -9,10 +9,10 @@ import { userDatabase } from '../database/user.database';
 class UserModel {
   
   /**
-   * Buscar usuario por credencial (username, email o phone)
+   * Buscar usuario por credencial (usuario, correo o teléfono)
    */
-  async findByCredential(credential: string): Promise<User | undefined> {
-    return userDatabase.findByCredential(credential);
+  async findByCredential(credencial: string): Promise<User | undefined> {
+    return userDatabase.findByCredential(credencial);
   }
   
   /**
@@ -25,22 +25,22 @@ class UserModel {
   /**
    * Verificar si existe usuario por username
    */
-  async existsByUsername(username: string): Promise<boolean> {
-    return userDatabase.existsByUsername(username);
+  async existsByUsername(usuario: string): Promise<boolean> {
+    return userDatabase.existsByUsername(usuario);
   }
 
   /**
    * Verificar si existe usuario por email
    */
-  async existsByEmail(email: string): Promise<boolean> {
-    return userDatabase.existsByEmail(email);
+  async existsByEmail(correo: string): Promise<boolean> {
+    return userDatabase.existsByEmail(correo);
   }
 
   /**
    * Verificar si existe usuario por teléfono
    */
-  async existsByPhone(phone: string): Promise<boolean> {
-    return userDatabase.existsByPhone(phone);
+  async existsByPhone(telefono: string): Promise<boolean> {
+    return userDatabase.existsByPhone(telefono);
   }
 
   /**
@@ -68,15 +68,15 @@ class UserModel {
    * Verificar si la cuenta está bloqueada
    */
   isLocked(user: User): boolean {
-    return user.lockedUntil !== null && user.lockedUntil > new Date();
+    return user.bloqueado_hasta !== null && user.bloqueado_hasta > new Date();
   }
   
   /**
    * Obtener tiempo restante de bloqueo en minutos
    */
   getLockTimeRemaining(user: User): number {
-    if (!user.lockedUntil) return 0;
-    return Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+    if (!user.bloqueado_hasta) return 0;
+    return Math.ceil((user.bloqueado_hasta.getTime() - Date.now()) / 60000);
   }
   
   /**
@@ -89,16 +89,16 @@ class UserModel {
   /**
    * Verificar contraseña
    */
-  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, hashedPassword);
+  async verifyPassword(passwordPlano: string, passwordHasheada: string): Promise<boolean> {
+    return bcrypt.compare(passwordPlano, passwordHasheada);
   }
   
   /**
    * Actualizar contraseña de usuario
    */
-  async updatePassword(userId: string, newPassword: string): Promise<boolean> {
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-    return userDatabase.updatePassword(userId, hashedPassword);
+  async updatePassword(idUsuario: string, nuevaPassword: string): Promise<boolean> {
+    const passwordHasheada = await bcrypt.hash(nuevaPassword, 12);
+    return userDatabase.updatePassword(idUsuario, passwordHasheada);
   }
 
   /**

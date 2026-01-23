@@ -9,12 +9,12 @@ class TokenDatabase {
   /**
    * Guardar refresh token
    */
-  store(token: string, userId: string, expiresAt: Date): void {
+  store(token: string, idUsuario: string, expiraEn: Date): void {
     this.refreshTokens.set(token, {
       token,
-      userId,
-      expiresAt,
-      createdAt: new Date(),
+      idUsuario,
+      expiraEn,
+      creadoEn: new Date(),
     });
   }
   
@@ -35,9 +35,9 @@ class TokenDatabase {
   /**
    * Eliminar todos los tokens de un usuario
    */
-  deleteAllByUserId(userId: string): void {
+  deleteAllByUserId(idUsuario: string): void {
     for (const [key, value] of this.refreshTokens.entries()) {
-      if (value.userId === userId) {
+      if (value.idUsuario === idUsuario) {
         this.refreshTokens.delete(key);
       }
     }
@@ -49,7 +49,7 @@ class TokenDatabase {
   cleanExpired(): void {
     const now = new Date();
     for (const [key, value] of this.refreshTokens.entries()) {
-      if (value.expiresAt < now) {
+      if (value.expiraEn < now) {
         this.refreshTokens.delete(key);
       }
     }
@@ -61,7 +61,7 @@ class TokenDatabase {
   isValid(token: string): boolean {
     const stored = this.refreshTokens.get(token);
     if (!stored) return false;
-    return stored.expiresAt > new Date();
+    return stored.expiraEn > new Date();
   }
 }
 

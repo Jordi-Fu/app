@@ -97,8 +97,8 @@ export class PerfilPage implements OnInit, OnDestroy {
   }
 
   getMemberYear(): string {
-    if (this.usuario?.createdAt) {
-      return new Date(this.usuario.createdAt).getFullYear().toString();
+    if (this.usuario?.creado_en) {
+      return new Date(this.usuario.creado_en).getFullYear().toString();
     }
     return new Date().getFullYear().toString();
   }

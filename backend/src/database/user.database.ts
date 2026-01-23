@@ -12,23 +12,23 @@ class UserDatabase {
   /**
    * Buscar usuario por credencial (username, email o phone)
    */
-  async findByCredential(credential: string): Promise<User | undefined> {
-    const normalizedCredential = credential.toLowerCase().trim();
+  async findByCredential(credencial: string): Promise<User | undefined> {
+    const credencialNormalizada = credencial.toLowerCase().trim();
     
     try {
       const query = `
         SELECT 
-          id, usuario as username, correo as email, hash_password as password,
-          nombre as "firstName", apellido as "lastName",
-          telefono as phone, codigo_pais as "countryCode",
-          url_avatar as "avatarUrl", biografia as bio,
-          'client' as "userType", 'user' as "userRole",
-          esta_verificado as "isVerified", esta_activo as "isActive",
-          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
-          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
-          intentos_fallidos_login as "failedLoginAttempts",
-          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
-          creado_en as "createdAt", actualizado_en as "updatedAt"
+          id, usuario, correo, hash_password,
+          nombre, apellido,
+          telefono, codigo_pais,
+          url_avatar, biografia,
+          'cliente' as tipo_usuario, 'usuario' as rol_usuario,
+          esta_verificado, esta_activo,
+          esta_en_linea, ultima_actividad,
+          promedio_calificacion, total_resenas,
+          intentos_fallidos_login,
+          bloqueado_hasta, ultimo_login,
+          creado_en, actualizado_en
         FROM usuarios 
         WHERE LOWER(usuario) = $1 
            OR LOWER(correo) = $1 
@@ -36,7 +36,7 @@ class UserDatabase {
         LIMIT 1
       `;
       
-      const result = await pool.query(query, [normalizedCredential]);
+      const result = await pool.query(query, [credencialNormalizada]);
       
       if (result.rows.length === 0) {
         return undefined;
@@ -52,10 +52,10 @@ class UserDatabase {
   /**
    * Verificar si existe un usuario por username
    */
-  async existsByUsername(username: string): Promise<boolean> {
+  async existsByUsername(usuario: string): Promise<boolean> {
     try {
       const query = 'SELECT id FROM usuarios WHERE LOWER(usuario) = LOWER($1) LIMIT 1';
-      const result = await pool.query(query, [username]);
+      const result = await pool.query(query, [usuario]);
       return result.rows.length > 0;
     } catch (error) {
       console.error('Error al verificar username:', error);
@@ -102,18 +102,18 @@ class UserDatabase {
       const passwordHash = await bcrypt.hash(userData.password, saltRounds);
       
       // Limpiar el teléfono de espacios
-      const cleanPhone = userData.telefono ? userData.telefono.replace(/\s/g, '') : null;
+      const telefonoLimpio = userData.telefono ? userData.telefono.replace(/\s/g, '') : null;
       
       // Generar ID único
-      const userId = uuidv4();
+      const idUsuario = uuidv4();
       
       // Procesar foto de perfil si existe, o generar avatar con iniciales
-      let avatarUrl = null;
-      if (userData.profilePhoto) {
-        avatarUrl = await saveBase64Image(userData.profilePhoto, 'uploads/avatars');
+      let urlAvatar = null;
+      if (userData.fotoPerfilBase64) {
+        urlAvatar = await saveBase64Image(userData.fotoPerfilBase64, 'uploads/avatars');
       } else {
         // Generar avatar con las iniciales del nombre y apellido
-        avatarUrl = generateInitialsAvatar(userData.nombre, userData.apellidos, 'uploads/avatars');
+        urlAvatar = generateInitialsAvatar(userData.nombre, userData.apellidos, 'uploads/avatars');
       }
       
       const query = `
@@ -133,31 +133,31 @@ class UserDatabase {
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING 
-          id, usuario as username, correo as email, hash_password as password,
-          nombre as "firstName", apellido as "lastName",
-          telefono as phone, codigo_pais as "countryCode",
-          url_avatar as "avatarUrl", biografia as bio,
-          'client' as "userType", 'user' as "userRole",
-          esta_verificado as "isVerified", esta_activo as "isActive",
-          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
-          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
-          intentos_fallidos_login as "failedLoginAttempts",
-          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
-          creado_en as "createdAt", actualizado_en as "updatedAt"
+          id, usuario, correo, hash_password,
+          nombre, apellido,
+          telefono, codigo_pais,
+          url_avatar, biografia,
+          'cliente' as tipo_usuario, 'usuario' as rol_usuario,
+          esta_verificado, esta_activo,
+          esta_en_linea, ultima_actividad,
+          promedio_calificacion, total_resenas,
+          intentos_fallidos_login,
+          bloqueado_hasta, ultimo_login,
+          creado_en, actualizado_en
       `;
       
       const values = [
-        userId,                              // $1 - id
-        userData.username,                   // $2 - username
-        userData.email.toLowerCase(),        // $3 - email
-        passwordHash,                        // $4 - password_hash
-        userData.nombre,                     // $5 - first_name
-        userData.apellidos,                  // $6 - last_name
-        cleanPhone,                          // $7 - phone
-        '+34',                               // $8 - country_code (España por defecto)
+        idUsuario,                           // $1 - id
+        userData.usuario,                    // $2 - usuario
+        userData.correo.toLowerCase(),       // $3 - correo
+        passwordHash,                        // $4 - hash_password
+        userData.nombre,                     // $5 - nombre
+        userData.apellidos,                  // $6 - apellido
+        telefonoLimpio,                      // $7 - telefono
+        '+34',                               // $8 - codigo_pais (España por defecto)
         userData.fechaNacimiento || null,    // $9 - fecha_nacimiento
-        avatarUrl,                           // $10 - url_avatar
-        userData.bio || null,                // $11 - biografia
+        urlAvatar,                           // $10 - url_avatar
+        userData.biografia || null,          // $11 - biografia
         false,                               // $12 - esta_verificado
         true,                                // $13 - esta_activo
         false,                               // $14 - esta_en_linea
@@ -185,17 +185,17 @@ class UserDatabase {
     try {
       const query = `
         SELECT 
-          id, usuario as username, correo as email, hash_password as password,
-          nombre as "firstName", apellido as "lastName",
-          telefono as phone, codigo_pais as "countryCode",
-          url_avatar as "avatarUrl", biografia as bio,
-          'client' as "userType", 'user' as "userRole",
-          esta_verificado as "isVerified", esta_activo as "isActive",
-          esta_en_linea as "isOnline", ultima_actividad as "lastSeen",
-          promedio_calificacion as "ratingAverage", total_resenas as "totalReviews",
-          intentos_fallidos_login as "failedLoginAttempts",
-          bloqueado_hasta as "lockedUntil", ultimo_login as "lastLogin",
-          creado_en as "createdAt", actualizado_en as "updatedAt"
+          id, usuario, correo, hash_password,
+          nombre, apellido,
+          telefono, codigo_pais,
+          url_avatar, biografia,
+          'cliente' as tipo_usuario, 'usuario' as rol_usuario,
+          esta_verificado, esta_activo,
+          esta_en_linea, ultima_actividad,
+          promedio_calificacion, total_resenas,
+          intentos_fallidos_login,
+          bloqueado_hasta, ultimo_login,
+          creado_en, actualizado_en
         FROM usuarios 
         WHERE id = $1
       `;
@@ -249,10 +249,10 @@ class UserDatabase {
         UPDATE usuarios 
         SET ${fields.join(', ')}
         WHERE id = $${paramCounter}
-        RETURNING id, usuario as username, correo as email, telefono as phone, hash_password as password,
-                  esta_activo as "isActive", intentos_fallidos_login as "failedLoginAttempts",
-                  bloqueado_hasta as "lockUntil", creado_en as "createdAt",
-                  actualizado_en as "updatedAt"
+        RETURNING id, usuario, correo, telefono, hash_password,
+                  esta_activo, intentos_fallidos_login,
+                  bloqueado_hasta, creado_en,
+                  actualizado_en
       `;
       
       const result = await pool.query(query, values);
@@ -339,6 +339,7 @@ class UserDatabase {
       const query = `
         SELECT 
           u.id,
+          u.usuario,
           u.nombre,
           u.apellido,
           u.correo as email,
@@ -498,21 +499,21 @@ class UserDatabase {
   toSafeUser(user: User): SafeUser {
     return {
       id: user.id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      countryCode: user.countryCode,
-      avatarUrl: user.avatarUrl,
-      bio: user.bio,
-      userType: user.userType,
-      userRole: user.userRole,
-      isVerified: user.isVerified,
-      isActive: user.isActive,
-      ratingAverage: user.ratingAverage,
-      totalReviews: user.totalReviews,
-      createdAt: user.createdAt,
+      usuario: user.usuario,
+      correo: user.correo,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      telefono: user.telefono,
+      codigo_pais: user.codigo_pais,
+      url_avatar: user.url_avatar,
+      biografia: user.biografia,
+      tipo_usuario: user.tipo_usuario,
+      rol_usuario: user.rol_usuario,
+      esta_verificado: user.esta_verificado,
+      esta_activo: user.esta_activo,
+      promedio_calificacion: user.promedio_calificacion,
+      total_resenas: user.total_resenas,
+      creado_en: user.creado_en,
     };
   }
 }
