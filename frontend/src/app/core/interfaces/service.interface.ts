@@ -127,8 +127,8 @@ export interface ServiceFilters {
   tipo_ubicacion?: LocationType;
   calificacion_minima?: number;
   busqueda?: string;
-  pagina?: number;
-  limite?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface ServicesResponse {

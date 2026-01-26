@@ -76,7 +76,7 @@ class UserModel {
    */
   getLockTimeRemaining(user: User): number {
     if (!user.bloqueado_hasta) return 0;
-    return Math.ceil((user.bloqueado_hasta.getTime() - Date.now()) / 60000);
+    return Math.ceil((user.bloqueado_hasta.getTime() - Date.now()) / 30000);
   }
   
   /**

@@ -64,7 +64,7 @@ export class BuscarServicioPersonaPage implements OnInit {
   }
 
   cargarDatos() {
-    this.serviceService.getServices({ pagina: 1, limite: 50 }).subscribe({
+    this.serviceService.getServices({ page: 1, limit: 50 }).subscribe({
       next: (response) => {
         this.allServices = response?.services || [];
         
