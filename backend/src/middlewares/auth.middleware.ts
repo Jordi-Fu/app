@@ -22,6 +22,11 @@ export const authMiddleware = (
 ): void => {
   const authHeader = req.headers.authorization;
   
+  console.log('[AUTH MIDDLEWARE] URL:', req.url);
+  console.log('[AUTH MIDDLEWARE] Method:', req.method);
+  console.log('[AUTH MIDDLEWARE] Auth header:', authHeader ? 'EXISTS' : 'MISSING');
+  console.log('[AUTH MIDDLEWARE] All headers:', JSON.stringify(req.headers, null, 2));
+  
   if (!authHeader) {
     res.status(401).json({
       success: false,

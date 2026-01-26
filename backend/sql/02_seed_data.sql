@@ -23,17 +23,152 @@ INSERT INTO configuracion_app (clave, valor, tipo_dato, descripcion, es_publico)
 -- CATEGORÍAS PRINCIPALES
 -- ============================================
 
-INSERT INTO categorias (nombre, slug, descripcion, color, esta_activo, indice_orden) VALUES
-('Limpieza del Hogar', 'limpieza-hogar', 'Servicios de limpieza residencial y profesional', '#4CAF50', true, 1),
-('Reparaciones', 'reparaciones', 'Plomería, electricidad, carpintería y más', '#FF9800', true, 2),
-('Clases Particulares', 'clases-particulares', 'Tutorías y clases privadas', '#2196F3', true, 3),
-('Belleza y Estética', 'belleza-estetica', 'Peluquería, manicure, maquillaje', '#E91E63', true, 4),
-('Transporte y Mudanzas', 'transporte-mudanzas', 'Servicios de transporte y mudanzas', '#9C27B0', true, 5),
-('Tecnología', 'tecnologia', 'Reparación de computadoras, celulares, etc.', '#3F51B5', true, 6),
-('Fotografía y Video', 'fotografia-video', 'Fotografía profesional y videografía', '#00BCD4', true, 7),
-('Eventos y Catering', 'eventos-catering', 'Organización de eventos y catering', '#FFC107', true, 8),
-('Salud y Bienestar', 'salud-bienestar', 'Masajes, yoga, entrenamiento personal', '#8BC34A', true, 9),
-('Jardinería', 'jardineria', 'Cuidado de jardines y paisajismo', '#4CAF50', true, 10);
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, esta_activo, indice_orden) VALUES
+-- Categorías principales
+('Hogar y Mantenimiento', 'hogar-mantenimiento', 'Servicios de mantenimiento y reparación para el hogar', '🔧', '#3B82F6', true, 1),
+('Construcción y Remodelación', 'construccion-remodelacion', 'Servicios de construcción, remodelaciones y obras', '🏗️', '#F59E0B', true, 2),
+('Limpieza y Aseo', 'limpieza-aseo', 'Servicios de limpieza doméstica y lavandería', '🧹', '#10B981', true, 3),
+('Jardinería y Exteriores', 'jardineria-exteriores', 'Servicios de jardinería y mantenimiento de áreas verdes', '🌿', '#22C55E', true, 4),
+('Servicios de Emergencia', 'servicios-emergencia', 'Servicios urgentes de cerrajería y gas', '🚨', '#EF4444', true, 5),
+('Tecnología y Soporte Técnico', 'tecnologia-soporte', 'Reparación de dispositivos y soporte técnico', '💻', '#8B5CF6', true, 6),
+('Transporte y Mensajería', 'transporte-mensajeria', 'Servicios de transporte privado y mensajería', '🚗', '#06B6D4', true, 7),
+('Alimentación y Delivery', 'alimentacion-delivery', 'Servicios de comida a domicilio', '🍳', '#F97316', true, 8),
+('Cuidado Personal y Estética', 'cuidado-personal-estetica', 'Servicios de belleza y cuidado personal', '💅', '#EC4899', true, 9),
+('Salud y Cuidado Familiar', 'salud-cuidado-familiar', 'Cuidado de adultos mayores y niños', '❤️', '#F43F5E', true, 10),
+('Educación y Enseñanza', 'educacion-ensenanza', 'Clases particulares, tutorías y capacitación', '📚', '#6366F1', true, 11),
+('Seguridad y Control de Plagas', 'seguridad-control-plagas', 'Servicios de fumigación y control de plagas', '🛡️', '#64748B', true, 12);
+
+-- ============================================
+-- SUBCATEGORÍAS
+-- ============================================
+
+-- Subcategorías de Hogar y Mantenimiento
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Plomería', 'plomeria', 'Reparación e instalación de tuberías y sanitarios', '🚿', '#3B82F6', id, true, 1
+FROM categorias WHERE slug = 'hogar-mantenimiento';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Electricidad', 'electricidad', 'Instalaciones y reparaciones eléctricas', '⚡', '#3B82F6', id, true, 2
+FROM categorias WHERE slug = 'hogar-mantenimiento';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Albañilería', 'albanileria', 'Trabajos de albañilería y construcción menor', '🧱', '#3B82F6', id, true, 3
+FROM categorias WHERE slug = 'hogar-mantenimiento';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Pintura', 'pintura', 'Servicios de pintura interior y exterior', '🎨', '#3B82F6', id, true, 4
+FROM categorias WHERE slug = 'hogar-mantenimiento';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Carpintería', 'carpinteria', 'Trabajos en madera y muebles', '🪚', '#3B82F6', id, true, 5
+FROM categorias WHERE slug = 'hogar-mantenimiento';
+
+-- Subcategorías de Construcción y Remodelación
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Remodelaciones', 'remodelaciones', 'Remodelación integral de espacios', '🏠', '#F59E0B', id, true, 1
+FROM categorias WHERE slug = 'construccion-remodelacion';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Reparaciones estructurales', 'reparaciones-estructurales', 'Reparaciones de estructura y cimientos', '🔨', '#F59E0B', id, true, 2
+FROM categorias WHERE slug = 'construccion-remodelacion';
+
+-- Subcategorías de Limpieza y Aseo
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Limpieza doméstica', 'limpieza-domestica', 'Limpieza general del hogar', '🏠', '#10B981', id, true, 1
+FROM categorias WHERE slug = 'limpieza-aseo';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Lavandería y planchado', 'lavanderia-planchado', 'Servicios de lavandería y planchado de ropa', '👕', '#10B981', id, true, 2
+FROM categorias WHERE slug = 'limpieza-aseo';
+
+-- Subcategorías de Jardinería y Exteriores
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Jardinería', 'jardineria', 'Diseño y cuidado de jardines', '🌱', '#22C55E', id, true, 1
+FROM categorias WHERE slug = 'jardineria-exteriores';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Mantenimiento de áreas verdes', 'mantenimiento-areas-verdes', 'Mantenimiento de césped y áreas verdes', '🌳', '#22C55E', id, true, 2
+FROM categorias WHERE slug = 'jardineria-exteriores';
+
+-- Subcategorías de Servicios de Emergencia
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Cerrajería', 'cerrajeria', 'Apertura de cerraduras y cambio de llaves', '🔑', '#EF4444', id, true, 1
+FROM categorias WHERE slug = 'servicios-emergencia';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Servicio de gas', 'servicio-gas', 'Reparación e instalación de gas', '🔥', '#EF4444', id, true, 2
+FROM categorias WHERE slug = 'servicios-emergencia';
+
+-- Subcategorías de Tecnología y Soporte Técnico
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Reparación de celulares', 'reparacion-celulares', 'Reparación de teléfonos móviles', '📱', '#8B5CF6', id, true, 1
+FROM categorias WHERE slug = 'tecnologia-soporte';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Soporte técnico básico', 'soporte-tecnico-basico', 'Soporte técnico para computadoras', '🖥️', '#8B5CF6', id, true, 2
+FROM categorias WHERE slug = 'tecnologia-soporte';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Reparación de electrodomésticos', 'reparacion-electrodomesticos', 'Reparación de electrodomésticos del hogar', '🔌', '#8B5CF6', id, true, 3
+FROM categorias WHERE slug = 'tecnologia-soporte';
+
+-- Subcategorías de Transporte y Mensajería
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Transporte privado', 'transporte-privado', 'Servicio de transporte privado de personas', '🚕', '#06B6D4', id, true, 1
+FROM categorias WHERE slug = 'transporte-mensajeria';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Mensajería y mandados', 'mensajeria-mandados', 'Servicio de mensajería y mandados', '📦', '#06B6D4', id, true, 2
+FROM categorias WHERE slug = 'transporte-mensajeria';
+
+-- Subcategoría de Alimentación y Delivery
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Servicio de comida a domicilio', 'comida-domicilio', 'Preparación y entrega de comida a domicilio', '🍽️', '#F97316', id, true, 1
+FROM categorias WHERE slug = 'alimentacion-delivery';
+
+-- Subcategorías de Cuidado Personal y Estética
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Estética', 'estetica', 'Servicios de estética y belleza', '💄', '#EC4899', id, true, 1
+FROM categorias WHERE slug = 'cuidado-personal-estetica';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Peluquería', 'peluqueria', 'Corte, peinado y tratamientos capilares', '💇', '#EC4899', id, true, 2
+FROM categorias WHERE slug = 'cuidado-personal-estetica';
+
+-- Subcategorías de Salud y Cuidado Familiar
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Cuidado de adultos mayores', 'cuidado-adultos-mayores', 'Cuidado y acompañamiento de personas mayores', '👴', '#F43F5E', id, true, 1
+FROM categorias WHERE slug = 'salud-cuidado-familiar';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Cuidado de niños (niñeras)', 'cuidado-ninos', 'Servicios de niñera y cuidado infantil', '👶', '#F43F5E', id, true, 2
+FROM categorias WHERE slug = 'salud-cuidado-familiar';
+
+-- Subcategorías de Educación y Enseñanza
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Clases particulares', 'clases-particulares', 'Clases particulares de diversas materias', '👨‍🏫', '#6366F1', id, true, 1
+FROM categorias WHERE slug = 'educacion-ensenanza';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Tutorías académicas', 'tutorias-academicas', 'Tutorías y asesorías académicas', '📖', '#6366F1', id, true, 2
+FROM categorias WHERE slug = 'educacion-ensenanza';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Enseñanza de idiomas', 'ensenanza-idiomas', 'Clases de idiomas extranjeros', '🌍', '#6366F1', id, true, 3
+FROM categorias WHERE slug = 'educacion-ensenanza';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Apoyo escolar', 'apoyo-escolar', 'Ayuda con tareas y estudios escolares', '✏️', '#6366F1', id, true, 4
+FROM categorias WHERE slug = 'educacion-ensenanza';
+
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Capacitación técnica', 'capacitacion-tecnica', 'Capacitación en habilidades técnicas y oficios', '🎓', '#6366F1', id, true, 5
+FROM categorias WHERE slug = 'educacion-ensenanza';
+
+-- Subcategoría de Seguridad y Control de Plagas
+INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
+SELECT 'Fumigación', 'fumigacion', 'Servicios de fumigación y control de plagas', '🐜', '#64748B', id, true, 1
+FROM categorias WHERE slug = 'seguridad-control-plagas';
 
 
 -- ============================================
@@ -108,17 +243,24 @@ DECLARE
   v_pedro_id UUID;
   v_sofia_id UUID;
   
-  -- Variables para almacenar IDs de categorías
+  -- Variables para almacenar IDs de categorías principales
+  v_cat_hogar UUID;
+  v_cat_construccion UUID;
   v_cat_limpieza UUID;
-  v_cat_reparaciones UUID;
-  v_cat_clases UUID;
-  v_cat_belleza UUID;
-  v_cat_transporte UUID;
-  v_cat_tecnologia UUID;
-  v_cat_fotografia UUID;
-  v_cat_eventos UUID;
-  v_cat_salud UUID;
   v_cat_jardineria UUID;
+  v_cat_emergencia UUID;
+  v_cat_tecnologia UUID;
+  v_cat_transporte UUID;
+  v_cat_alimentacion UUID;
+  v_cat_estetica UUID;
+  v_cat_salud UUID;
+  v_cat_educacion UUID;
+  v_cat_seguridad UUID;
+  -- Variables para subcategorías más usadas
+  v_subcat_electricidad UUID;
+  v_subcat_plomeria UUID;
+  v_subcat_limpieza_domestica UUID;
+  v_subcat_clases UUID;
   
   -- Variables para almacenar IDs de servicios
   v_service1_id UUID;
@@ -227,18 +369,25 @@ BEGIN
   SELECT id INTO v_sofia_id FROM usuarios WHERE usuario = 'sofia_profesional';
   
   -- ============================================
-  -- OBTENER IDs DE CATEGORÍAS
+  -- OBTENER IDs DE CATEGORÍAS PRINCIPALES
   -- ============================================
-  SELECT id INTO v_cat_limpieza FROM categorias WHERE slug = 'limpieza-hogar';
-  SELECT id INTO v_cat_reparaciones FROM categorias WHERE slug = 'reparaciones';
-  SELECT id INTO v_cat_clases FROM categorias WHERE slug = 'clases-particulares';
-  SELECT id INTO v_cat_belleza FROM categorias WHERE slug = 'belleza-estetica';
-  SELECT id INTO v_cat_transporte FROM categorias WHERE slug = 'transporte-mudanzas';
-  SELECT id INTO v_cat_tecnologia FROM categorias WHERE slug = 'tecnologia';
-  SELECT id INTO v_cat_fotografia FROM categorias WHERE slug = 'fotografia-video';
-  SELECT id INTO v_cat_eventos FROM categorias WHERE slug = 'eventos-catering';
-  SELECT id INTO v_cat_salud FROM categorias WHERE slug = 'salud-bienestar';
-  SELECT id INTO v_cat_jardineria FROM categorias WHERE slug = 'jardineria';
+  SELECT id INTO v_cat_hogar FROM categorias WHERE slug = 'hogar-mantenimiento';
+  SELECT id INTO v_cat_construccion FROM categorias WHERE slug = 'construccion-remodelacion';
+  SELECT id INTO v_cat_limpieza FROM categorias WHERE slug = 'limpieza-aseo';
+  SELECT id INTO v_cat_jardineria FROM categorias WHERE slug = 'jardineria-exteriores';
+  SELECT id INTO v_cat_emergencia FROM categorias WHERE slug = 'servicios-emergencia';
+  SELECT id INTO v_cat_tecnologia FROM categorias WHERE slug = 'tecnologia-soporte';
+  SELECT id INTO v_cat_transporte FROM categorias WHERE slug = 'transporte-mensajeria';
+  SELECT id INTO v_cat_alimentacion FROM categorias WHERE slug = 'alimentacion-delivery';
+  SELECT id INTO v_cat_estetica FROM categorias WHERE slug = 'cuidado-personal-estetica';
+  SELECT id INTO v_cat_salud FROM categorias WHERE slug = 'salud-cuidado-familiar';
+  SELECT id INTO v_cat_educacion FROM categorias WHERE slug = 'educacion-ensenanza';
+  SELECT id INTO v_cat_seguridad FROM categorias WHERE slug = 'seguridad-control-plagas';
+  -- Obtener IDs de subcategorías más usadas
+  SELECT id INTO v_subcat_electricidad FROM categorias WHERE slug = 'electricidad';
+  SELECT id INTO v_subcat_plomeria FROM categorias WHERE slug = 'plomeria';
+  SELECT id INTO v_subcat_limpieza_domestica FROM categorias WHERE slug = 'limpieza-domestica';
+  SELECT id INTO v_subcat_clases FROM categorias WHERE slug = 'clases-particulares';
   
   -- ============================================
   -- DIRECCIONES DE USUARIOS
@@ -259,14 +408,14 @@ BEGIN
   -- ============================================
   RAISE NOTICE 'Insertando servicios...';
   
-  -- Servicio 1: Instalación eléctrica por Juan
+  -- Servicio 1: Instalación eléctrica por Juan (subcategoría Electricidad)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais, latitud, longitud,
     esta_activo, es_destacado, vistas, promedio_calificacion, total_resenas
   ) VALUES (
-    v_juan_id, v_cat_reparaciones,
+    v_juan_id, v_subcat_electricidad,
     'Instalación y Reparación Eléctrica Residencial',
     'Servicio profesional de electricidad para tu hogar. Incluye: instalación de contactos, apagadores, lámparas, ventiladores de techo, reparación de cortocircuitos, actualización de tableros eléctricos, instalación de timbres y porteros eléctricos. Trabajo garantizado y materiales de primera calidad. Atención 24/7 para emergencias.',
     'por_hora', 35.00, '€',
@@ -274,14 +423,14 @@ BEGIN
     true, true, 245, 4.8, 45
   ) RETURNING id INTO v_service1_id;
   
-  -- Servicio 2: Limpieza profunda por María
+  -- Servicio 2: Limpieza profunda por María (subcategoría Limpieza doméstica)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais, latitud, longitud,
     esta_activo, es_destacado, vistas, promedio_calificacion, total_resenas
   ) VALUES (
-    v_maria_id, v_cat_limpieza,
+    v_maria_id, v_subcat_limpieza_domestica,
     'Limpieza Profunda de Hogar y Oficina',
     'Servicio completo de limpieza profesional. Incluye: barrido y fregado de suelos, limpieza de baños y cocina, desempolvado de muebles, limpieza de ventanas, aspirado de alfombras. Llevamos nuestros propios productos de limpieza ecológicos. Personal capacitado y confiable. Disponible fines de semana.',
     'fijo', 80.00, '€',
@@ -289,14 +438,14 @@ BEGIN
     true, true, 387, 4.9, 78
   ) RETURNING id INTO v_service2_id;
   
-  -- Servicio 3: Plomería por Carlos
+  -- Servicio 3: Plomería por Carlos (subcategoría Plomería)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais, latitud, longitud,
     esta_activo, vistas, promedio_calificacion, total_resenas
   ) VALUES (
-    v_carlos_id, v_cat_reparaciones,
+    v_carlos_id, v_subcat_plomeria,
     'Plomería Residencial y Comercial',
     'Servicios completos de plomería: reparación de fugas, desatasco de tuberías, instalación de grifos y sanitarios, reparación de calentadores, instalación de depósitos, mantenimiento preventivo. Servicio de emergencia disponible. Presupuesto sin compromiso.',
     'por_hora', 40.00, '€',
@@ -304,14 +453,14 @@ BEGIN
     true, 198, 4.7, 92
   ) RETURNING id INTO v_service3_id;
   
-  -- Servicio 4: Clases de inglés por Sofía
+  -- Servicio 4: Clases de inglés por Sofía (subcategoría Enseñanza de idiomas)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais, latitud, longitud,
     esta_activo, es_destacado, vistas, promedio_calificacion, total_resenas
   ) VALUES (
-    v_sofia_id, v_cat_clases,
+    v_sofia_id, v_subcat_clases,
     'Clases Particulares de Inglés Online',
     'Clases personalizadas de inglés para todos los niveles (A1-C2). Preparación para exámenes TOEFL, IELTS, Cambridge. Conversación, gramática, escritura. Material didáctico incluido. Horarios flexibles. Primera clase de prueba gratis. Metodología comunicativa y dinámica.',
     'por_hora', 25.00, '€',
@@ -319,14 +468,14 @@ BEGIN
     true, true, 156, 4.85, 34
   ) RETURNING id INTO v_service4_id;
   
-  -- Servicio 5: Clases de matemáticas por Sofía
+  -- Servicio 5: Clases de matemáticas por Sofía (subcategoría Clases particulares)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais,
     esta_activo, vistas
   ) VALUES (
-    v_sofia_id, v_cat_clases,
+    v_sofia_id, v_subcat_clases,
     'Asesorías de Matemáticas - Todos los Niveles',
     'Asesorías personalizadas de matemáticas: primaria, secundaria, bachillerato y universidad. Álgebra, cálculo, geometría, trigonometría, estadística. Explicaciones claras y pacientes. Resolución de ejercicios paso a paso. Material de apoyo incluido.',
     'por_hora', 28.00, '€',
@@ -334,14 +483,14 @@ BEGIN
     true, 89
   ) RETURNING id INTO v_service5_id;
   
-  -- Servicio 6: Mantenimiento por Juan
+  -- Servicio 6: Mantenimiento por Juan (subcategoría Electricidad)
   INSERT INTO servicios (
     proveedor_id, categoria_id, titulo, descripcion,
     tipo_precio, precio, moneda,
     tipo_ubicacion, ciudad, estado, pais,
     esta_activo, vistas
   ) VALUES (
-    v_juan_id, v_cat_reparaciones,
+    v_juan_id, v_subcat_electricidad,
     'Mantenimiento Preventivo Eléctrico',
     'Servicio de mantenimiento preventivo para tu instalación eléctrica. Incluye: revisión de cuadro eléctrico, verificación de conexiones, prueba de circuitos, informe de condiciones. Previene accidentes y ahorra energía.',
     'fijo', 120.00, '€',
@@ -713,11 +862,11 @@ BEGIN
   
   INSERT INTO historial_busquedas (usuario_id, termino_busqueda, categoria_id, ubicacion, conteo_resultados, servicio_clickeado_id, creado_en)
   VALUES
-    (v_ana_id, 'electricista', v_cat_reparaciones, 'Madrid', 5, v_service1_id, CURRENT_TIMESTAMP - INTERVAL '7 days'),
-    (v_ana_id, 'limpieza', v_cat_limpieza, 'Madrid', 8, v_service2_id, CURRENT_TIMESTAMP - INTERVAL '5 days'),
-    (v_ana_id, 'clases inglés', v_cat_clases, 'Online', 12, v_service4_id, CURRENT_TIMESTAMP - INTERVAL '2 days'),
-    (v_pedro_id, 'plomero urgente', v_cat_reparaciones, 'Barcelona', 6, v_service3_id, CURRENT_TIMESTAMP - INTERVAL '10 days'),
-    (v_pedro_id, 'limpieza profunda', v_cat_limpieza, 'Barcelona', 9, v_service2_id, CURRENT_TIMESTAMP - INTERVAL '4 days');
+    (v_ana_id, 'electricista', v_subcat_electricidad, 'Madrid', 5, v_service1_id, CURRENT_TIMESTAMP - INTERVAL '7 days'),
+    (v_ana_id, 'limpieza', v_subcat_limpieza_domestica, 'Madrid', 8, v_service2_id, CURRENT_TIMESTAMP - INTERVAL '5 days'),
+    (v_ana_id, 'clases inglés', v_subcat_clases, 'Online', 12, v_service4_id, CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (v_pedro_id, 'plomero urgente', v_subcat_plomeria, 'Barcelona', 6, v_service3_id, CURRENT_TIMESTAMP - INTERVAL '10 days'),
+    (v_pedro_id, 'limpieza profunda', v_subcat_limpieza_domestica, 'Barcelona', 9, v_service2_id, CURRENT_TIMESTAMP - INTERVAL '4 days');
   
   -- ============================================
   -- REPORTES (EJEMPLO)
@@ -1151,8 +1300,6 @@ UNION ALL
 SELECT 'Etiquetas', COUNT(*) FROM etiquetas
 UNION ALL
 SELECT 'Seguidores', COUNT(*) FROM seguidores_usuarios
-UNION ALL
-SELECT 'Portafolio', COUNT(*) FROM portafolios
 UNION ALL
 SELECT 'FAQs', COUNT(*) FROM preguntas_frecuentes_servicios
 UNION ALL

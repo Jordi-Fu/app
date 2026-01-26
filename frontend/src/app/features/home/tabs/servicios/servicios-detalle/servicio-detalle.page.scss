@@ -1,5 +1,15 @@
 @use '../../../../../../theme/variables' as *;
 
+// Header sin padding superior
+ion-header {
+  padding-top: 0 !important;
+  
+  ion-toolbar {
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}
+
 // Flecha de volver con degradado
 .back-arrow {
   width: 24px;
@@ -43,7 +53,6 @@
 
 // Header buttons
 ion-toolbar {
-  margin-top: 20px;
   ion-buttons[slot="end"] {
     ion-button {
       ion-icon {

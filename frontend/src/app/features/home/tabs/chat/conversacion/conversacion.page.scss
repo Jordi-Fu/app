@@ -11,15 +11,15 @@
 // ============ HEADER ============
 ion-header {
   background: #ffffff;
-  
-  // Padding para el notch/safe-area
-  padding-top: var(--ion-safe-area-top, env(safe-area-inset-top, 0px));
+  padding-top: 0 !important;
   
   ion-toolbar {
     --background: #ffffff;
     --border-width: 0 0 1px 0;
     --border-color: #e0e0e0;
     --color: #000000;
+    --padding-top: 0;
+    --padding-bottom: 0;
     padding: 8px 0;
     position: relative;
     

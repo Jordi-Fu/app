@@ -1,7 +1,6 @@
 export enum PriceType {
-  FIXED = 'fixed',
-  HOURLY = 'hourly',
-  NEGOTIABLE = 'negotiable'
+  FIXED = 'fijo',
+  HOURLY = 'por_hora'
 }
 
 export enum LocationType {
@@ -137,4 +136,54 @@ export interface ServicesResponse {
   page: number;
   limit: number;
   total_pages: number;
+}
+
+/**
+ * Interfaces para crear servicios
+ */
+export interface ServiceAvailabilitySlot {
+  dia_semana: number;
+  hora_inicio: string;
+  hora_fin: string;
+  esta_disponible: boolean;
+}
+
+export interface ServiceImageUpload {
+  base64: string;
+  formato: string;
+}
+
+export interface CreateServiceRequest {
+  titulo: string;
+  descripcion: string;
+  descripcion_corta?: string;
+  categoria_id: string;
+  tipo_precio: PriceType;
+  precio?: number;
+  precio_maximo?: number;
+  moneda?: string;
+  duracion_minutos?: number;
+  tipo_ubicacion: LocationType;
+  direccion?: string;
+  ciudad?: string;
+  estado?: string;
+  pais?: string;
+  codigo_postal?: string;
+  latitud?: number;
+  longitud?: number;
+  radio_servicio_km?: number;
+  que_incluye?: string;
+  que_no_incluye?: string;
+  requisitos?: string;
+  politica_cancelacion?: string;
+  disponibilidad_urgencias?: boolean;
+  precio_urgencias?: number;
+  imagenes?: ServiceImageUpload[];
+  disponibilidad?: ServiceAvailabilitySlot[];
+}
+
+export interface CreateServiceResponse {
+  success: boolean;
+  message: string;
+  data: Service;
 }

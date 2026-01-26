@@ -2,100 +2,458 @@
   <div class="service-container">
     <div class="service-card">
       
-      <h2 class="title">Publica tu servicio</h2>
+      <!-- PASO 1: Información básica -->
+      <div *ngIf="currentStep === 1" class="step-content">
+        <h2 class="title">Publica tu servicio</h2>
 
-      <!-- Sección de imágenes -->
-      <div class="images-section">
-        <div 
-          *ngFor="let image of serviceImages; let i = index" 
-          class="image-box"
-          [class.primary]="i === 0"
-          [class.has-image]="image"
-          (click)="selectImageSource(i)">
+        <!-- Sección de imágenes -->
+        <div class="images-section">
+          <div 
+            *ngFor="let image of serviceImages; let i = index" 
+            class="image-box"
+            [class.primary]="i === 0"
+            [class.has-image]="image"
+            (click)="selectImageSource(i)">
+            
+            <img *ngIf="image" [src]="image" alt="Imagen del servicio" />
+            
+            <div *ngIf="!image" class="image-placeholder">
+              <img src="/assets/imagen.svg" alt="Icono de imagen" />
+            </div>
+
+            <button 
+              *ngIf="image" 
+              type="button" 
+              class="remove-image-btn"
+              (click)="removeImage(i); $event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="image-hint">Al subir varias fotos, la primera imagen será la principal y es la que se muestre al momento de publicar.</p>
+
+        <!-- Formulario básico -->
+        <form [formGroup]="serviceForm" class="service-form">
           
-          <img *ngIf="image" [src]="image" alt="Imagen del servicio" />
-          
-          <div *ngIf="!image" class="image-placeholder">
-            <img src="/assets/imagen.svg" alt="Icono de imagen" />
+          <div class="form-group">
+            <label>Título</label>
+            <input 
+              type="text" 
+              placeholder="¿Qué servicio ofreces?" 
+              formControlName="titulo"
+              maxlength="50">
+            <span class="char-counter">{{ tituloLength }}/50</span>
+            <p class="error-message" *ngIf="serviceForm.get('titulo')?.touched && serviceForm.get('titulo')?.errors?.['required']">
+              El título es requerido
+            </p>
+            <p class="error-message" *ngIf="serviceForm.get('titulo')?.touched && serviceForm.get('titulo')?.errors?.['minlength']">
+              Mínimo 5 caracteres
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea 
+              placeholder="Descripción del servicio que ofreces" 
+              formControlName="descripcion"
+              rows="4"
+              maxlength="200"></textarea>
+            <span class="char-counter">{{ descripcionLength }}/200</span>
+            <p class="error-message" *ngIf="serviceForm.get('descripcion')?.touched && serviceForm.get('descripcion')?.errors?.['required']">
+              La descripción es requerida
+            </p>
+            <p class="error-message" *ngIf="serviceForm.get('descripcion')?.touched && serviceForm.get('descripcion')?.errors?.['minlength']">
+              Mínimo 20 caracteres
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label>Precio</label>
+            <div class="price-input-container">
+              <input 
+                type="number" 
+                placeholder="0,00" 
+                formControlName="precio"
+                step="0.01"
+                min="0"
+                [class.disabled]="!precioFijo">
+              <button type="button" class="currency-btn" (click)="toggleCurrency()">
+                {{ monedaActual }}
+              </button>
+            </div>
+            
+            <div class="precio-fijo-toggle">
+              <label class="toggle-label">
+                <span class="toggle-switch" [class.active]="precioFijo" (click)="togglePrecioFijo()">
+                  <span class="toggle-slider"></span>
+                </span>
+                <span class="toggle-text">Precio Fijo</span>
+              </label>
+            </div>
+
+            <!-- Popup de precio variable -->
+            <div class="price-variable-popup" *ngIf="showPricePopup">
+              <div class="popup-overlay" (click)="closePricePopup()"></div>
+              <div class="popup-content">
+                <h3>¿Desactivar Precio Fijo?</h3>
+                <p>Al desactivar este botón, el precio del servicio será <strong>variable</strong> y podrá ajustarse según las características y necesidades del trabajo.</p>
+                <div class="popup-buttons">
+                  <button type="button" class="btn-cancel" (click)="closePricePopup()">Cancelar</button>
+                  <button type="button" class="btn-confirm" (click)="confirmPrecioVariable()">Desactivar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Duración estimada (opcional)</label>
+            <div class="duration-input-container">
+              <input 
+                type="number" 
+                placeholder="60" 
+                formControlName="duracion_minutos"
+                min="0"
+                step="15">
+              <span class="duration-unit">minutos</span>
+            </div>
+            <p class="input-hint">Indica el tiempo aproximado que toma completar el servicio.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Ubicación (opcional)</label>
+            <input 
+              type="text" 
+              placeholder="Ciudad, C.P" 
+              formControlName="ubicacion">
+            <p class="input-hint">Al rellenar la ubicación, esta se mostrará automáticamente en el mapa para facilitar la visualización y referencia del lugar.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de servicio</label>
+            <div class="location-type-options">
+              <button 
+                type="button" 
+                class="location-type-btn"
+                [class.active]="serviceForm.get('tipo_ubicacion')?.value === 'at_client'"
+                (click)="setTipoUbicacion('at_client')">
+                <span class="icon">🏠</span>
+                <span class="label">A domicilio</span>
+              </button>
+              <button 
+                type="button" 
+                class="location-type-btn"
+                [class.active]="serviceForm.get('tipo_ubicacion')?.value === 'at_provider'"
+                (click)="setTipoUbicacion('at_provider')">
+                <span class="icon">🏪</span>
+                <span class="label">En tienda</span>
+              </button>
+              <button 
+                type="button" 
+                class="location-type-btn"
+                [class.active]="serviceForm.get('tipo_ubicacion')?.value === 'remote'"
+                (click)="setTipoUbicacion('remote')">
+                <span class="icon">💻</span>
+                <span class="label">Online</span>
+              </button>
+              <button 
+                type="button" 
+                class="location-type-btn"
+                [class.active]="serviceForm.get('tipo_ubicacion')?.value === 'flexible'"
+                (click)="setTipoUbicacion('flexible')">
+                <span class="icon">🔄</span>
+                <span class="label">Flexible</span>
+              </button>
+            </div>
           </div>
 
           <button 
-            *ngIf="image" 
             type="button" 
-            class="remove-image-btn"
-            (click)="removeImage(i); $event.stopPropagation()">
+            class="btn-next"
+            [class.disabled]="!isStep1Valid()"
+            (click)="nextStep()">
+            Siguiente
+          </button>
+        </form>
+      </div>
+
+      <!-- PASO 2: Selección de Categoría -->
+      <div *ngIf="currentStep === 2" class="step-content">
+        <div class="step-header">
+          <button class="back-btn" (click)="prevStep()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <path d="M15 18l-6-6 6-6"></path>
             </svg>
+          </button>
+          <h2 class="title">Categorías</h2>
+        </div>
+
+        <div class="categories-list">
+          <div 
+            *ngFor="let cat of categorias"
+            class="category-item"
+            [class.selected]="serviceForm.get('categoria_id')?.value === cat.id || isCategoryOrSubcategorySelected(cat)"
+            (click)="selectCategory(cat)">
+            <div class="category-info">
+              <span class="category-icon" *ngIf="cat.url_icono">{{ cat.url_icono }}</span>
+              <span class="category-name">{{ cat.nombre }}</span>
+            </div>
+            <div class="category-right">
+              <span class="subcategory-count" *ngIf="cat.subcategorias && cat.subcategorias.length > 0">
+                {{ cat.subcategorias.length }} subcategorías
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-icon">
+                <path d="M9 18l6-6-6-6"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overlay para cerrar menú de subcategorías -->
+      <div class="subcategory-overlay" *ngIf="showSubcategoryModal" (click)="closeSubcategoryModal()"></div>
+
+      <!-- Menú desplegable de subcategorías desde abajo -->
+      <div class="subcategory-menu" *ngIf="showSubcategoryModal && categoriaSeleccionada" (click)="$event.stopPropagation()">
+        <div class="subcategory-header">
+          <span class="subcategory-title">
+            {{ categoriaSeleccionada.url_icono }} {{ categoriaSeleccionada.nombre }}
+          </span>
+        </div>
+        
+        <!-- Opción de categoría general -->
+        <div 
+          class="subcategory-option"
+          [class.selected]="serviceForm.get('categoria_id')?.value === categoriaSeleccionada.id"
+          (click)="selectSubcategory(categoriaSeleccionada)">
+          <span class="option-label">{{ categoriaSeleccionada.nombre }} (General)</span>
+          <span class="option-radio" [class.active]="serviceForm.get('categoria_id')?.value === categoriaSeleccionada.id"></span>
+        </div>
+        
+        <!-- Subcategorías -->
+        <div 
+          *ngFor="let sub of categoriaSeleccionada.subcategorias"
+          class="subcategory-option"
+          [class.selected]="serviceForm.get('categoria_id')?.value === sub.id"
+          (click)="selectSubcategory(sub)">
+          <span class="option-label">{{ sub.url_icono }} {{ sub.nombre }}</span>
+          <span class="option-radio" [class.active]="serviceForm.get('categoria_id')?.value === sub.id"></span>
+        </div>
+      </div>
+
+      <!-- PASO 3: Disponibilidad -->
+      <div *ngIf="currentStep === 3" class="step-content">
+        <div class="step-header">
+          <button class="back-btn" (click)="prevStep()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+          </button>
+          <h2 class="title">Configurar Disponibilidad</h2>
+        </div>
+
+        <div class="availability-section">
+          <!-- Días de la semana -->
+          <div class="days-list">
+            <div 
+              *ngFor="let day of diasSemana; let i = index"
+              class="day-item"
+              [class.selected]="day.selected">
+              
+              <div class="day-header" (click)="toggleDay(i)">
+                <div class="day-checkbox" [class.checked]="day.selected">
+                  <svg *ngIf="day.selected" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                  </svg>
+                </div>
+                <span class="day-name">{{ day.nombre }}</span>
+                <button 
+                  *ngIf="day.selected" 
+                  type="button" 
+                  class="add-schedule-btn"
+                  (click)="addTimeSlot(i); $event.stopPropagation()">
+                  + Horario
+                </button>
+              </div>
+
+              <div class="time-slots" *ngIf="day.selected && day.horarios.length > 0">
+                <div *ngFor="let slot of day.horarios; let j = index" class="time-slot">
+                  <input 
+                    type="time" 
+                    [(ngModel)]="slot.inicio"
+                    class="time-input">
+                  <span class="time-separator">a</span>
+                  <input 
+                    type="time" 
+                    [(ngModel)]="slot.fin"
+                    class="time-input">
+                  <button 
+                    type="button" 
+                    class="remove-slot-btn"
+                    (click)="removeTimeSlot(i, j)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Servicios de Urgencias -->
+          <div class="urgencias-section">
+            <div class="urgencias-header">
+              <div class="urgencias-icon">⚠️</div>
+              <div class="urgencias-info">
+                <span class="urgencias-title">Servicios de Urgencias</span>
+                <span class="urgencias-subtitle">Disponible 24/7 para emergencias</span>
+              </div>
+              <label class="toggle-switch-urgencias" [class.active]="disponibilidadUrgencias">
+                <input type="checkbox" [(ngModel)]="disponibilidadUrgencias" (change)="onUrgenciasChange()">
+                <span class="toggle-slider-urgencias"></span>
+              </label>
+            </div>
+            
+            <div class="urgencias-description" *ngIf="disponibilidadUrgencias">
+              <p>Fuera del horario configurado, recibirás notificaciones cuando un usuario intente contactarte.</p>
+              
+              <div class="form-group urgencias-price">
+                <label>Precio</label>
+                <input 
+                  type="number" 
+                  placeholder="0,00"
+                  [(ngModel)]="precioUrgencias"
+                  step="0.01"
+                  min="0">
+                <p class="input-hint">Indica un precio para los servicios de Urgencias.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-buttons">
+          <button 
+            type="button" 
+            class="btn-skip"
+            (click)="skipAvailability()">
+            Omitir
+          </button>
+          <button 
+            type="button" 
+            class="btn-next"
+            (click)="nextStep()">
+            Siguiente
           </button>
         </div>
       </div>
 
-      <p class="image-hint">Al subir varias fotos, la primera imagen será la principal y es la que se muestre al momento de publicar.</p>
-
-      <!-- Formulario -->
-      <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form">
-        
-        <div class="form-group">
-          <label>Título</label>
-          <input 
-            type="text" 
-            placeholder="¿Qué servicio ofreces?" 
-            formControlName="titulo"
-            maxlength="200">
+      <!-- PASO 4: Resumen del servicio -->
+      <div *ngIf="currentStep === 4" class="step-content">
+        <div class="step-header">
+          <button class="back-btn" (click)="prevStep()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+          </button>
+          <h2 class="title">Resumen del servicio</h2>
         </div>
 
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea 
-            placeholder="Descripción del servicio que ofreces" 
-            formControlName="descripcion"
-            rows="4"></textarea>
+        <div class="summary-section">
+          <!-- Imagen principal -->
+          <div class="summary-image" *ngIf="serviceImages[0]">
+            <img [src]="serviceImages[0]" alt="Imagen del servicio" />
+            <div class="image-count" *ngIf="getImageCount() > 1">
+              +{{ getImageCount() - 1 }} fotos
+            </div>
+          </div>
+
+          <!-- Información básica -->
+          <div class="summary-card">
+            <h3 class="summary-title">{{ serviceForm.get('titulo')?.value }}</h3>
+            <p class="summary-description">{{ serviceForm.get('descripcion')?.value }}</p>
+          </div>
+
+          <!-- Detalles -->
+          <div class="summary-details">
+            <div class="detail-item">
+              <span class="detail-icon">💰</span>
+              <div class="detail-content">
+                <span class="detail-label">Precio</span>
+                <span class="detail-value" *ngIf="precioFijo">{{ serviceForm.get('precio')?.value | number:'1.2-2' }} {{ monedaActual }}</span>
+                <span class="detail-value" *ngIf="!precioFijo">Precio variable</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="serviceForm.get('duracion_minutos')?.value">
+              <span class="detail-icon">⏱️</span>
+              <div class="detail-content">
+                <span class="detail-label">Duración</span>
+                <span class="detail-value">{{ serviceForm.get('duracion_minutos')?.value }} minutos</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">📍</span>
+              <div class="detail-content">
+                <span class="detail-label">Tipo de servicio</span>
+                <span class="detail-value">{{ getTipoUbicacionLabel() }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="serviceForm.get('ubicacion')?.value">
+              <span class="detail-icon">🗺️</span>
+              <div class="detail-content">
+                <span class="detail-label">Ubicación</span>
+                <span class="detail-value">{{ serviceForm.get('ubicacion')?.value }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">📂</span>
+              <div class="detail-content">
+                <span class="detail-label">Categoría</span>
+                <span class="detail-value">{{ getCategoriaSeleccionadaNombre() }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="getDisponibilidadResumen()">
+              <span class="detail-icon">📅</span>
+              <div class="detail-content">
+                <span class="detail-label">Disponibilidad</span>
+                <span class="detail-value">{{ getDisponibilidadResumen() }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="disponibilidadUrgencias">
+              <span class="detail-icon">🚨</span>
+              <div class="detail-content">
+                <span class="detail-label">Urgencias 24/7</span>
+                <span class="detail-value" *ngIf="precioUrgencias">{{ precioUrgencias | number:'1.2-2' }} {{ monedaActual }}</span>
+                <span class="detail-value" *ngIf="!precioUrgencias">Activado</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Precio</label>
-          <input 
-            type="number" 
-            placeholder="0.00" 
-            formControlName="precio"
-            step="0.01"
-            min="0">
-          <p class="input-hint">Al pulsar € se puede cambiar el tipo de moneda</p>
+        <div class="step-buttons">
+          <button 
+            type="button" 
+            class="btn-edit"
+            (click)="currentStep = 1">
+            Editar
+          </button>
+          <button 
+            type="button" 
+            class="btn-publish"
+            (click)="submitService()"
+            [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Publicando...' : 'Publicar' }}
+          </button>
         </div>
-
-        <div class="form-group">
-          <label>Ubicación</label>
-          <input 
-            type="text" 
-            placeholder="Ciudad, C.P" 
-            formControlName="ubicacion">
-        </div>
-
-        <div class="form-group">
-          <label>Categoría</label>
-          <select formControlName="categoria">
-            <option value="" disabled selected>Selecciona tu</option>
-            <option value="limpieza">Limpieza</option>
-            <option value="reparaciones">Reparaciones</option>
-            <option value="jardineria">Jardinería</option>
-            <option value="plomeria">Plomería</option>
-            <option value="electricidad">Electricidad</option>
-            <option value="pintura">Pintura</option>
-            <option value="carpinteria">Carpintería</option>
-            <option value="mudanzas">Mudanzas</option>
-            <option value="otros">Otros</option>
-          </select>
-        </div>
-
-        <button 
-          type="submit" 
-          class="btn-publish"
-          [disabled]="!serviceForm.valid">
-          Publicar
-        </button>
-      </form>
+      </div>
 
     </div>
   </div>

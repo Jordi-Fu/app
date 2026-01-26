@@ -400,6 +400,188 @@ class ServiceDatabase {
       throw error;
     }
   }
+
+  /**
+   * Crear un nuevo servicio
+   */
+  async create(data: {
+    proveedor_id: string;
+    categoria_id: string;
+    titulo: string;
+    descripcion: string;
+    tipo_precio: string;
+    precio?: number;
+    moneda?: string;
+    duracion_minutos?: number;
+    tipo_ubicacion: string;
+    direccion?: string;
+    ciudad?: string;
+    estado?: string;
+    pais?: string;
+    codigo_postal?: string;
+    latitud?: number;
+    longitud?: number;
+    radio_servicio_km?: number;
+    incluye?: string;
+    no_incluye?: string;
+    disponibilidad_urgencias?: boolean;
+    precio_urgencias?: number;
+  }) {
+    try {
+      const query = `
+        INSERT INTO servicios (
+          proveedor_id, categoria_id, titulo, descripcion,
+          tipo_precio, precio, moneda, duracion_minutos,
+          tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal,
+          latitud, longitud, radio_servicio_km, incluye, no_incluye,
+          disponibilidad_urgencias, precio_urgencias,
+          esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos,
+          conteo_reservas, promedio_calificacion, total_resenas
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+          $15, $16, $17, $18, $19, $20, $21,
+          true, false, false, 0, 0, 0, 0, 0
+        )
+        RETURNING *
+      `;
+
+      const values = [
+        data.proveedor_id,
+        data.categoria_id,
+        data.titulo,
+        data.descripcion,
+        data.tipo_precio,
+        data.precio || null,
+        data.moneda || 'EUR',
+        data.duracion_minutos || null,
+        data.tipo_ubicacion,
+        data.direccion || null,
+        data.ciudad || null,
+        data.estado || null,
+        data.pais || 'España',
+        data.codigo_postal || null,
+        data.latitud || null,
+        data.longitud || null,
+        data.radio_servicio_km || null,
+        data.incluye || null,
+        data.no_incluye || null,
+        data.disponibilidad_urgencias || false,
+        data.precio_urgencias || null,
+      ];
+
+      const result = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error en ServiceDatabase.create:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Crear imagen de servicio
+   */
+  async createImage(data: {
+    servicio_id: string;
+    url_imagen: string;
+    url_miniatura?: string;
+    pie_de_foto?: string;
+    es_principal: boolean;
+    indice_orden: number;
+    ancho?: number;
+    alto?: number;
+  }) {
+    try {
+      const query = `
+        INSERT INTO imagenes_servicios (
+          servicio_id, url_imagen, url_miniatura, pie_de_foto, 
+          es_principal, indice_orden, ancho, alto
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *
+      `;
+
+      const values = [
+        data.servicio_id,
+        data.url_imagen,
+        data.url_miniatura || null,
+        data.pie_de_foto || null,
+        data.es_principal,
+        data.indice_orden,
+        data.ancho || null,
+        data.alto || null,
+      ];
+
+      const result = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error en ServiceDatabase.createImage:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Crear disponibilidad de servicio
+   */
+  async createAvailability(data: {
+    servicio_id: string;
+    dia_semana: number;
+    hora_inicio: string;
+    hora_fin: string;
+    esta_disponible: boolean;
+  }) {
+    try {
+      const query = `
+        INSERT INTO disponibilidad_servicios (
+          servicio_id, dia_semana, hora_inicio, hora_fin, esta_disponible
+        ) VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `;
+
+      const values = [
+        data.servicio_id,
+        data.dia_semana,
+        data.hora_inicio,
+        data.hora_fin,
+        data.esta_disponible,
+      ];
+
+      const result = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error en ServiceDatabase.createAvailability:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar toda la disponibilidad de un servicio
+   */
+  async deleteAvailabilityByServiceId(serviceId: string) {
+    try {
+      const query = `DELETE FROM disponibilidad_servicios WHERE servicio_id = $1`;
+      await pool.query(query, [serviceId]);
+    } catch (error) {
+      console.error('Error en ServiceDatabase.deleteAvailabilityByServiceId:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualizar contador de servicios del usuario
+   */
+  async incrementUserServiceCount(userId: string) {
+    try {
+      const query = `
+        UPDATE usuarios 
+        SET total_servicios = COALESCE(total_servicios, 0) + 1 
+        WHERE id = $1
+      `;
+      await pool.query(query, [userId]);
+    } catch (error) {
+      console.error('Error en ServiceDatabase.incrementUserServiceCount:', error);
+      throw error;
+    }
+  }
 }
 
 export const serviceDatabase = new ServiceDatabase();
+

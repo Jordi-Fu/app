@@ -108,6 +108,89 @@ class ServiceService {
       throw error;
     }
   }
+
+  /**
+   * Crear un nuevo servicio
+   */
+  async createService(data: {
+    proveedor_id: string;
+    categoria_id: string;
+    titulo: string;
+    descripcion: string;
+    tipo_precio: string;
+    precio?: number;
+    moneda?: string;
+    duracion_minutos?: number;
+    tipo_ubicacion: string;
+    direccion?: string;
+    ciudad?: string;
+    estado?: string;
+    pais?: string;
+    codigo_postal?: string;
+    latitud?: number;
+    longitud?: number;
+    radio_servicio_km?: number;
+    incluye?: string;
+    no_incluye?: string;
+    disponibilidad_urgencias?: boolean;
+    precio_urgencias?: number;
+    imagenes?: Array<{
+      base64: string;
+      formato: string;
+    }>;
+    disponibilidad?: Array<{
+      dia_semana: number;
+      hora_inicio: string;
+      hora_fin: string;
+      esta_disponible: boolean;
+    }>;
+  }) {
+    try {
+      return await serviceModel.createService(data);
+    } catch (error) {
+      console.error('Error en ServiceService.createService:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Añadir imagen a un servicio
+   */
+  async addServiceImage(data: {
+    servicio_id: string;
+    url_imagen: string;
+    url_miniatura?: string;
+    pie_de_foto?: string;
+    es_principal: boolean;
+    indice_orden: number;
+    ancho?: number;
+    alto?: number;
+  }) {
+    try {
+      return await serviceModel.addServiceImage(data);
+    } catch (error) {
+      console.error('Error en ServiceService.addServiceImage:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Añadir disponibilidad a un servicio
+   */
+  async addServiceAvailability(data: {
+    servicio_id: string;
+    dia_semana: number;
+    hora_inicio: string;
+    hora_fin: string;
+    esta_disponible: boolean;
+  }) {
+    try {
+      return await serviceModel.addServiceAvailability(data);
+    } catch (error) {
+      console.error('Error en ServiceService.addServiceAvailability:', error);
+      throw error;
+    }
+  }
 }
 
 export const serviceService = new ServiceService();

@@ -6,7 +6,9 @@ import {
   Service, 
   ServicesResponse, 
   ServiceFilters, 
-  Category 
+  Category,
+  CreateServiceRequest,
+  CreateServiceResponse
 } from '../interfaces/service.interface';
 
 @Injectable({
@@ -103,5 +105,12 @@ export class ServiceService {
     return this.http.get<{ success: boolean; data: Service[]; total: number }>(
       `${this.apiUrl}/user/favorites`
     );
+  }
+
+  /**
+   * Crear un nuevo servicio
+   */
+  createService(data: CreateServiceRequest): Observable<CreateServiceResponse> {
+    return this.http.post<CreateServiceResponse>(this.apiUrl, data);
   }
 }

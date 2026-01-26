@@ -101,3 +101,104 @@ body.dark {
     --color: var(--ion-text-color);
   }
 }
+
+/**
+ * Estilos para ActionSheet de subcategorías
+ */
+.subcategory-action-sheet {
+  .action-sheet-group {
+    background: #ffffff;
+    
+    .action-sheet-title {
+      color: #333333;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .action-sheet-button {
+      color: #333333;
+      font-size: 16px;
+      padding: 14px 16px;
+      
+      &:hover {
+        background: rgba(19, 181, 181, 0.1);
+      }
+      
+      &.action-sheet-cancel {
+        color: #ef4444;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Modo oscuro para el ActionSheet de subcategorías
+@media (prefers-color-scheme: dark) {
+  .subcategory-action-sheet {
+    .action-sheet-group {
+      background: #2a2a2a;
+      
+      .action-sheet-title {
+        color: #ffffff;
+      }
+
+      .action-sheet-button {
+        color: #ffffff;
+        background: #2a2a2a;
+        
+        &:hover {
+          background: rgba(19, 181, 181, 0.2);
+        }
+        
+        &.action-sheet-cancel {
+          color: #ef4444;
+        }
+      }
+    }
+    
+    .action-sheet-group-cancel {
+      background: #1a1a1a;
+      
+      .action-sheet-button {
+        color: #ef4444;
+        background: #1a1a1a;
+      }
+    }
+  }
+}
+
+body.dark {
+  .subcategory-action-sheet {
+    .action-sheet-group {
+      background: #2a2a2a;
+      
+      .action-sheet-title {
+        color: #ffffff;
+      }
+
+      .action-sheet-button {
+        color: #ffffff;
+        background: #2a2a2a;
+        
+        &:hover {
+          background: rgba(19, 181, 181, 0.2);
+        }
+        
+        &.action-sheet-cancel {
+          color: #ef4444;
+        }
+      }
+    }
+    
+    .action-sheet-group-cancel {
+      background: #1a1a1a;
+      
+      .action-sheet-button {
+        color: #ef4444;
+        background: #1a1a1a;
+      }
+    }
+  }
+}

@@ -153,6 +153,7 @@ CREATE TABLE servicios (
   tipo_precio tipo_precio_enum NOT NULL,
   precio DECIMAL(10,2),
   moneda VARCHAR(3) DEFAULT '€',
+  duracion_minutos INTEGER, -- Duración estimada del servicio en minutos
   tipo_ubicacion VARCHAR(50) NOT NULL,
   direccion TEXT,
   ciudad VARCHAR(100),
@@ -161,16 +162,20 @@ CREATE TABLE servicios (
   codigo_postal VARCHAR(20),
   latitud DECIMAL(10,8),
   longitud DECIMAL(11,8),
+  radio_servicio_km DECIMAL(5,2), -- Radio de cobertura del servicio en km
   esta_activo BOOLEAN DEFAULT true,
   es_destacado BOOLEAN DEFAULT false,
   esta_verificado BOOLEAN DEFAULT false,
   vistas INTEGER DEFAULT 0,
   conteo_favoritos INTEGER DEFAULT 0,
+  conteo_reservas INTEGER DEFAULT 0, -- Contador de reservas realizadas
   promedio_calificacion DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio_calificacion >= 0 AND promedio_calificacion <= 5),
   total_resenas INTEGER DEFAULT 0,
   tiempo_respuesta_horas INTEGER,
   incluye TEXT, -- Qué incluye el servicio
-  no_incluye TEXT, -- Qué no incluye
+  no_incluye TEXT, -- Qué no incluye el servicio
+  disponibilidad_urgencias BOOLEAN DEFAULT false, -- Si acepta servicios de urgencia
+  precio_urgencias DECIMAL(10,2), -- Precio especial para urgencias
   url_video VARCHAR(500),
   creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

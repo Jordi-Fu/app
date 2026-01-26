@@ -182,6 +182,102 @@ class ServiceModel {
   async getFavoriteServices(userId: string) {
     return await serviceDatabase.findFavoritesByUserId(userId);
   }
+
+  /**
+   * Crear un nuevo servicio
+   */
+  async createService(data: {
+    proveedor_id: string;
+    categoria_id: string;
+    titulo: string;
+    descripcion: string;
+    tipo_precio: string;
+    precio?: number;
+    moneda?: string;
+    duracion_minutos?: number;
+    tipo_ubicacion: string;
+    direccion?: string;
+    ciudad?: string;
+    estado?: string;
+    pais?: string;
+    codigo_postal?: string;
+    latitud?: number;
+    longitud?: number;
+    radio_servicio_km?: number;
+    incluye?: string;
+    no_incluye?: string;
+    disponibilidad_urgencias?: boolean;
+    precio_urgencias?: number;
+    imagenes?: Array<{
+      base64: string;
+      formato: string;
+    }>;
+    disponibilidad?: Array<{
+      dia_semana: number;
+      hora_inicio: string;
+      hora_fin: string;
+      esta_disponible: boolean;
+    }>;
+  }) {
+    // 1. Crear el servicio
+    const service = await serviceDatabase.create({
+      proveedor_id: data.proveedor_id,
+      categoria_id: data.categoria_id,
+      titulo: data.titulo,
+      descripcion: data.descripcion,
+      tipo_precio: data.tipo_precio,
+      precio: data.precio,
+      moneda: data.moneda,
+      duracion_minutos: data.duracion_minutos,
+      tipo_ubicacion: data.tipo_ubicacion,
+      direccion: data.direccion,
+      ciudad: data.ciudad,
+      estado: data.estado,
+      pais: data.pais,
+      codigo_postal: data.codigo_postal,
+      latitud: data.latitud,
+      longitud: data.longitud,
+      radio_servicio_km: data.radio_servicio_km,
+      incluye: data.incluye,
+      no_incluye: data.no_incluye,
+      disponibilidad_urgencias: data.disponibilidad_urgencias,
+      precio_urgencias: data.precio_urgencias,
+    });
+
+    // 2. Incrementar contador de servicios del usuario
+    await serviceDatabase.incrementUserServiceCount(data.proveedor_id);
+
+    return service;
+  }
+
+  /**
+   * Añadir imagen a un servicio
+   */
+  async addServiceImage(data: {
+    servicio_id: string;
+    url_imagen: string;
+    url_miniatura?: string;
+    pie_de_foto?: string;
+    es_principal: boolean;
+    indice_orden: number;
+    ancho?: number;
+    alto?: number;
+  }) {
+    return await serviceDatabase.createImage(data);
+  }
+
+  /**
+   * Añadir disponibilidad a un servicio
+   */
+  async addServiceAvailability(data: {
+    servicio_id: string;
+    dia_semana: number;
+    hora_inicio: string;
+    hora_fin: string;
+    esta_disponible: boolean;
+  }) {
+    return await serviceDatabase.createAvailability(data);
+  }
 }
 
 export const serviceModel = new ServiceModel();

@@ -263,15 +263,11 @@ export class ServiciosPage implements OnInit {
 
   getPriceText(servicio: Service): string {
     if (!servicio.precio) {
-      return 'Precio no disponible';
-    }
-
-    if (servicio.tipo_precio === 'negotiable') {
-      return 'Negociable';
+      return 'Precio a consultar';
     }
 
     const symbol = servicio.moneda === 'MXN' ? '$' : servicio.moneda;
-    const suffix = servicio.tipo_precio === 'hourly' ? '/hora' : '';
+    const suffix = servicio.tipo_precio === 'por_hora' ? '/hora' : '';
     return `${symbol}${servicio.precio}${suffix}`;
   }
 

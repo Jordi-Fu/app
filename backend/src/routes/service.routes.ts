@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { serviceController } from '../controllers/service.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
+import { serviceValidators } from '../validators';
+import { validationResult } from 'express-validator';
 
 const router = Router();
 
@@ -12,6 +14,12 @@ router.get('/provider/:providerId', serviceController.getServicesByProvider.bind
 router.get('/:id', serviceController.getServiceById.bind(serviceController));
 
 // Todas las demás rutas requieren autenticación
+router.post(
+  '/', 
+  authMiddleware, 
+  serviceValidators.create(),
+  serviceController.createService.bind(serviceController)
+);
 router.post('/:id/views', authMiddleware, serviceController.incrementViews.bind(serviceController));
 router.post('/:id/favorite', authMiddleware, serviceController.toggleFavorite.bind(serviceController));
 router.get('/:id/is-favorite', authMiddleware, serviceController.checkIsFavorite.bind(serviceController));

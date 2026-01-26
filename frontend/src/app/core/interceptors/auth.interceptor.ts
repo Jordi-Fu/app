@@ -41,6 +41,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   // Obtener token y añadirlo al header
   return from(authService.getAccessToken()).pipe(
     switchMap(token => {
+      console.log('[AUTH INTERCEPTOR] URL:', req.url);
+      console.log('[AUTH INTERCEPTOR] Token exists:', !!token);
+      if (token) {
+        console.log('[AUTH INTERCEPTOR] Token preview:', token.substring(0, 20) + '...');
+      }
+      
       // Clonar petición con token si existe
       const authReq = token ? addTokenToRequest(req, token) : req;
 
