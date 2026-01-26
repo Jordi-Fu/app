@@ -498,6 +498,9 @@ ion-card {
 
 // Modo oscuro
 @media (prefers-color-scheme: dark) {
+  ion-toolbar{
+    --background: var(--ion-color-dark);
+  }
   .main-info {
     .header {
       h1 {

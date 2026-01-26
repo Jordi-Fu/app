@@ -688,4 +688,11 @@ export class AltaServicioPage implements OnInit {
   get descripcionLength(): number {
     return this.serviceForm.get('descripcion')?.value?.length || 0;
   }
+
+  /**
+   * Volver a la página anterior
+   */
+  goBack() {
+    this.router.navigate(['/home/servicios']);
+  }
 }

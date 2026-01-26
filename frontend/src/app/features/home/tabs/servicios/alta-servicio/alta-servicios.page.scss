@@ -6,6 +6,53 @@
   height: 100%;
 }
 
+// Header personalizado (sin ion-header)
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  position: relative;
+  
+  .back-arrow {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.3s;
+    z-index: 10;
+    background: $primary-gradient;
+    mask-image: url('/assets/back.svg');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url('/assets/back.svg');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+
+    &:hover {
+      transform: translateY(-50%) scale(1.1);
+      opacity: 0.8;
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+  }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+  }
+}
+
 ion-content {
   --background: #ffffff;
 }
@@ -418,7 +465,7 @@ ion-content {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -440,6 +487,7 @@ ion-content {
     max-width: 320px;
     margin: 20px;
     text-align: center;
+    z-index: 100000;
 
     h3 {
       font-size: 18px;
@@ -492,6 +540,37 @@ ion-content {
           background: #0fa0a0;
         }
       }
+    }
+
+    // Modo oscuro inline
+    @media (prefers-color-scheme: dark) {
+      background: #2a2a2a;
+
+      h3 {
+        color: #ffffff;
+      }
+
+      p {
+        color: #b3b3b3;
+
+        strong {
+          color: #13b5b5;
+        }
+      }
+
+      .popup-buttons {
+        .btn-cancel {
+          background: #404040;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  // Modo oscuro para overlay
+  @media (prefers-color-scheme: dark) {
+    .popup-overlay {
+      background: rgba(0, 0, 0, 0.7);
     }
   }
 }
@@ -1001,6 +1080,15 @@ ion-content {
 
 // Modo oscuro
 @media (prefers-color-scheme: dark) {
+  .page-header {
+    background: #1a1a1a;
+    border-bottom-color: #333333;
+    
+    .header-title {
+      color: #ffffff;
+    }
+  }
+
   ion-content {
     --background: #1a1a1a;
   }
@@ -1364,7 +1452,7 @@ ion-content {
       color: #b3b3b3 !important;
 
       strong {
-        color: #ffffff;
+        color: #13b5b5 !important;
       }
     }
 

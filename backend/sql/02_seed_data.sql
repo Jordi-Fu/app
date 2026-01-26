@@ -44,130 +44,130 @@ INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, esta_activo
 
 -- Subcategorías de Hogar y Mantenimiento
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Plomería', 'plomeria', 'Reparación e instalación de tuberías y sanitarios', '🚿', '#3B82F6', id, true, 1
+SELECT 'Plomería', 'plomeria', 'Reparación e instalación de tuberías y sanitarios', '', '#3B82F6', id, true, 1
 FROM categorias WHERE slug = 'hogar-mantenimiento';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Electricidad', 'electricidad', 'Instalaciones y reparaciones eléctricas', '⚡', '#3B82F6', id, true, 2
+SELECT 'Electricidad', 'electricidad', 'Instalaciones y reparaciones eléctricas', '', '#3B82F6', id, true, 2
 FROM categorias WHERE slug = 'hogar-mantenimiento';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Albañilería', 'albanileria', 'Trabajos de albañilería y construcción menor', '🧱', '#3B82F6', id, true, 3
+SELECT 'Albañilería', 'albanileria', 'Trabajos de albañilería y construcción menor', '', '#3B82F6', id, true, 3
 FROM categorias WHERE slug = 'hogar-mantenimiento';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Pintura', 'pintura', 'Servicios de pintura interior y exterior', '🎨', '#3B82F6', id, true, 4
+SELECT 'Pintura', 'pintura', 'Servicios de pintura interior y exterior', '', '#3B82F6', id, true, 4
 FROM categorias WHERE slug = 'hogar-mantenimiento';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Carpintería', 'carpinteria', 'Trabajos en madera y muebles', '🪚', '#3B82F6', id, true, 5
+SELECT 'Carpintería', 'carpinteria', 'Trabajos en madera y muebles', '', '#3B82F6', id, true, 5
 FROM categorias WHERE slug = 'hogar-mantenimiento';
 
 -- Subcategorías de Construcción y Remodelación
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Remodelaciones', 'remodelaciones', 'Remodelación integral de espacios', '🏠', '#F59E0B', id, true, 1
+SELECT 'Remodelaciones', 'remodelaciones', 'Remodelación integral de espacios', '', '#F59E0B', id, true, 1
 FROM categorias WHERE slug = 'construccion-remodelacion';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Reparaciones estructurales', 'reparaciones-estructurales', 'Reparaciones de estructura y cimientos', '🔨', '#F59E0B', id, true, 2
+SELECT 'Reparaciones estructurales', 'reparaciones-estructurales', 'Reparaciones de estructura y cimientos', '', '#F59E0B', id, true, 2
 FROM categorias WHERE slug = 'construccion-remodelacion';
 
 -- Subcategorías de Limpieza y Aseo
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Limpieza doméstica', 'limpieza-domestica', 'Limpieza general del hogar', '🏠', '#10B981', id, true, 1
+SELECT 'Limpieza doméstica', 'limpieza-domestica', 'Limpieza general del hogar', '', '#10B981', id, true, 1
 FROM categorias WHERE slug = 'limpieza-aseo';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Lavandería y planchado', 'lavanderia-planchado', 'Servicios de lavandería y planchado de ropa', '👕', '#10B981', id, true, 2
+SELECT 'Lavandería y planchado', 'lavanderia-planchado', 'Servicios de lavandería y planchado de ropa', '', '#10B981', id, true, 2
 FROM categorias WHERE slug = 'limpieza-aseo';
 
 -- Subcategorías de Jardinería y Exteriores
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Jardinería', 'jardineria', 'Diseño y cuidado de jardines', '🌱', '#22C55E', id, true, 1
+SELECT 'Jardinería', 'jardineria', 'Diseño y cuidado de jardines', '', '#22C55E', id, true, 1
 FROM categorias WHERE slug = 'jardineria-exteriores';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Mantenimiento de áreas verdes', 'mantenimiento-areas-verdes', 'Mantenimiento de césped y áreas verdes', '🌳', '#22C55E', id, true, 2
+SELECT 'Mantenimiento de áreas verdes', 'mantenimiento-areas-verdes', 'Mantenimiento de césped y áreas verdes', '', '#22C55E', id, true, 2
 FROM categorias WHERE slug = 'jardineria-exteriores';
 
 -- Subcategorías de Servicios de Emergencia
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Cerrajería', 'cerrajeria', 'Apertura de cerraduras y cambio de llaves', '🔑', '#EF4444', id, true, 1
+SELECT 'Cerrajería', 'cerrajeria', 'Apertura de cerraduras y cambio de llaves', '', '#EF4444', id, true, 1
 FROM categorias WHERE slug = 'servicios-emergencia';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Servicio de gas', 'servicio-gas', 'Reparación e instalación de gas', '🔥', '#EF4444', id, true, 2
+SELECT 'Servicio de gas', 'servicio-gas', 'Reparación e instalación de gas', '', '#EF4444', id, true, 2
 FROM categorias WHERE slug = 'servicios-emergencia';
 
 -- Subcategorías de Tecnología y Soporte Técnico
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Reparación de celulares', 'reparacion-celulares', 'Reparación de teléfonos móviles', '📱', '#8B5CF6', id, true, 1
+SELECT 'Reparación de celulares', 'reparacion-celulares', 'Reparación de teléfonos móviles', '', '#8B5CF6', id, true, 1
 FROM categorias WHERE slug = 'tecnologia-soporte';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Soporte técnico básico', 'soporte-tecnico-basico', 'Soporte técnico para computadoras', '🖥️', '#8B5CF6', id, true, 2
+SELECT 'Soporte técnico básico', 'soporte-tecnico-basico', 'Soporte técnico para computadoras', '', '#8B5CF6', id, true, 2
 FROM categorias WHERE slug = 'tecnologia-soporte';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Reparación de electrodomésticos', 'reparacion-electrodomesticos', 'Reparación de electrodomésticos del hogar', '🔌', '#8B5CF6', id, true, 3
+SELECT 'Reparación de electrodomésticos', 'reparacion-electrodomesticos', 'Reparación de electrodomésticos del hogar', '', '#8B5CF6', id, true, 3
 FROM categorias WHERE slug = 'tecnologia-soporte';
 
 -- Subcategorías de Transporte y Mensajería
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Transporte privado', 'transporte-privado', 'Servicio de transporte privado de personas', '🚕', '#06B6D4', id, true, 1
+SELECT 'Transporte privado', 'transporte-privado', 'Servicio de transporte privado de personas', '', '#06B6D4', id, true, 1
 FROM categorias WHERE slug = 'transporte-mensajeria';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Mensajería y mandados', 'mensajeria-mandados', 'Servicio de mensajería y mandados', '📦', '#06B6D4', id, true, 2
+SELECT 'Mensajería y mandados', 'mensajeria-mandados', 'Servicio de mensajería y mandados', '', '#06B6D4', id, true, 2
 FROM categorias WHERE slug = 'transporte-mensajeria';
 
 -- Subcategoría de Alimentación y Delivery
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Servicio de comida a domicilio', 'comida-domicilio', 'Preparación y entrega de comida a domicilio', '🍽️', '#F97316', id, true, 1
+SELECT 'Servicio de comida a domicilio', 'comida-domicilio', 'Preparación y entrega de comida a domicilio', '', '#F97316', id, true, 1
 FROM categorias WHERE slug = 'alimentacion-delivery';
 
 -- Subcategorías de Cuidado Personal y Estética
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Estética', 'estetica', 'Servicios de estética y belleza', '💄', '#EC4899', id, true, 1
+SELECT 'Estética', 'estetica', 'Servicios de estética y belleza', '', '#EC4899', id, true, 1
 FROM categorias WHERE slug = 'cuidado-personal-estetica';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Peluquería', 'peluqueria', 'Corte, peinado y tratamientos capilares', '💇', '#EC4899', id, true, 2
+SELECT 'Peluquería', 'peluqueria', 'Corte, peinado y tratamientos capilares', '', '#EC4899', id, true, 2
 FROM categorias WHERE slug = 'cuidado-personal-estetica';
 
 -- Subcategorías de Salud y Cuidado Familiar
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Cuidado de adultos mayores', 'cuidado-adultos-mayores', 'Cuidado y acompañamiento de personas mayores', '👴', '#F43F5E', id, true, 1
+SELECT 'Cuidado de adultos mayores', 'cuidado-adultos-mayores', 'Cuidado y acompañamiento de personas mayores', '', '#F43F5E', id, true, 1
 FROM categorias WHERE slug = 'salud-cuidado-familiar';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Cuidado de niños (niñeras)', 'cuidado-ninos', 'Servicios de niñera y cuidado infantil', '👶', '#F43F5E', id, true, 2
+SELECT 'Cuidado de niños (niñeras)', 'cuidado-ninos', 'Servicios de niñera y cuidado infantil', '', '#F43F5E', id, true, 2
 FROM categorias WHERE slug = 'salud-cuidado-familiar';
 
 -- Subcategorías de Educación y Enseñanza
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Clases particulares', 'clases-particulares', 'Clases particulares de diversas materias', '👨‍🏫', '#6366F1', id, true, 1
+SELECT 'Clases particulares', 'clases-particulares', 'Clases particulares de diversas materias', '', '#6366F1', id, true, 1
 FROM categorias WHERE slug = 'educacion-ensenanza';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Tutorías académicas', 'tutorias-academicas', 'Tutorías y asesorías académicas', '📖', '#6366F1', id, true, 2
+SELECT 'Tutorías académicas', 'tutorias-academicas', 'Tutorías y asesorías académicas', '', '#6366F1', id, true, 2
 FROM categorias WHERE slug = 'educacion-ensenanza';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Enseñanza de idiomas', 'ensenanza-idiomas', 'Clases de idiomas extranjeros', '🌍', '#6366F1', id, true, 3
+SELECT 'Enseñanza de idiomas', 'ensenanza-idiomas', 'Clases de idiomas extranjeros', '', '#6366F1', id, true, 3
 FROM categorias WHERE slug = 'educacion-ensenanza';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Apoyo escolar', 'apoyo-escolar', 'Ayuda con tareas y estudios escolares', '✏️', '#6366F1', id, true, 4
+SELECT 'Apoyo escolar', 'apoyo-escolar', 'Ayuda con tareas y estudios escolares', '', '#6366F1', id, true, 4
 FROM categorias WHERE slug = 'educacion-ensenanza';
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Capacitación técnica', 'capacitacion-tecnica', 'Capacitación en habilidades técnicas y oficios', '🎓', '#6366F1', id, true, 5
+SELECT 'Capacitación técnica', 'capacitacion-tecnica', 'Capacitación en habilidades técnicas y oficios', '', '#6366F1', id, true, 5
 FROM categorias WHERE slug = 'educacion-ensenanza';
 
 -- Subcategoría de Seguridad y Control de Plagas
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
-SELECT 'Fumigación', 'fumigacion', 'Servicios de fumigación y control de plagas', '🐜', '#64748B', id, true, 1
+SELECT 'Fumigación', 'fumigacion', 'Servicios de fumigación y control de plagas', '', '#64748B', id, true, 1
 FROM categorias WHERE slug = 'seguridad-control-plagas';
 
 

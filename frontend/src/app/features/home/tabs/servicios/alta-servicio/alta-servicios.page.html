@@ -1,10 +1,14 @@
 <ion-content [scrollY]="true">
+  <div class="page-header">
+    <div class="back-arrow" (click)="goBack()"></div>
+    <span class="header-title">Publica tu servicio</span>
+  </div>
+
   <div class="service-container">
     <div class="service-card">
       
       <!-- PASO 1: Información básica -->
       <div *ngIf="currentStep === 1" class="step-content">
-        <h2 class="title">Publica tu servicio</h2>
 
         <!-- Sección de imágenes -->
         <div class="images-section">
