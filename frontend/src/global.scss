@@ -30,15 +30,21 @@
  * -----------------------------------------------------
  * Asegurar que el contenido no se oculte detrás del notch o la barra de estado
  */
-ion-app {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-safe-area-left: env(safe-area-inset-left);
+  --ion-safe-area-right: env(safe-area-inset-right);
 }
 
+ion-app {
+  margin-top: calc(env(safe-area-inset-top) + 10px);
+}
+
+// Asegurar que ion-content respete las safe areas
 ion-content {
-  --padding-top: env(safe-area-inset-top);
+  --padding-top: 0;
+  --padding-bottom: 0;
 }
 
 /**
