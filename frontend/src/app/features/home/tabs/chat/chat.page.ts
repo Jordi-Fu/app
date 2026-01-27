@@ -221,20 +221,34 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
       // Solo mostrar loading si es pull-to-refresh o si no hay datos cacheados
       if (event || this.conversaciones.length === 0) {
         this.cargando = true;
+        this.cdr.detectChanges();
       }
       this.error = null;
       
       const conversaciones = await this.chatService.obtenerConversaciones();
-      this.conversaciones = conversaciones;
-      this.aplicarFiltro();
+      
+      // Solo actualizar si hay conversaciones o si es la primera carga
+      if (conversaciones && conversaciones.length > 0) {
+        this.conversaciones = conversaciones;
+        this.aplicarFiltro();
+        this.cdr.detectChanges();
+      } else if (this.conversaciones.length === 0) {
+        // Solo si no hay datos previos, mostrar vacío
+        this.conversaciones = [];
+        this.conversacionesFiltradas = [];
+        this.cdr.detectChanges();
+      }
+      // Si hay datos previos y la respuesta está vacía, mantener los datos previos
     } catch (error) {
       console.error('Error al cargar conversaciones:', error);
       // Solo mostrar error si no hay datos cacheados
       if (this.conversaciones.length === 0) {
         this.error = 'Error al cargar las conversaciones';
+        this.cdr.detectChanges();
       }
     } finally {
       this.cargando = false;
+      this.cdr.detectChanges();
       if (event) {
         event.target.complete();
       }
@@ -247,17 +261,13 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
   }
 
   aplicarFiltro() {
-    // Primero filtrar solo conversaciones que tienen al menos un mensaje
-    const conversacionesConMensajes = this.conversaciones.filter(chat => 
-      chat.texto_ultimo_mensaje && chat.texto_ultimo_mensaje.trim() !== ''
-    );
-
     if (!this.searchQuery) {
-      this.conversacionesFiltradas = conversacionesConMensajes;
+      this.conversacionesFiltradas = [...this.conversaciones];
+      this.cdr.detectChanges();
       return;
     }
 
-    this.conversacionesFiltradas = conversacionesConMensajes.filter(chat => {
+    this.conversacionesFiltradas = this.conversaciones.filter(chat => {
       const nombreCompleto = this.getNombreCompleto(chat.otro_usuario).toLowerCase();
       const ultimoMensaje = (chat.texto_ultimo_mensaje || '').toLowerCase();
       const usuario = (chat.otro_usuario.usuario || '').toLowerCase();
@@ -266,6 +276,7 @@ export class ChatPage implements OnInit, OnDestroy, ViewDidEnter {
              ultimoMensaje.includes(this.searchQuery) ||
              usuario.includes(this.searchQuery);
     });
+    this.cdr.detectChanges();
   }
 
   abrirConversacion(chat: ConversacionUsuario) {

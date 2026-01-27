@@ -51,8 +51,11 @@ export class ChatService {
       );
       const conversaciones = response.data || [];
       
-      // Actualizar en memoria y notificar
-      this.conversacionesSubject.next(conversaciones);
+      // Solo actualizar en memoria si hay conversaciones o si es la primera vez
+      const currentConversaciones = this.conversacionesSubject.getValue();
+      if (conversaciones.length > 0 || currentConversaciones.length === 0) {
+        this.conversacionesSubject.next(conversaciones);
+      }
       
       return conversaciones;
     } catch (error) {
