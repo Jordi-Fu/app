@@ -12,16 +12,23 @@
 ion-header {
   background: #ffffff;
   padding-top: 0 !important;
+  box-shadow: none !important;
+  
+  &::after {
+    display: none !important;
+  }
   
   ion-toolbar {
     --background: #ffffff;
-    --border-width: 0 0 1px 0;
-    --border-color: #e0e0e0;
+    --border-width: 0;
+    --border-color: transparent;
+    --box-shadow: none;
     --color: #000000;
     --padding-top: 0;
     --padding-bottom: 0;
     padding: 8px 0;
     position: relative;
+    box-shadow: none !important;
     
     .back-arrow {
       position: absolute;

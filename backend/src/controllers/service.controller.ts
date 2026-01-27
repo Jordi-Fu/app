@@ -165,7 +165,7 @@ class ServiceController {
   async toggleFavorite(req: Request, res: Response): Promise<void> {
     try {
       const { id: serviceId } = req.params;
-      const userId = (req as any).user?.userId; // Asumiendo que el middleware de autenticación agrega el userId
+      const userId = req.user?.idUsuario;
 
       if (!userId) {
         res.status(401).json({
@@ -197,7 +197,7 @@ class ServiceController {
   async checkIsFavorite(req: Request, res: Response): Promise<void> {
     try {
       const { id: serviceId } = req.params;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.idUsuario;
 
       if (!userId) {
         res.status(200).json({
@@ -228,7 +228,7 @@ class ServiceController {
    */
   async getFavoriteServices(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.idUsuario;
 
       if (!userId) {
         res.status(401).json({

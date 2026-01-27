@@ -7,7 +7,7 @@
 }
 
 ion-content {
-  --background: #f5f5f5;
+  --background: #ffffff;
 }
 
 .servicios-container {
@@ -118,7 +118,7 @@ ion-content {
       color: var(--ion-text-color);
       white-space: nowrap;
       flex-shrink: 0;
-      background: var(--category-bg);
+      background: var(--card-light-bg);
       border: none;
 
       &.active {
@@ -191,7 +191,7 @@ ion-content {
   }
 
   .servicio-card {
-    background-color: #ffffff;
+    background-color: var(--card-light-bg);
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 20px;
