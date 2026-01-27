@@ -5,8 +5,11 @@
       <ion-label>Servicios</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="chat" (click)="goToTab('chat')">
-      <ion-icon name="chatbubbles-outline"></ion-icon>
+    <ion-tab-button tab="chat" (click)="goToTab('chat')" class="chat-tab">
+      <div class="icon-wrapper">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+        <span class="unread-indicator" *ngIf="tieneMensajesNoLeidos"></span>
+      </div>
       <ion-label>Chat</ion-label>
     </ion-tab-button>
 

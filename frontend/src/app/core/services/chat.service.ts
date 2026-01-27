@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, BehaviorSubject } from 'rxjs';
+import { firstValueFrom, BehaviorSubject, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ConversacionUsuario, MensajeConRemitente, EnviarMensajeRequest } from '../interfaces';
 
@@ -13,6 +13,11 @@ export class ChatService {
   // BehaviorSubject para notificar cambios en tiempo real (solo en memoria)
   private conversacionesSubject = new BehaviorSubject<ConversacionUsuario[]>([]);
   public conversaciones$ = this.conversacionesSubject.asObservable();
+  
+  // Observable para el total de mensajes no leídos
+  public totalNoLeidos$ = this.conversaciones$.pipe(
+    map(conversaciones => conversaciones.reduce((total, conv) => total + (conv.no_leidos || 0), 0))
+  );
 
   constructor(private http: HttpClient) {}
 
@@ -51,6 +56,31 @@ export class ChatService {
     if (index !== -1 && conversaciones[index].no_leidos > 0) {
       conversaciones[index] = { ...conversaciones[index], no_leidos: 0 };
       this.conversacionesSubject.next([...conversaciones]);
+    }
+  }
+
+  /**
+   * Incrementar contador de no leídos y actualizar conversación (para eventos de socket)
+   */
+  incrementarNoLeidos(conversacionId: string, ultimoMensaje: string, ultimoMensajeEn: string): void {
+    const conversaciones = this.conversacionesSubject.getValue();
+    const index = conversaciones.findIndex(c => c.id === conversacionId);
+    
+    if (index !== -1) {
+      const conv = conversaciones[index];
+      const conversacionActualizada = {
+        ...conv,
+        texto_ultimo_mensaje: ultimoMensaje,
+        ultimo_mensaje_en: ultimoMensajeEn,
+        no_leidos: (conv.no_leidos || 0) + 1
+      };
+      
+      const nuevasConversaciones = [
+        conversacionActualizada,
+        ...conversaciones.filter((_, i) => i !== index)
+      ];
+      
+      this.conversacionesSubject.next(nuevasConversaciones);
     }
   }
 

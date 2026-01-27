@@ -49,3 +49,28 @@ ion-tab-button.tab-selected {
     }
   }
 }
+
+// Indicador de mensajes no leídos
+.chat-tab {
+  .icon-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .unread-indicator {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #3DD598, #13B5B5);
+    border: 2px solid #ffffff;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .chat-tab .unread-indicator {
+    border-color: #1a1a1a;
+  }
+}
