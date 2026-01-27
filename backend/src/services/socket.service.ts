@@ -8,9 +8,9 @@ import { pool } from '../config/database.config';
  * Interfaz para el payload del JWT
  */
 interface JwtPayload {
-  userId: string;
-  username: string;
-  email: string;
+  idUsuario: string;
+  usuario: string;
+  correo: string;
 }
 
 /**
@@ -78,9 +78,9 @@ class SocketService {
 
         const decoded = jwt.verify(token, ENV.JWT_SECRET) as JwtPayload;
         
-        // Adjuntar información del usuario al socket
-        (socket as any).userId = decoded.userId;
-        (socket as any).username = decoded.username;
+        // Adjuntar información del usuario al socket (usando los nombres correctos del JWT)
+        (socket as any).userId = decoded.idUsuario;
+        (socket as any).username = decoded.usuario;
         
         next();
       } catch (error) {
@@ -98,7 +98,6 @@ class SocketService {
     this.io.on('connection', (socket: Socket) => {
       const userId = (socket as any).userId;
       const username = (socket as any).username;
-      
 
       // Registrar el socket del usuario
       this.addUserSocket(userId, socket.id);

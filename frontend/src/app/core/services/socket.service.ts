@@ -94,7 +94,6 @@ export class SocketService implements OnDestroy {
 
     // Error de conexión
     this.socket.on('connect_error', (error) => {
-      console.error('🔴 Error de conexión socket:', error.message);
       this.connectionStatusSubject.next(false);
     });
 

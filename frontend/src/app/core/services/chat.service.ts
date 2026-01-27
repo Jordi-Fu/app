@@ -42,6 +42,19 @@ export class ChatService {
   }
 
   /**
+   * Resetear contador de mensajes no leídos de una conversación
+   */
+  resetearContadorNoLeidos(conversacionId: string): void {
+    const conversaciones = this.conversacionesSubject.getValue();
+    const index = conversaciones.findIndex(c => c.id === conversacionId);
+    
+    if (index !== -1 && conversaciones[index].no_leidos > 0) {
+      conversaciones[index] = { ...conversaciones[index], no_leidos: 0 };
+      this.conversacionesSubject.next([...conversaciones]);
+    }
+  }
+
+  /**
    * Obtener todas las conversaciones del usuario autenticado
    */
   async obtenerConversaciones(): Promise<ConversacionUsuario[]> {
@@ -132,6 +145,9 @@ export class ChatService {
    */
   async marcarComoLeido(conversacionId: string): Promise<void> {
     try {
+      // Primero actualizar en memoria para respuesta inmediata en la UI
+      this.resetearContadorNoLeidos(conversacionId);
+      
       await firstValueFrom(
         this.http.put<any>(`${this.apiUrl}/conversaciones/${conversacionId}/leer`, {})
       );
