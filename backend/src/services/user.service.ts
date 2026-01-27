@@ -1,4 +1,4 @@
-import { userDatabase } from '../database/user.database';
+import { userModel } from '../models/user.model';
 
 interface UserProfile {
   id: string;
@@ -22,7 +22,7 @@ class UserService {
    */
   async getUserById(userId: string): Promise<UserProfile | null> {
     try {
-      return await userDatabase.getUserById(userId);
+      return await userModel.getUserById(userId);
     } catch (error) {
       console.error('Error al obtener usuario:', error);
       throw error;
@@ -34,7 +34,7 @@ class UserService {
    */
   async getUserServices(userId: string): Promise<any[]> {
     try {
-      return await userDatabase.getUserServices(userId);
+      return await userModel.getUserServices(userId);
     } catch (error) {
       console.error('Error al obtener servicios del usuario:', error);
       throw error;
@@ -46,7 +46,7 @@ class UserService {
    */
   async searchUsers(query: string, limit: number = 20): Promise<any[]> {
     try {
-      return await userDatabase.searchUsers(query, limit);
+      return await userModel.searchUsers(query, limit);
     } catch (error) {
       console.error('Error al buscar usuarios:', error);
       throw error;
@@ -58,7 +58,7 @@ class UserService {
    */
   async getAllActiveUsers(limit: number = 50): Promise<any[]> {
     try {
-      return await userDatabase.getAllActiveUsers(limit);
+      return await userModel.getAllActiveUsers(limit);
     } catch (error) {
       console.error('Error al obtener usuarios activos:', error);
       throw error;

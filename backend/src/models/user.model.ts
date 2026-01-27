@@ -107,6 +107,34 @@ class UserModel {
   async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 12);
   }
+
+  /**
+   * Obtener perfil público de un usuario por ID
+   */
+  async getUserById(userId: string): Promise<any | null> {
+    return userDatabase.getUserById(userId);
+  }
+
+  /**
+   * Obtener servicios de un usuario
+   */
+  async getUserServices(userId: string): Promise<any[]> {
+    return userDatabase.getUserServices(userId);
+  }
+
+  /**
+   * Buscar usuarios por nombre/username
+   */
+  async searchUsers(query: string, limit: number = 20): Promise<any[]> {
+    return userDatabase.searchUsers(query, limit);
+  }
+
+  /**
+   * Obtener todos los usuarios activos
+   */
+  async getAllActiveUsers(limit: number = 50): Promise<any[]> {
+    return userDatabase.getAllActiveUsers(limit);
+  }
 }
 
 export const userModel = new UserModel();

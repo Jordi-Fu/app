@@ -1,4 +1,4 @@
-import { chatDatabase } from '../database/chat.database';
+import { chatModel } from '../models/chat.model';
 import { Conversacion, Mensaje, ConversacionConUsuario, MensajeConRemitente, CrearMensajeRequest } from '../interfaces';
 import { socketService, MensajeRealTime } from './socket.service';
 
@@ -12,21 +12,21 @@ class ChatService {
    * Obtener todas las conversaciones de un usuario
    */
   async obtenerConversaciones(userId: string): Promise<ConversacionConUsuario[]> {
-    return await chatDatabase.getConversacionesByUserId(userId);
+    return await chatModel.getConversacionesByUserId(userId);
   }
 
   /**
    * Obtener una conversación específica
    */
   async obtenerConversacion(conversacionId: string, userId: string): Promise<ConversacionConUsuario | undefined> {
-    return await chatDatabase.getConversacionById(conversacionId, userId);
+    return await chatModel.getConversacionById(conversacionId, userId);
   }
 
   /**
    * Obtener o crear una conversación con otro usuario
    */
   async obtenerOCrearConversacion(userId: string, otroUserId: string, servicioId?: string): Promise<Conversacion> {
-    return await chatDatabase.findOrCreateConversacion(userId, otroUserId, servicioId);
+    return await chatModel.findOrCreateConversacion(userId, otroUserId, servicioId);
   }
 
   /**
@@ -34,12 +34,12 @@ class ChatService {
    */
   async obtenerMensajes(conversacionId: string, userId: string, limit: number = 50, offset: number = 0): Promise<MensajeConRemitente[]> {
     // Verificar que el usuario pertenece a la conversación
-    const conversacion = await chatDatabase.getConversacionById(conversacionId, userId);
+    const conversacion = await chatModel.getConversacionById(conversacionId, userId);
     if (!conversacion) {
       throw new Error('Conversación no encontrada o no tienes acceso');
     }
 
-    return await chatDatabase.getMensajesByConversacionId(conversacionId, limit, offset);
+    return await chatModel.getMensajesByConversacionId(conversacionId, limit, offset);
   }
 
   /**
@@ -50,7 +50,7 @@ class ChatService {
 
     // Si no hay conversación pero hay destinatario, crear o encontrar conversación
     if (!conversacionId && datos.destinatario_id) {
-      const conversacion = await chatDatabase.findOrCreateConversacion(userId, datos.destinatario_id);
+      const conversacion = await chatModel.findOrCreateConversacion(userId, datos.destinatario_id);
       conversacionId = conversacion.id;
     }
 
@@ -59,19 +59,19 @@ class ChatService {
     }
 
     // Verificar que el usuario pertenece a la conversación
-    const conversacion = await chatDatabase.getConversacionById(conversacionId, userId);
+    const conversacion = await chatModel.getConversacionById(conversacionId, userId);
     if (!conversacion) {
       throw new Error('Conversación no encontrada o no tienes acceso');
     }
 
     // Crear el mensaje
-    const mensaje = await chatDatabase.createMensaje(
+    const mensaje = await chatModel.createMensaje(
       conversacionId,
       userId,
       datos.tipo_mensaje || 'texto',
-      datos.contenido,
-      datos.url_media,
-      datos.respuesta_a_mensaje_id
+      datos.contenido || null,
+      datos.url_media || null,
+      datos.respuesta_a_mensaje_id || null
     );
 
     // Construir el mensaje con información del remitente para tiempo real
@@ -117,26 +117,26 @@ class ChatService {
    */
   async marcarComoLeido(conversacionId: string, userId: string): Promise<void> {
     // Verificar que el usuario pertenece a la conversación
-    const conversacion = await chatDatabase.getConversacionById(conversacionId, userId);
+    const conversacion = await chatModel.getConversacionById(conversacionId, userId);
     if (!conversacion) {
       throw new Error('Conversación no encontrada o no tienes acceso');
     }
 
-    await chatDatabase.marcarMensajesComoLeidos(conversacionId, userId);
+    await chatModel.marcarMensajesComoLeidos(conversacionId, userId);
   }
 
   /**
    * Eliminar un mensaje
    */
   async eliminarMensaje(mensajeId: string, userId: string): Promise<boolean> {
-    return await chatDatabase.eliminarMensaje(mensajeId, userId);
+    return await chatModel.eliminarMensaje(mensajeId, userId);
   }
 
   /**
    * Archivar una conversación
    */
   async archivarConversacion(conversacionId: string, userId: string): Promise<boolean> {
-    return await chatDatabase.archivarConversacion(conversacionId, userId);
+    return await chatModel.archivarConversacion(conversacionId, userId);
   }
 }
 

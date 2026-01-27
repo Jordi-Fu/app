@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { userService } from '../services';
-import { reviewDatabase } from '../database';
+import { reviewModel } from '../models/review.model';
 
 class UserController {
   /**
@@ -142,8 +142,8 @@ class UserController {
         return;
       }
 
-      const reviews = await reviewDatabase.getReviewsForUser(userId, sortBy, limit);
-      const total = await reviewDatabase.countReviewsForUser(userId);
+      const reviews = await reviewModel.getReviewsForUser(userId, sortBy, limit);
+      const total = await reviewModel.countReviewsForUser(userId);
 
       res.json({
         success: true,
