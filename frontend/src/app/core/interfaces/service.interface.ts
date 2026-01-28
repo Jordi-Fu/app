@@ -108,6 +108,8 @@ export interface Service {
   url_video?: string;
   creado_en: string;
   actualizado_en: string;
+  precio_urgencias?: number;
+  disponibilidad_urgencias?: boolean;
   // Relaciones
   provider?: ServiceProvider;
   category?: Category;

@@ -96,11 +96,26 @@
     <div class="section">
       <div class="section-header">
         <h2>Reseñas</h2>
-        <div class="sort-button" (click)="toggleSort()">
+        <div class="sort-button" (click)="toggleSort(); $event.stopPropagation()">
           <ion-icon name="options-outline"></ion-icon>
           <span>Ordenar</span>
         </div>
       </div>
+
+      <!-- Menú desplegable de ordenación -->
+      <div class="sort-menu" *ngIf="showSortMenu" (click)="$event.stopPropagation()">
+        <div 
+          *ngFor="let option of sortOptions" 
+          class="sort-option"
+          [class.selected]="currentSort === option.value"
+          (click)="selectSort(option.value)">
+          <span class="option-label">{{ option.label }}</span>
+          <span class="option-radio" [class.active]="currentSort === option.value"></span>
+        </div>
+      </div>
+
+      <!-- Overlay para cerrar menú -->
+      <div class="sort-overlay" *ngIf="showSortMenu" (click)="closeSortMenu()"></div>
       
       <div class="reviews-list" *ngIf="userReviews && userReviews.length > 0">
         <div *ngFor="let review of userReviews" class="review-item">

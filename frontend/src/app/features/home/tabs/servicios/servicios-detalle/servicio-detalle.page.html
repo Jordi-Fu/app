@@ -206,6 +206,31 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- Servicio de Urgencias -->
+    <ion-card *ngIf="servicio.disponibilidad_urgencias">
+      <ion-card-content>
+        <div class="urgencias-section">
+          <div class="urgencias-header">
+            <span class="urgencias-icon">🚨</span>
+            <span class="urgencias-title">Servicio de urgencias disponible</span>
+            <div class="info-icon" (click)="showUrgenciasInfo = !showUrgenciasInfo">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="urgencias-info" *ngIf="showUrgenciasInfo">
+            <p *ngIf="servicio.precio_urgencias">
+              Este servicio está disponible fuera del horario establecido con un costo de <strong>{{ servicio.precio_urgencias }} {{ servicio.moneda }} la hora</strong>.
+            </p>
+            <p *ngIf="!servicio.precio_urgencias">
+              Este servicio está disponible fuera del horario establecido. Contacta al proveedor para más información sobre precios.
+            </p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
     <!-- Disponibilidad -->
     <ion-card *ngIf="servicio.availability && servicio.availability.length > 0">
       <ion-card-header>

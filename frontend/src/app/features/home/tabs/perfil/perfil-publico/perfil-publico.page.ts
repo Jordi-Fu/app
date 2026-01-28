@@ -20,7 +20,7 @@ import {
   ellipse,
   optionsOutline
 } from 'ionicons/icons';
-import { UserService, getAvatarUrl as getAvatarUrlHelper, getAbsoluteImageUrl } from '../../../../../core/services';
+import { UserService, getAvatarUrl as getAvatarUrlHelper, getAbsoluteImageUrl, ReviewSortOption } from '../../../../../core/services';
 import { UserProfile, Review } from '../../../../../core/interfaces';
 
 @Component({
@@ -49,6 +49,15 @@ export class PerfilPublicoPage implements OnInit {
   userReviews: Review[] = [];
   isLoading = true;
   isDescripcionExpanded = false;
+  showSortMenu = false;
+  currentSort: ReviewSortOption = 'recent';
+
+  sortOptions: { value: ReviewSortOption; label: string }[] = [
+    { value: 'recent', label: 'Más recientes' },
+    { value: 'oldest', label: 'Menos recientes' },
+    { value: 'rating-desc', label: 'Puntuación descendente' },
+    { value: 'rating-asc', label: 'Puntuación ascendente' }
+  ];
 
   constructor() {
     addIcons({
@@ -107,21 +116,18 @@ export class PerfilPublicoPage implements OnInit {
   }
 
   async loadUserReviews(userId: string) {
-    // TODO: Implementar cuando exista el endpoint de reseñas
-    // Por ahora mostramos datos de ejemplo
-    this.userReviews = [
-      {
-        id: '1',
-        reviewer_name: 'Fidel E.',
-        reviewer_avatar: '',
-        reviewer_time_in_app: '7 meses',
-        rating: 5,
-        time_ago: '1 mes',
-        comment: 'Persona muy ordenada y buena cuidadora, la recomiendo para cuidados de personas de tercera edad.',
-        service_id: '1',
-        service_name: 'Limpieza del hogar'
+    this.userService.getUserReviews(userId, this.currentSort).subscribe({
+      next: (response) => {
+        this.userReviews = (response?.data || []).map((review: any) => ({
+          ...review,
+          reviewer_avatar: review.reviewer_avatar === null ? undefined : review.reviewer_avatar
+        }));
+      },
+      error: (error) => {
+        console.error('Error al cargar reseñas del usuario:', error);
+        this.userReviews = [];
       }
-    ];
+    });
   }
 
   getStarsArray(): number[] {
@@ -163,8 +169,22 @@ export class PerfilPublicoPage implements OnInit {
   }
 
   toggleSort() {
-    // TODO: Implementar ordenación de reseñas
-    this.showToast('Ordenar reseñas', 'medium');
+    this.showSortMenu = !this.showSortMenu;
+  }
+
+  closeSortMenu() {
+    this.showSortMenu = false;
+  }
+
+  selectSort(option: ReviewSortOption) {
+    if (this.currentSort !== option) {
+      this.currentSort = option;
+      const userId = this.route.snapshot.paramMap.get('id');
+      if (userId) {
+        this.loadUserReviews(userId);
+      }
+    }
+    this.closeSortMenu();
   }
 
   contactUser() {

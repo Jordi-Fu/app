@@ -452,7 +452,7 @@ class ServiceDatabase {
         data.descripcion,
         data.tipo_precio,
         data.precio || null,
-        data.moneda || 'EUR',
+        data.moneda || '€',
         data.duracion_minutos || null,
         data.tipo_ubicacion,
         data.direccion || null,

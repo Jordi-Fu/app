@@ -232,7 +232,6 @@ ion-content {
         position: absolute;
         top: 12px;
         left: 12px;
-        background: rgba(255, 193, 7, 0.95);
         color: white;
         padding: 6px 12px;
         border-radius: 20px;
@@ -249,7 +248,16 @@ ion-content {
 
         &.verified {
           background: rgba(76, 175, 80, 0.95);
-          top: 48px;
+          top: 12px;
+        }
+
+        &.destacado {
+          background: rgba(255, 193, 7, 0.95);
+          top: 12px;
+          
+          &.con-verificado {
+            top: 48px;
+          }
         }
       }
     }

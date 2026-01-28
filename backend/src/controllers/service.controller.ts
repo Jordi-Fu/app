@@ -339,7 +339,7 @@ class ServiceController {
         descripcion,
         tipo_precio,
         precio: precio ? Number(precio) : undefined,
-        moneda: moneda || 'EUR',
+        moneda: moneda || '€',
         duracion_minutos: duracion_minutos ? Number(duracion_minutos) : undefined,
         tipo_ubicacion,
         direccion,

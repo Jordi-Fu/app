@@ -72,6 +72,7 @@ export class ServicioDetallePage implements OnInit {
   selectedImageIndex = 0;
   isFavorite = false;
   isSharingSupported = false;
+  showUrgenciasInfo = false;
   
 
   constructor() {

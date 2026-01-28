@@ -297,6 +297,7 @@ export class AltaServicioPage implements OnInit {
   async selectImageSource(index: number) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Seleccionar imagen',
+      cssClass: 'image-source-action-sheet',
       buttons: [
         {
           text: 'Cámara',
@@ -691,7 +692,7 @@ export class AltaServicioPage implements OnInit {
         categoria_id: this.serviceForm.get('categoria_id')?.value,
         tipo_precio: this.precioFijo ? PriceType.FIXED : PriceType.FIXED, // Siempre 'fijo', el precio null indica variable
         precio: this.precioFijo ? this.serviceForm.get('precio')?.value : undefined,
-        moneda: this.monedaActual === '€' ? 'EUR' : this.monedaActual === '$' ? 'USD' : 'GBP',
+        moneda: this.monedaActual === '€' ? '€' : this.monedaActual === '$' ? 'USD' : 'GBP',
         duracion_minutos: this.serviceForm.get('duracion_minutos')?.value || undefined,
         tipo_ubicacion: (this.serviceForm.get('tipo_ubicacion')?.value || 'flexible') as LocationType,
         ciudad: ciudad || undefined,

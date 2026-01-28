@@ -637,3 +637,120 @@ ion-content {
     }
   }
 }
+
+// ===============================================
+// MENÚ DE ORDENACIÓN DE RESEÑAS
+// ===============================================
+.sort-menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f5f5f5;
+  border-radius: 24px 24px 0 0;
+  padding: 1.5rem 1rem 2rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  animation: slideUp 0.3s ease-out;
+  
+  .sort-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:active {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .option-label {
+      font-size: 1rem;
+      color: #333;
+    }
+    
+    .option-radio {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      position: relative;
+      transition: border-color 0.2s;
+      
+      &.active {
+        border-color: $primary-green;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: $primary-gradient;
+        }
+      }
+    }
+    
+    &.selected {
+      .option-label {
+        color: $primary-green;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Overlay para cerrar el menú
+.sort-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Dark mode para el menú de ordenación
+@media (prefers-color-scheme: dark) {
+  .sort-menu {
+    background: #2a2a2a;
+    
+    .sort-option {
+      &:active {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      
+      .option-label {
+        color: #ffffff;
+      }
+      
+      .option-radio {
+        border-color: #666;
+      }
+    }
+  }
+}
