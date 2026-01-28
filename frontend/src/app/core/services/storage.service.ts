@@ -28,7 +28,6 @@ export class StorageService {
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
-    console.log('[SecureStorage] Inicializado - Plataforma nativa:', this.isNativePlatform);
     
     if (!this.isNativePlatform) {
       this.initWebCrypto();
@@ -70,7 +69,6 @@ export class StorageService {
       }
       
       this.webCryptoInitialized = true;
-      console.log('[SecureStorage] Web Crypto API inicializado');
     } catch (error) {
       console.error('[SecureStorage] Error inicializando Web Crypto:', error);
     }
@@ -139,12 +137,10 @@ export class StorageService {
       if (this.isNativePlatform) {
         // Usar Capacitor Secure Storage Plugin (Keychain/Keystore)
         await SecureStoragePlugin.set({ key, value });
-        console.log(`[SecureStorage] Guardado ${key} en Secure Storage (nativo)`);
       } else {
         // Web: Cifrar con AES-GCM y guardar en sessionStorage
         const encryptedValue = await this.encryptForWeb(value);
         sessionStorage.setItem(`__secure__${key}`, encryptedValue);
-        console.log(`[SecureStorage] Guardado ${key} en Web (cifrado AES-GCM)`);
       }
       
       // Actualizar cache en memoria
@@ -162,7 +158,6 @@ export class StorageService {
     try {
       // Primero intentar cache en memoria
       if (this.memoryCache.has(key)) {
-        console.log(`[SecureStorage] Leído ${key} de memoria cache`);
         return this.memoryCache.get(key)!;
       }
 
@@ -174,19 +169,16 @@ export class StorageService {
           this.memoryCache.set(key, value);
         }
         
-        console.log(`[SecureStorage] Leído ${key} de Secure Storage:`, value ? 'tiene valor' : 'null');
         return value;
       } else {
         const encryptedValue = sessionStorage.getItem(`__secure__${key}`);
         if (!encryptedValue) {
-          console.log(`[SecureStorage] Leído ${key} de Web: null`);
           return null;
         }
         
         const value = await this.decryptForWeb(encryptedValue);
         this.memoryCache.set(key, value);
         
-        console.log(`[SecureStorage] Leído ${key} de Web (descifrado): tiene valor`);
         return value;
       }
     } catch (error) {
@@ -209,7 +201,6 @@ export class StorageService {
       } else {
         sessionStorage.removeItem(`__secure__${key}`);
       }
-      console.log(`[SecureStorage] Eliminado ${key}`);
     } catch (error) {
       console.warn(`[SecureStorage] Error eliminando ${key}:`, error);
     }
@@ -235,7 +226,6 @@ export class StorageService {
         }
         keysToRemove.forEach(key => sessionStorage.removeItem(key));
       }
-      console.log('[SecureStorage] Storage limpiado');
     } catch (error) {
       console.error('[SecureStorage] Error limpiando storage:', error);
     }

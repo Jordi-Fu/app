@@ -73,8 +73,7 @@ export class AuthService {
       const token = await this.storage.get(TOKEN_KEY);
       const user = await this.storage.getObject<SafeUser>(USER_KEY);
       
-      console.log('[Auth] Token encontrado:', !!token);
-      console.log('[Auth] Usuario encontrado:', !!user);
+     
       
       if (token && user) {
         // Guardar en memoria para acceso rápido
@@ -92,7 +91,6 @@ export class AuthService {
           });
         }
       } else {
-        console.log('[Auth] No hay sesión guardada en Secure Storage');
       }
     } catch (error) {
       // NO llamar a clearAuth() aquí - solo loguear el error
@@ -102,7 +100,6 @@ export class AuthService {
       // Marcar la autenticación como inicializada (independientemente del resultado)
       this._authInitialized = true;
       this.authInitializedSubject.next(true);
-      console.log('[Auth] Inicialización completada');
     }
   }
 

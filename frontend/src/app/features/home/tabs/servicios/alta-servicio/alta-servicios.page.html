@@ -277,7 +277,7 @@
                 </div>
                 <span class="day-name">{{ day.nombre }}</span>
                 <button 
-                  *ngIf="day.selected" 
+                  *ngIf="day.selected && day.horarios.length < 3" 
                   type="button" 
                   class="add-schedule-btn"
                   (click)="addTimeSlot(i); $event.stopPropagation()">
@@ -299,6 +299,7 @@
                   <button 
                     type="button" 
                     class="remove-slot-btn"
+                    *ngIf="j > 0"
                     (click)="removeTimeSlot(i, j)">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
