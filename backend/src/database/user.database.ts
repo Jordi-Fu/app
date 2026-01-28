@@ -385,6 +385,7 @@ class UserDatabase {
           s.tipo_ubicacion,
           s.es_destacado,
           s.esta_verificado,
+          s.esta_activo,
           s.creado_en as fecha_creacion,
           COALESCE(AVG(r.calificacion), 0) as promedio_calificacion,
           COUNT(DISTINCT r.id) as total_resenas,
@@ -394,7 +395,7 @@ class UserDatabase {
         FROM servicios s
         LEFT JOIN resenas r ON r.servicio_id = s.id
         LEFT JOIN categorias c ON c.id = s.categoria_id
-        WHERE s.proveedor_id::text = $1 AND s.esta_activo = true
+        WHERE s.proveedor_id::text = $1
         GROUP BY s.id, c.nombre, c.color, c.url_icono
         ORDER BY s.creado_en DESC
       `;

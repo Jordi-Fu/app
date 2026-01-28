@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, NavController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, NavController } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
@@ -17,7 +17,9 @@ import { Service } from '../../../../core/interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
-    IonContent
+    IonContent,
+    IonRefresher,
+    IonRefresherContent
   ]
 })
 export class PerfilPage implements OnInit, OnDestroy {
@@ -69,6 +71,20 @@ export class PerfilPage implements OnInit, OnDestroy {
     });
   }
 
+  async handleRefresh(event: any) {
+    try {
+      // Recargar datos del usuario actual
+      if (this.usuario?.id) {
+        // Recargar servicios
+        this.cargarServicios(this.usuario.id);
+      }
+    } catch (error) {
+      console.error('Error al refrescar perfil:', error);
+    } finally {
+      event.target.complete();
+    }
+  }
+
   getAvatarUrl(avatarUrl: string | null): string {
     if (!avatarUrl) {
       return '';
@@ -109,6 +125,10 @@ export class PerfilPage implements OnInit, OnDestroy {
 
   irAltaServicio() {
     this.router.navigate(['/home/alta-servicio']);
+  }
+
+  verDetalleServicio(servicioId: string) {
+    this.router.navigate(['/home/servicios', servicioId]);
   }
 
   irResenasRecibidas() {

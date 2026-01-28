@@ -1,4 +1,8 @@
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="perfil-container">
     <!-- Header con username centrado -->
     <div class="custom-header">
@@ -69,7 +73,7 @@
       
       <!-- Si hay servicios -->
       <div class="services-list" *ngIf="serviciosActivos && serviciosActivos.length > 0">
-        <div class="service-item" *ngFor="let servicio of serviciosActivos">
+        <div class="service-item" *ngFor="let servicio of serviciosActivos" (click)="verDetalleServicio(servicio.id)">
           <div class="service-image">
             <img *ngIf="servicio.images && servicio.images.length > 0" 
                  [src]="getServiceImageUrl(servicio.images[0].url_imagen)" 
