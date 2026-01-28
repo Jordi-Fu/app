@@ -1,6 +1,6 @@
 <ion-content [scrollY]="true">
   <div class="page-header">
-    <div class="back-arrow" (click)="goBack()"></div>
+    <div class="back-arrow" *ngIf="currentStep === 1" (click)="goBack()"></div>
     <span class="header-title">Publica tu servicio</span>
   </div>
 
@@ -9,6 +9,7 @@
       
       <!-- PASO 1: Información básica -->
       <div *ngIf="currentStep === 1" class="step-content">
+        <div class="step-title">Información básica</div>
 
         <!-- Sección de imágenes -->
         <div class="images-section">
@@ -38,7 +39,7 @@
           </div>
         </div>
 
-        <p class="image-hint">Al subir varias fotos, la primera imagen será la principal y es la que se muestre al momento de publicar.</p>
+        <p class="image-hint">Al subir varias fotos, la primera imagen será la principal y es la que se muestra al momento de publicar.</p>
 
         <!-- Formulario básico -->
         <form [formGroup]="serviceForm" class="service-form">
@@ -174,19 +175,24 @@
             </div>
           </div>
 
+        </form>
+
+        <div class="step-spacer"></div>
+
+        <div class="step-buttons">
           <button 
             type="button" 
-            class="btn-next"
+            class="btn-publish"
             [class.disabled]="!isStep1Valid()"
             (click)="nextStep()">
             Siguiente
           </button>
-        </form>
+        </div>
       </div>
 
       <!-- PASO 2: Selección de Categoría -->
       <div *ngIf="currentStep === 2" class="step-content">
-        
+        <div class="step-title">Categorías</div>
 
         <div class="categories-list">
           <div 
@@ -195,7 +201,6 @@
             [class.selected]="serviceForm.get('categoria_id')?.value === cat.id || isCategoryOrSubcategorySelected(cat)"
             (click)="selectCategory(cat)">
             <div class="category-info">
-              <span class="category-icon" *ngIf="cat.url_icono">{{ cat.url_icono }}</span>
               <span class="category-name">{{ cat.nombre }}</span>
             </div>
             <div class="category-right">
@@ -207,6 +212,17 @@
               </svg>
             </div>
           </div>
+        </div>
+
+        <div class="step-spacer"></div>
+
+        <div class="step-buttons">
+          <button 
+            type="button" 
+            class="btn-back"
+            (click)="previousStep()">
+            Atrás
+          </button>
         </div>
       </div>
 
@@ -243,6 +259,7 @@
 
       <!-- PASO 3: Disponibilidad -->
       <div *ngIf="currentStep === 3" class="step-content">
+        <div class="step-title">Horarios</div>
 
         <div class="availability-section">
           <!-- Días de la semana -->
@@ -254,7 +271,7 @@
               
               <div class="day-header" (click)="toggleDay(i)">
                 <div class="day-checkbox" [class.checked]="day.selected">
-                  <svg *ngIf="day.selected" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <svg *ngIf="day.selected" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
                   </svg>
                 </div>
@@ -293,20 +310,21 @@
           </div>
 
           <!-- Servicios de Urgencias -->
-          <div class="urgencias-section">
+          <div class="urgencias-section" [class.disabled]="!hasScheduleSelected()">
             <div class="urgencias-header">
               <div class="urgencias-icon">⚠️</div>
               <div class="urgencias-info">
                 <span class="urgencias-title">Servicios de Urgencias</span>
-                <span class="urgencias-subtitle">Disponible 24/7 para emergencias</span>
+                <span class="urgencias-subtitle" *ngIf="hasScheduleSelected()">Disponible 24/7 para emergencias</span>
+                <span class="urgencias-subtitle" *ngIf="!hasScheduleSelected()">Primero configura al menos un día con horario</span>
               </div>
-              <label class="toggle-switch-urgencias" [class.active]="disponibilidadUrgencias">
-                <input type="checkbox" [(ngModel)]="disponibilidadUrgencias" (change)="onUrgenciasChange()">
+              <label class="toggle-switch-urgencias" [class.active]="disponibilidadUrgencias" [class.disabled]="!hasScheduleSelected()">
+                <input type="checkbox" [(ngModel)]="disponibilidadUrgencias" (change)="onUrgenciasChange()" [disabled]="!hasScheduleSelected()">
                 <span class="toggle-slider-urgencias"></span>
               </label>
             </div>
             
-            <div class="urgencias-description" *ngIf="disponibilidadUrgencias">
+            <div class="urgencias-description" *ngIf="disponibilidadUrgencias && hasScheduleSelected()">
               <p>Fuera del horario configurado, recibirás notificaciones cuando un usuario intente contactarte.</p>
               
               <div class="form-group urgencias-price">
@@ -323,17 +341,32 @@
           </div>
         </div>
 
+        <!-- Modal de confirmación sin horarios -->
+        <div class="price-variable-popup" *ngIf="showNoSchedulePopup">
+          <div class="popup-overlay" (click)="closeNoSchedulePopup()"></div>
+          <div class="popup-content">
+            <h3>¿Continuar sin horarios?</h3>
+            <p>No has seleccionado ningún día de la semana para configurar tu disponibilidad. Tu servicio se publicará <strong>sin horarios definidos</strong>.</p>
+            <div class="popup-buttons">
+              <button type="button" class="btn-cancel" (click)="closeNoSchedulePopup()">Cancelar</button>
+              <button type="button" class="btn-confirm" (click)="confirmNoSchedule()">Continuar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-spacer"></div>
+
         <div class="step-buttons">
           <button 
             type="button" 
-            class="btn-skip"
-            (click)="skipAvailability()">
-            Omitir
+            class="btn-back"
+            (click)="previousStep()">
+            Atrás
           </button>
           <button 
             type="button" 
             class="btn-publish"
-            (click)="nextStep()">
+            (click)="handleStep3Next()">
             Siguiente
           </button>
         </div>
@@ -341,14 +374,43 @@
 
       <!-- PASO 4: Resumen del servicio -->
       <div *ngIf="currentStep === 4" class="step-content">
-       
+        <div class="step-title">Resumen</div>
 
         <div class="summary-section">
-          <!-- Imagen principal -->
-          <div class="summary-image" *ngIf="serviceImages[0]">
-            <img [src]="serviceImages[0]" alt="Imagen del servicio" />
-            <div class="image-count" *ngIf="getImageCount() > 1">
-              +{{ getImageCount() - 1 }} fotos
+          <!-- Galería de imágenes -->
+          <div class="summary-images-gallery" *ngIf="getImageCount() > 0">
+            <div 
+              *ngFor="let image of serviceImages; let i = index"
+              class="gallery-image"
+              [class.has-image]="image"
+              (click)="image && openImageViewer(i)">
+              <img *ngIf="image" [src]="image" alt="Imagen del servicio {{ i + 1 }}" />
+              <div *ngIf="!image" class="empty-slot"></div>
+            </div>
+          </div>
+
+          <!-- Modal visor de imágenes -->
+          <div class="image-viewer-modal" *ngIf="showImageViewer">
+            <div class="viewer-overlay" (click)="closeImageViewer()"></div>
+            <div class="viewer-content">
+              <button class="viewer-close" (click)="closeImageViewer()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              <button class="viewer-nav viewer-prev" *ngIf="canNavigatePrev()" (click)="prevImage(); $event.stopPropagation()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+              </button>
+              <img [src]="serviceImages[currentImageIndex]!" alt="Imagen del servicio" class="viewer-image" />
+              <button class="viewer-nav viewer-next" *ngIf="canNavigateNext()" (click)="nextImage(); $event.stopPropagation()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+              </button>
+              <div class="viewer-counter">{{ currentImageIndex + 1 }} / {{ getImageCount() }}</div>
             </div>
           </div>
 

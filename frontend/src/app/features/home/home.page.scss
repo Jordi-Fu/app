@@ -26,7 +26,10 @@ ion-tab-button {
 ion-tab-button.tab-selected {
   ion-icon,
   ion-label {
-    color: #13B5B5;
+    background: linear-gradient(90deg, #3DD598, #13B5B5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
 
@@ -45,7 +48,10 @@ ion-tab-button.tab-selected {
   ion-tab-button.tab-selected {
     ion-icon,
     ion-label {
-      color: #13B5B5;
+      background: linear-gradient(90deg, #3DD598, #13B5B5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 }

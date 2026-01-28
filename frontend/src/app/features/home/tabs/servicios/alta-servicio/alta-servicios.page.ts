@@ -73,6 +73,7 @@ export class AltaServicioPage implements OnInit {
   showPricePopup = false;
   
   // Disponibilidad
+  showNoSchedulePopup = false;
   diasSemana: DiaDisponibilidad[] = [
     { nombre: 'Lunes', dia: 1, selected: false, horarios: [] },
     { nombre: 'Martes', dia: 2, selected: false, horarios: [] },
@@ -92,6 +93,10 @@ export class AltaServicioPage implements OnInit {
   
   // Datos para el resumen
   createdService: any = null;
+
+  // Visor de imágenes
+  showImageViewer = false;
+  currentImageIndex = 0;
 
   ngOnInit() {
     this.initForm();
@@ -219,6 +224,10 @@ export class AltaServicioPage implements OnInit {
     if (this.currentStep > 1) {
       this.currentStep--;
     }
+  }
+
+  previousStep() {
+    this.prevStep();
   }
 
   private validateStep1(): boolean {
@@ -425,6 +434,9 @@ export class AltaServicioPage implements OnInit {
       // Agregar horario por defecto
       day.horarios.push({ inicio: '08:00', fin: '16:00' });
     }
+    
+    // Si ya no hay horarios, desactivar urgencias
+    this.checkAndDisableUrgencias();
   }
 
   addTimeSlot(dayIndex: number) {
@@ -433,6 +445,19 @@ export class AltaServicioPage implements OnInit {
 
   removeTimeSlot(dayIndex: number, slotIndex: number) {
     this.diasSemana[dayIndex].horarios.splice(slotIndex, 1);
+    
+    // Si ya no hay horarios, desactivar urgencias
+    this.checkAndDisableUrgencias();
+  }
+
+  /**
+   * Verifica si hay horarios y desactiva urgencias si no los hay
+   */
+  private checkAndDisableUrgencias() {
+    if (!this.hasScheduleSelected() && this.disponibilidadUrgencias) {
+      this.disponibilidadUrgencias = false;
+      this.precioUrgencias = null;
+    }
   }
 
   onUrgenciasChange() {
@@ -441,12 +466,37 @@ export class AltaServicioPage implements OnInit {
     }
   }
 
-  skipAvailability() {
+  /**
+   * Verifica si hay al menos un día con horarios seleccionados
+   */
+  hasScheduleSelected(): boolean {
+    return this.diasSemana.some(day => day.selected && day.horarios.length > 0);
+  }
+
+  /**
+   * Maneja el click en siguiente del paso 3
+   */
+  handleStep3Next() {
+    if (this.hasScheduleSelected()) {
+      // Si tiene horarios, avanzar directamente
+      this.nextStep();
+    } else {
+      // Si no tiene horarios, mostrar modal de confirmación
+      this.showNoSchedulePopup = true;
+    }
+  }
+
+  closeNoSchedulePopup() {
+    this.showNoSchedulePopup = false;
+  }
+
+  confirmNoSchedule() {
     // Limpiar disponibilidad y pasar al resumen
     this.diasSemana.forEach(day => {
       day.selected = false;
       day.horarios = [];
     });
+    this.showNoSchedulePopup = false;
     this.currentStep = 4;
   }
 
@@ -455,6 +505,59 @@ export class AltaServicioPage implements OnInit {
   getImageCount(): number {
     return this.serviceImages.filter(img => img !== null).length;
   }
+
+  // ===================== VISOR DE IMÁGENES =====================
+
+  openImageViewer(index: number) {
+    this.currentImageIndex = index;
+    this.showImageViewer = true;
+  }
+
+  closeImageViewer() {
+    this.showImageViewer = false;
+  }
+
+  prevImage() {
+    const imagesWithContent = this.serviceImages
+      .map((img, idx) => ({ img, idx }))
+      .filter(item => item.img !== null);
+    
+    const currentPos = imagesWithContent.findIndex(item => item.idx === this.currentImageIndex);
+    if (currentPos > 0) {
+      this.currentImageIndex = imagesWithContent[currentPos - 1].idx;
+    }
+  }
+
+  nextImage() {
+    const imagesWithContent = this.serviceImages
+      .map((img, idx) => ({ img, idx }))
+      .filter(item => item.img !== null);
+    
+    const currentPos = imagesWithContent.findIndex(item => item.idx === this.currentImageIndex);
+    if (currentPos < imagesWithContent.length - 1) {
+      this.currentImageIndex = imagesWithContent[currentPos + 1].idx;
+    }
+  }
+
+  canNavigatePrev(): boolean {
+    const imagesWithContent = this.serviceImages
+      .map((img, idx) => ({ img, idx }))
+      .filter(item => item.img !== null);
+    
+    const currentPos = imagesWithContent.findIndex(item => item.idx === this.currentImageIndex);
+    return currentPos > 0;
+  }
+
+  canNavigateNext(): boolean {
+    const imagesWithContent = this.serviceImages
+      .map((img, idx) => ({ img, idx }))
+      .filter(item => item.img !== null);
+    
+    const currentPos = imagesWithContent.findIndex(item => item.idx === this.currentImageIndex);
+    return currentPos < imagesWithContent.length - 1;
+  }
+
+  // ===================== HELPERS =====================
 
   getTipoUbicacionLabel(): string {
     const tipo = this.serviceForm.get('tipo_ubicacion')?.value;

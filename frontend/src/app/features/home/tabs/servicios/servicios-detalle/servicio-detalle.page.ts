@@ -46,12 +46,7 @@ import { Service } from '../../../../../core/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonTitle,
     IonContent,
-    IonButton,
     IonIcon,
     IonChip,
     IonLabel,

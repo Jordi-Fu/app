@@ -25,18 +25,18 @@ INSERT INTO configuracion_app (clave, valor, tipo_dato, descripcion, es_publico)
 
 INSERT INTO categorias (nombre, slug, descripcion, url_icono, color, esta_activo, indice_orden) VALUES
 -- Categorías principales
-('Hogar y Mantenimiento', 'hogar-mantenimiento', 'Servicios de mantenimiento y reparación para el hogar', '🔧', '#3B82F6', true, 1),
-('Construcción y Remodelación', 'construccion-remodelacion', 'Servicios de construcción, remodelaciones y obras', '🏗️', '#F59E0B', true, 2),
-('Limpieza y Aseo', 'limpieza-aseo', 'Servicios de limpieza doméstica y lavandería', '🧹', '#10B981', true, 3),
-('Jardinería y Exteriores', 'jardineria-exteriores', 'Servicios de jardinería y mantenimiento de áreas verdes', '🌿', '#22C55E', true, 4),
-('Servicios de Emergencia', 'servicios-emergencia', 'Servicios urgentes de cerrajería y gas', '🚨', '#EF4444', true, 5),
-('Tecnología y Soporte Técnico', 'tecnologia-soporte', 'Reparación de dispositivos y soporte técnico', '💻', '#8B5CF6', true, 6),
-('Transporte y Mensajería', 'transporte-mensajeria', 'Servicios de transporte privado y mensajería', '🚗', '#06B6D4', true, 7),
-('Alimentación y Delivery', 'alimentacion-delivery', 'Servicios de comida a domicilio', '🍳', '#F97316', true, 8),
-('Cuidado Personal y Estética', 'cuidado-personal-estetica', 'Servicios de belleza y cuidado personal', '💅', '#EC4899', true, 9),
-('Salud y Cuidado Familiar', 'salud-cuidado-familiar', 'Cuidado de adultos mayores y niños', '❤️', '#F43F5E', true, 10),
-('Educación y Enseñanza', 'educacion-ensenanza', 'Clases particulares, tutorías y capacitación', '📚', '#6366F1', true, 11),
-('Seguridad y Control de Plagas', 'seguridad-control-plagas', 'Servicios de fumigación y control de plagas', '🛡️', '#64748B', true, 12);
+('Hogar y Mantenimiento', 'hogar-mantenimiento', 'Servicios de mantenimiento y reparación para el hogar', '', '#3B82F6', true, 1),
+('Construcción y Remodelación', 'construccion-remodelacion', 'Servicios de construcción, remodelaciones y obras', '', '#F59E0B', true, 2),
+('Limpieza y Aseo', 'limpieza-aseo', 'Servicios de limpieza doméstica y lavandería', '', '#10B981', true, 3),
+('Jardinería y Exteriores', 'jardineria-exteriores', 'Servicios de jardinería y mantenimiento de áreas verdes', '', '#22C55E', true, 4),
+('Servicios de Emergencia', 'servicios-emergencia', 'Servicios urgentes de cerrajería y gas', '', '#EF4444', true, 5),
+('Tecnología y Soporte Técnico', 'tecnologia-soporte', 'Reparación de dispositivos y soporte técnico', '', '#8B5CF6', true, 6),
+('Transporte y Mensajería', 'transporte-mensajeria', 'Servicios de transporte privado y mensajería', '', '#06B6D4', true, 7),
+('Alimentación y Delivery', 'alimentacion-delivery', 'Servicios de comida a domicilio', '', '#F97316', true, 8),
+('Cuidado Personal y Estética', 'cuidado-personal-estetica', 'Servicios de belleza y cuidado personal', '', '#EC4899', true, 9),
+('Salud y Cuidado Familiar', 'salud-cuidado-familiar', 'Cuidado de adultos mayores y niños', '', '#F43F5E', true, 10),
+('Educación y Enseñanza', 'educacion-ensenanza', 'Clases particulares, tutorías y capacitación', '', '#6366F1', true, 11),
+('Seguridad y Control de Plagas', 'seguridad-control-plagas', 'Servicios de fumigación y control de plagas', '', '#64748B', true, 12);
 
 -- ============================================
 -- SUBCATEGORÍAS
@@ -209,7 +209,7 @@ INSERT INTO usuarios (
   'Sistema',
   '34912345678',
   '+34',
-  'https://ui-avatars.com/api/?name=Admin&background=4CAF50&color=fff&size=200',
+  '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
   'Usuario administrador del sistema. Cuenta de prueba para desarrollo y testing.',
   '1990-01-15',
   true,
@@ -296,7 +296,7 @@ BEGIN
   ) VALUES
     ('juan@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'juan_electricista', 'Juan', 'Martínez', '34666111222', '+34',
-     'https://ui-avatars.com/api/?name=Juan&background=FF9800&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Electricista profesional con 10 años de experiencia', '1985-03-15', true, true, 4.8, 45, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -308,7 +308,7 @@ BEGIN
   ) VALUES
     ('maria@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'maria_limpieza', 'María', 'García', '34666222333', '+34',
-     'https://ui-avatars.com/api/?name=Maria&background=4CAF50&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Servicio profesional de limpieza con productos ecológicos', '1990-07-22', true, true, 4.9, 78, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -320,7 +320,7 @@ BEGIN
   ) VALUES
     ('carlos@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'carlos_plomero', 'Carlos', 'López', '34666333444', '+34',
-     'https://ui-avatars.com/api/?name=Carlos&background=2196F3&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Plomero certificado - Emergencias 24/7', '1988-11-10', true, true, 4.7, 92, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -332,7 +332,7 @@ BEGIN
   ) VALUES
     ('ana@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'ana_cliente', 'Ana', 'Rodríguez', '34666444555', '+34',
-     'https://ui-avatars.com/api/?name=Ana&background=E91E63&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Cliente activa de la plataforma', '1992-05-18', true, true, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -344,7 +344,7 @@ BEGIN
   ) VALUES
     ('pedro@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'pedro_cliente', 'Pedro', 'Fernández', '34666555666', '+34',
-     'https://ui-avatars.com/api/?name=Pedro&background=9C27B0&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Buscando servicios de calidad', '1987-09-25', true, true, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -356,7 +356,7 @@ BEGIN
   ) VALUES
     ('sofia@email.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 
      'sofia_profesional', 'Sofía', 'Torres', '34666777888', '+34',
-     'https://ui-avatars.com/api/?name=Sofia&background=00BCD4&color=fff&size=200',
+     '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg',
      'Profesora certificada de inglés y matemáticas', '1991-12-08', true, true, 4.85, 34, 'es', 'Europe/Madrid', '€')
   ON CONFLICT (usuario) DO NOTHING;
   
@@ -506,26 +506,26 @@ BEGIN
   -- Imágenes para servicio de electricidad
   INSERT INTO imagenes_servicios (servicio_id, url_imagen, url_miniatura, pie_de_foto, es_principal, indice_orden)
   VALUES
-    (v_service1_id, 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4', 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=200', 'Instalación eléctrica profesional', true, 1),
-    (v_service1_id, 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d', 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=200', 'Cuadro eléctrico moderno', false, 2),
-    (v_service1_id, 'https://images.unsplash.com/photo-1590852498113-c1cf6b21aaa8', 'https://images.unsplash.com/photo-1590852498113-c1cf6b21aaa8?w=200', 'Herramientas profesionales', false, 3);
+    (v_service1_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Instalación eléctrica profesional', true, 1),
+    (v_service1_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Cuadro eléctrico moderno', false, 2),
+    (v_service1_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Herramientas profesionales', false, 3);
   
   -- Imágenes para servicio de limpieza
   INSERT INTO imagenes_servicios (servicio_id, url_imagen, url_miniatura, pie_de_foto, es_principal, indice_orden)
   VALUES
-    (v_service2_id, 'https://images.unsplash.com/photo-1581578731548-c64695cc6952', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=200', 'Limpieza profesional de hogar', true, 1),
-    (v_service2_id, 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50', 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=200', 'Productos de limpieza ecológicos', false, 2);
+    (v_service2_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Limpieza profesional de hogar', true, 1),
+    (v_service2_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Productos de limpieza ecológicos', false, 2);
   
   -- Imágenes para servicio de plomería
   INSERT INTO imagenes_servicios (servicio_id, url_imagen, url_miniatura, pie_de_foto, es_principal, indice_orden)
   VALUES
-    (v_service3_id, 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39', 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=200', 'Reparación profesional de plomería', true, 1),
-    (v_service3_id, 'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d', 'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=200', 'Instalación de grifería', false, 2);
+    (v_service3_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Reparación profesional de plomería', true, 1),
+    (v_service3_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Instalación de grifería', false, 2);
   
   -- Imágenes para clases de inglés
   INSERT INTO imagenes_servicios (servicio_id, url_imagen, url_miniatura, pie_de_foto, es_principal, indice_orden)
   VALUES
-    (v_service4_id, 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d', 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200', 'Clases online personalizadas', true, 1);
+    (v_service4_id, '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Clases online personalizadas', true, 1);
   
   -- ============================================
   -- DISPONIBILIDAD DE SERVICIOS
@@ -910,13 +910,13 @@ END $$;
 -- Paso 1: Categorías PADRE (sin padre_id)
 INSERT INTO categorias (id, nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
 VALUES
-('c0000000-0000-0000-0000-000000000001','Hogar','hogar-cat','Servicios para el hogar','https://cdn.example.com/icons/home.svg','#2E86AB',NULL,true,11),
-('c0000000-0000-0000-0000-000000000004','Tecnología Avanzada','tecnologia-avanzada','Soporte y servicios tecnológicos avanzados','https://cdn.example.com/icons/tech.svg','#F39C12',NULL,true,14),
-('c0000000-0000-0000-0000-000000000006','Diseño Gráfico','diseno-grafico','Diseño gráfico y digital','https://cdn.example.com/icons/design.svg','#E74C3C',NULL,true,16),
-('c0000000-0000-0000-0000-000000000007','Marketing Digital','marketing-digital','Publicidad y redes sociales','https://cdn.example.com/icons/marketing.svg','#7DCEA0',NULL,true,17),
-('c0000000-0000-0000-0000-000000000008','Clases Online','clases-online','Clases y tutorías online','https://cdn.example.com/icons/education.svg','#5DADE2',NULL,true,18),
-('c0000000-0000-0000-0000-000000000009','Salud y Bienestar Plus','salud-bienestar-plus','Servicios de bienestar premium','https://cdn.example.com/icons/wellness.svg','#48C9B0',NULL,true,19),
-('c0000000-0000-0000-0000-000000000010','Mascotas y Animales','mascotas-animales','Cuidado y paseos de mascotas','https://cdn.example.com/icons/pet.svg','#AAB7B8',NULL,true,20)
+('c0000000-0000-0000-0000-000000000001','Hogar','hogar-cat','Servicios para el hogar','','#2E86AB',NULL,true,11),
+('c0000000-0000-0000-0000-000000000004','Tecnología Avanzada','tecnologia-avanzada','Soporte y servicios tecnológicos avanzados','','#F39C12',NULL,true,14),
+('c0000000-0000-0000-0000-000000000006','Diseño Gráfico','diseno-grafico','Diseño gráfico y digital','','#E74C3C',NULL,true,16),
+('c0000000-0000-0000-0000-000000000007','Marketing Digital','marketing-digital','Publicidad y redes sociales','','#7DCEA0',NULL,true,17),
+('c0000000-0000-0000-0000-000000000008','Clases Online','clases-online','Clases y tutorías online','','#5DADE2',NULL,true,18),
+('c0000000-0000-0000-0000-000000000009','Salud y Bienestar Plus','salud-bienestar-plus','Servicios de bienestar premium','','#48C9B0',NULL,true,19),
+('c0000000-0000-0000-0000-000000000010','Mascotas y Animales','mascotas-animales','Cuidado y paseos de mascotas','','#AAB7B8',NULL,true,20)
 ON CONFLICT (id) DO UPDATE
 SET
   nombre = EXCLUDED.nombre,
@@ -932,9 +932,9 @@ SET
 -- Paso 2: Categorías HIJAS (con padre_id)
 INSERT INTO categorias (id, nombre, slug, descripcion, url_icono, color, padre_id, esta_activo, indice_orden)
 VALUES
-('c0000000-0000-0000-0000-000000000002','Limpieza Hogar','limpieza-hogar-sub','Limpieza general y profunda','https://cdn.example.com/icons/cleaning.svg','#28B463','c0000000-0000-0000-0000-000000000001',true,12),
-('c0000000-0000-0000-0000-000000000003','Reparaciones Hogar','reparaciones-hogar-sub','Arreglos y mantenimiento','https://cdn.example.com/icons/tools.svg','#AF7AC5','c0000000-0000-0000-0000-000000000001',true,13),
-('c0000000-0000-0000-0000-000000000005','Soporte PC','soporte-pc-sub','Formateo, optimización, soporte','https://cdn.example.com/icons/laptop.svg','#1F618D','c0000000-0000-0000-0000-000000000004',true,15)
+('c0000000-0000-0000-0000-000000000002','Limpieza Hogar','limpieza-hogar-sub','Limpieza general y profunda','','#28B463','c0000000-0000-0000-0000-000000000001',true,12),
+('c0000000-0000-0000-0000-000000000003','Reparaciones Hogar','reparaciones-hogar-sub','Arreglos y mantenimiento','','#AF7AC5','c0000000-0000-0000-0000-000000000001',true,13),
+('c0000000-0000-0000-0000-000000000005','Soporte PC','soporte-pc-sub','Formateo, optimización, soporte','','#1F618D','c0000000-0000-0000-0000-000000000004',true,15)
 ON CONFLICT (id) DO UPDATE
 SET
   nombre = EXCLUDED.nombre,
@@ -954,22 +954,22 @@ SET
 
 INSERT INTO usuarios (id, correo, hash_password, usuario, nombre, apellido, telefono, codigo_pais, url_avatar, biografia, esta_verificado, esta_activo, promedio_calificacion, total_resenas, idioma, zona_horaria, moneda)
 VALUES 
-('018de432-0d71-4d8e-8b24-181c266f2a97', 'proveedor01@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor01', 'Laura', 'Sánchez', '34611111111', '+34', 'https://ui-avatars.com/api/?name=Laura&background=2E86AB&color=fff', 'Profesional de limpieza con 5 años de experiencia', true, true, 4.6, 10, 'es', 'Europe/Madrid', '€'),
-('060a39a7-621b-42ab-9249-a7383a8eb7b4', 'proveedor02@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor02', 'Miguel', 'Torres', '34611111112', '+34', 'https://ui-avatars.com/api/?name=Miguel&background=AF7AC5&color=fff', 'Manitas profesional, montaje y reparaciones', true, true, 4.8, 12, 'es', 'Europe/Madrid', '€'),
-('1f7c40ba-aa81-4aa3-835a-20b283b17c57', 'proveedor03@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor03', 'David', 'Ruiz', '34611111113', '+34', 'https://ui-avatars.com/api/?name=David&background=1F618D&color=fff', 'Técnico informático certificado', true, true, 4.7, 18, 'es', 'Europe/Madrid', '€'),
-('624fb14b-cda2-4def-8775-12cf6d5b4acb', 'proveedor04@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor04', 'Carmen', 'Díaz', '34611111114', '+34', 'https://ui-avatars.com/api/?name=Carmen&background=E74C3C&color=fff', 'Diseñadora gráfica freelance', true, true, 4.5, 20, 'es', 'Europe/Madrid', '€'),
-('7243312e-bb97-4960-9dbf-d4052208018f', 'proveedor05@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor05', 'Pablo', 'Navarro', '34611111115', '+34', 'https://ui-avatars.com/api/?name=Pablo&background=7DCEA0&color=fff', 'Community manager y estratega digital', true, true, 4.2, 15, 'es', 'Europe/Madrid', '€'),
-('782d0d95-fcca-4c40-bc8e-6abd1d998127', 'proveedor06@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor06', 'Elena', 'Moreno', '34611111116', '+34', 'https://ui-avatars.com/api/?name=Elena&background=5DADE2&color=fff', 'Profesora particular de matemáticas y física', true, true, 4.9, 22, 'es', 'Europe/Madrid', '€'),
-('81399510-7b33-46d5-8806-0cdfe5986470', 'proveedor07@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor07', 'Roberto', 'Jiménez', '34611111117', '+34', 'https://ui-avatars.com/api/?name=Roberto&background=48C9B0&color=fff', 'Masajista y entrenador personal certificado', true, true, 4.4, 12, 'es', 'Europe/Madrid', '€'),
-('96808fea-c124-43b7-9068-15f99f0e005c', 'proveedor08@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor08', 'Lucía', 'Herrera', '34611111118', '+34', 'https://ui-avatars.com/api/?name=Lucia&background=AAB7B8&color=fff', 'Cuidadora de mascotas profesional', true, true, 4.8, 25, 'es', 'Europe/Madrid', '€'),
-('983b9c31-2017-4a26-b9fa-65284050d26f', 'proveedor09@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor09', 'Andrés', 'Castro', '34611111119', '+34', 'https://ui-avatars.com/api/?name=Andres&background=28B463&color=fff', 'Servicio de limpieza premium', true, true, 4.7, 11, 'es', 'Europe/Madrid', '€'),
-('b2cc63ee-cd3e-4a60-ae7f-d2822778ed54', 'proveedor10@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor10', 'Isabel', 'Vega', '34611111120', '+34', 'https://ui-avatars.com/api/?name=Isabel&background=F39C12&color=fff', 'Fontanera profesional con 8 años de experiencia', true, true, 4.1, 9, 'es', 'Europe/Madrid', '€'),
-('b86bcd2b-48fd-4b89-b4c5-3466de152099', 'proveedor11@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor11', 'Fernando', 'Ortiz', '34611111121', '+34', 'https://ui-avatars.com/api/?name=Fernando&background=3498DB&color=fff', 'Soporte técnico remoto especializado', true, true, 4.9, 31, 'es', 'Europe/Madrid', '€'),
-('c0ffa176-8858-41f9-a09f-ec87807c62b8', 'proveedor12@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor12', 'Sara', 'Molina', '34611111122', '+34', 'https://ui-avatars.com/api/?name=Sara&background=9B59B6&color=fff', 'Diseñadora de banners y material gráfico', true, true, 4.4, 7, 'es', 'Europe/Madrid', '€'),
-('cb4c48e9-a44d-4be7-a1aa-f015a3a02b16', 'proveedor13@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor13', 'Jorge', 'Delgado', '34611111123', '+34', 'https://ui-avatars.com/api/?name=Jorge&background=1ABC9C&color=fff', 'Especialista en Google Ads y email marketing', true, true, 4.0, 6, 'es', 'Europe/Madrid', '€'),
-('d30c2a59-dfb4-4f9a-9b7a-98a5033d615f', 'proveedor14@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor14', 'Patricia', 'Romero', '34611111124', '+34', 'https://ui-avatars.com/api/?name=Patricia&background=E67E22&color=fff', 'Profesora de inglés nativa certificada', true, true, 4.8, 40, 'es', 'Europe/Madrid', '€'),
-('def344f6-6f59-4091-bf49-b070ce6f7538', 'proveedor15@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor15', 'Ricardo', 'Fuentes', '34611111125', '+34', 'https://ui-avatars.com/api/?name=Ricardo&background=16A085&color=fff', 'Instructor de yoga y meditación', true, true, 4.2, 4, 'es', 'Europe/Madrid', '€'),
-('e2060f0c-20ac-4c04-8cf5-7257cc417606', 'proveedor16@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor16', 'Marina', 'Guerrero', '34611111126', '+34', 'https://ui-avatars.com/api/?name=Marina&background=D35400&color=fff', 'Cuidadora de gatos y pequeños animales', true, true, 4.6, 9, 'es', 'Europe/Madrid', '€')
+('018de432-0d71-4d8e-8b24-181c266f2a97', 'proveedor01@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor01', 'Laura', 'Sánchez', '34611111111', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Profesional de limpieza con 5 años de experiencia', true, true, 4.6, 10, 'es', 'Europe/Madrid', '€'),
+('060a39a7-621b-42ab-9249-a7383a8eb7b4', 'proveedor02@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor02', 'Miguel', 'Torres', '34611111112', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Manitas profesional, montaje y reparaciones', true, true, 4.8, 12, 'es', 'Europe/Madrid', '€'),
+('1f7c40ba-aa81-4aa3-835a-20b283b17c57', 'proveedor03@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor03', 'David', 'Ruiz', '34611111113', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Técnico informático certificado', true, true, 4.7, 18, 'es', 'Europe/Madrid', '€'),
+('624fb14b-cda2-4def-8775-12cf6d5b4acb', 'proveedor04@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor04', 'Carmen', 'Díaz', '34611111114', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Diseñadora gráfica freelance', true, true, 4.5, 20, 'es', 'Europe/Madrid', '€'),
+('7243312e-bb97-4960-9dbf-d4052208018f', 'proveedor05@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor05', 'Pablo', 'Navarro', '34611111115', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Community manager y estratega digital', true, true, 4.2, 15, 'es', 'Europe/Madrid', '€'),
+('782d0d95-fcca-4c40-bc8e-6abd1d998127', 'proveedor06@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor06', 'Elena', 'Moreno', '34611111116', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Profesora particular de matemáticas y física', true, true, 4.9, 22, 'es', 'Europe/Madrid', '€'),
+('81399510-7b33-46d5-8806-0cdfe5986470', 'proveedor07@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor07', 'Roberto', 'Jiménez', '34611111117', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Masajista y entrenador personal certificado', true, true, 4.4, 12, 'es', 'Europe/Madrid', '€'),
+('96808fea-c124-43b7-9068-15f99f0e005c', 'proveedor08@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor08', 'Lucía', 'Herrera', '34611111118', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Cuidadora de mascotas profesional', true, true, 4.8, 25, 'es', 'Europe/Madrid', '€'),
+('983b9c31-2017-4a26-b9fa-65284050d26f', 'proveedor09@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor09', 'Andrés', 'Castro', '34611111119', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Servicio de limpieza premium', true, true, 4.7, 11, 'es', 'Europe/Madrid', '€'),
+('b2cc63ee-cd3e-4a60-ae7f-d2822778ed54', 'proveedor10@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor10', 'Isabel', 'Vega', '34611111120', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Fontanera profesional con 8 años de experiencia', true, true, 4.1, 9, 'es', 'Europe/Madrid', '€'),
+('b86bcd2b-48fd-4b89-b4c5-3466de152099', 'proveedor11@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor11', 'Fernando', 'Ortiz', '34611111121', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Soporte técnico remoto especializado', true, true, 4.9, 31, 'es', 'Europe/Madrid', '€'),
+('c0ffa176-8858-41f9-a09f-ec87807c62b8', 'proveedor12@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor12', 'Sara', 'Molina', '34611111122', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Diseñadora de banners y material gráfico', true, true, 4.4, 7, 'es', 'Europe/Madrid', '€'),
+('cb4c48e9-a44d-4be7-a1aa-f015a3a02b16', 'proveedor13@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor13', 'Jorge', 'Delgado', '34611111123', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Especialista en Google Ads y email marketing', true, true, 4.0, 6, 'es', 'Europe/Madrid', '€'),
+('d30c2a59-dfb4-4f9a-9b7a-98a5033d615f', 'proveedor14@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor14', 'Patricia', 'Romero', '34611111124', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Profesora de inglés nativa certificada', true, true, 4.8, 40, 'es', 'Europe/Madrid', '€'),
+('def344f6-6f59-4091-bf49-b070ce6f7538', 'proveedor15@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor15', 'Ricardo', 'Fuentes', '34611111125', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Instructor de yoga y meditación', true, true, 4.2, 4, 'es', 'Europe/Madrid', '€'),
+('e2060f0c-20ac-4c04-8cf5-7257cc417606', 'proveedor16@test.com', '$2b$10$gFWmCnZci9Lu0sIynwsp9.y0yRcAzZDdepskPdcfuZpOgtaiiE3Ty', 'proveedor16', 'Marina', 'Guerrero', '34611111126', '+34', '/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg', 'Cuidadora de gatos y pequeños animales', true, true, 4.6, 9, 'es', 'Europe/Madrid', '€')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
@@ -980,193 +980,193 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000001','018de432-0d71-4d8e-8b24-181c266f2a97','c0000000-0000-0000-0000-000000000002',
-'Limpieza de apartamento (2h)','Limpieza de cocina, baño y zonas comunes.','por_hora',18.00,'€','a_domicilio','Calle Mayor 1','Barcelona','Barcelona','España','08001',41.38790000,2.16992000,true,false,true,120,9,4.60,10,2,'Productos básicos, aspirado, fregado','No incluye limpieza de horno','https://video.example.com/v/clean1')
+'Limpieza de apartamento (2h)','Limpieza de cocina, baño y zonas comunes.','por_hora',18.00,'€','a_domicilio','Calle Mayor 1','Barcelona','Barcelona','España','08001',41.38790000,2.16992000,true,false,true,120,9,4.60,10,2,'Productos básicos, aspirado, fregado','No incluye limpieza de horno','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000002','060a39a7-621b-42ab-9249-a7383a8eb7b4','c0000000-0000-0000-0000-000000000003',
-'Manitas: montaje de muebles','Montaje de muebles tipo IKEA y ajustes.','fijo',45.00,'€','a_domicilio','Av. Diagonal 100','Barcelona','Barcelona','España','08019',41.39480000,2.14260000,true,true,true,98,14,4.80,12,3,'Montaje completo, nivelado','No incluye transporte del mueble','https://video.example.com/v/handy1')
+'Manitas: montaje de muebles','Montaje de muebles tipo IKEA y ajustes.','fijo',45.00,'€','a_domicilio','Av. Diagonal 100','Barcelona','Barcelona','España','08019',41.39480000,2.14260000,true,true,true,98,14,4.80,12,3,'Montaje completo, nivelado','No incluye transporte del mueble','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000003','1f7c40ba-aa81-4aa3-835a-20b283b17c57','c0000000-0000-0000-0000-000000000005',
-'Formateo y puesta a punto','Instalación sistema, drivers y optimización.','fijo',60.00,'€','a_domicilio','C/ Aragó 50','Barcelona','Barcelona','España','08015',41.38270000,2.15380000,true,false,true,210,22,4.70,18,6,'Instalación, antivirus básico','No incluye licencia Windows','https://video.example.com/v/pc1')
+'Formateo y puesta a punto','Instalación sistema, drivers y optimización.','fijo',60.00,'€','a_domicilio','C/ Aragó 50','Barcelona','Barcelona','España','08015',41.38270000,2.15380000,true,false,true,210,22,4.70,18,6,'Instalación, antivirus básico','No incluye licencia Windows','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000004','624fb14b-cda2-4def-8775-12cf6d5b4acb','c0000000-0000-0000-0000-000000000006',
-'Logo básico para tu marca','3 propuestas + 2 revisiones.','fijo',90.00,'€','remoto',NULL,'Madrid','Madrid','España','28001',40.41680000,-3.70380000,true,false,true,340,33,4.50,20,12,'PNG/SVG, paleta de color','No incluye manual de marca completo','https://video.example.com/v/logo1')
+'Logo básico para tu marca','3 propuestas + 2 revisiones.','fijo',90.00,'€','remoto',NULL,'Madrid','Madrid','España','28001',40.41680000,-3.70380000,true,false,true,340,33,4.50,20,12,'PNG/SVG, paleta de color','No incluye manual de marca completo','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000005','7243312e-bb97-4960-9dbf-d4052208018f','c0000000-0000-0000-0000-000000000007',
-'Gestión de Instagram (mensual)','Calendario + 12 posts + métricas.','fijo',250.00,'€','remoto',NULL,'Valencia','Valencia','España','46001',39.46990000,-0.37630000,true,true,false,410,51,4.20,15,24,'Plan de contenido, copies','No incluye inversión en ads','https://video.example.com/v/ig1')
+'Gestión de Instagram (mensual)','Calendario + 12 posts + métricas.','fijo',250.00,'€','remoto',NULL,'Valencia','Valencia','España','46001',39.46990000,-0.37630000,true,true,false,410,51,4.20,15,24,'Plan de contenido, copies','No incluye inversión en ads','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000006','782d0d95-fcca-4c40-bc8e-6abd1d998127','c0000000-0000-0000-0000-000000000008',
-'Clases de matemáticas (ESO)','Refuerzo y preparación de exámenes.','por_hora',20.00,'€','mixto',NULL,'Sevilla','Sevilla','España','41001',37.38910000,-5.98450000,true,false,true,175,18,4.90,22,4,'Material y ejercicios','No incluye desplazamientos fuera de zona','https://video.example.com/v/math1')
+'Clases de matemáticas (ESO)','Refuerzo y preparación de exámenes.','por_hora',20.00,'€','mixto',NULL,'Sevilla','Sevilla','España','41001',37.38910000,-5.98450000,true,false,true,175,18,4.90,22,4,'Material y ejercicios','No incluye desplazamientos fuera de zona','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000007','81399510-7b33-46d5-8806-0cdfe5986470','c0000000-0000-0000-0000-000000000009',
-'Masaje relajante 60min','Masaje descontracturante suave.','fijo',40.00,'€','a_domicilio','C/ San Juan 12','Bilbao','Bizkaia','España','48001',43.26300000,-2.93500000,true,false,false,90,7,4.30,8,5,'Aceites, camilla portátil','No incluye fisioterapia clínica','https://video.example.com/v/massage1')
+'Masaje relajante 60min','Masaje descontracturante suave.','fijo',40.00,'€','a_domicilio','C/ San Juan 12','Bilbao','Bizkaia','España','48001',43.26300000,-2.93500000,true,false,false,90,7,4.30,8,5,'Aceites, camilla portátil','No incluye fisioterapia clínica','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000008','96808fea-c124-43b7-9068-15f99f0e005c','c0000000-0000-0000-0000-000000000010',
-'Paseo de perros (30min)','Paseos individuales o en pareja compatible.','por_hora',12.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08002',41.38510000,2.17340000,true,true,true,260,27,4.80,25,2,'Agua, reporte básico','No incluye adiestramiento','https://video.example.com/v/dog1')
+'Paseo de perros (30min)','Paseos individuales o en pareja compatible.','por_hora',12.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08002',41.38510000,2.17340000,true,true,true,260,27,4.80,25,2,'Agua, reporte básico','No incluye adiestramiento','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000009','983b9c31-2017-4a26-b9fa-65284050d26f','c0000000-0000-0000-0000-000000000002',
-'Limpieza profunda (3h)','Cocina a fondo, baño y polvo detallado.','por_hora',22.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28002',40.42800000,-3.67900000,true,false,true,155,16,4.70,11,3,'Productos premium','No incluye cristales exteriores','https://video.example.com/v/clean2')
+'Limpieza profunda (3h)','Cocina a fondo, baño y polvo detallado.','por_hora',22.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28002',40.42800000,-3.67900000,true,false,true,155,16,4.70,11,3,'Productos premium','No incluye cristales exteriores','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000010','b2cc63ee-cd3e-4a60-ae7f-d2822778ed54','c0000000-0000-0000-0000-000000000003',
-'Reparación básica de fontanería','Cambio de grifo, sifón o pequeñas fugas.','fijo',50.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46002',39.47020000,-0.37680000,true,false,false,130,10,4.10,9,8,'Diagnóstico y mano de obra','No incluye piezas especiales','https://video.example.com/v/plumb1')
+'Reparación básica de fontanería','Cambio de grifo, sifón o pequeñas fugas.','fijo',50.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46002',39.47020000,-0.37680000,true,false,false,130,10,4.10,9,8,'Diagnóstico y mano de obra','No incluye piezas especiales','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000011','b86bcd2b-48fd-4b89-b4c5-3466de152099','c0000000-0000-0000-0000-000000000005',
-'Soporte remoto (1h)','Resolución de problemas por videollamada.','por_hora',25.00,'€','remoto',NULL,'Zaragoza','Zaragoza','España','50001',41.64880000,-0.88910000,true,true,true,300,29,4.90,31,1,'Diagnóstico, limpieza software','No incluye reparaciones hardware','https://video.example.com/v/remote1')
+'Soporte remoto (1h)','Resolución de problemas por videollamada.','por_hora',25.00,'€','remoto',NULL,'Zaragoza','Zaragoza','España','50001',41.64880000,-0.88910000,true,true,true,300,29,4.90,31,1,'Diagnóstico, limpieza software','No incluye reparaciones hardware','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000012','c0ffa176-8858-41f9-a09f-ec87807c62b8','c0000000-0000-0000-0000-000000000006',
-'Pack 5 banners para redes','Diseños listos para publicar.','fijo',70.00,'€','remoto',NULL,'Málaga','Málaga','España','29001',36.72130000,-4.42140000,true,false,true,145,12,4.40,7,10,'5 diseños, 2 revisiones','No incluye copywriting','https://video.example.com/v/banner1')
+'Pack 5 banners para redes','Diseños listos para publicar.','fijo',70.00,'€','remoto',NULL,'Málaga','Málaga','España','29001',36.72130000,-4.42140000,true,false,true,145,12,4.40,7,10,'5 diseños, 2 revisiones','No incluye copywriting','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000013','cb4c48e9-a44d-4be7-a1aa-f015a3a02b16','c0000000-0000-0000-0000-000000000007',
-'Campaña Google Ads (setup)','Configuración de cuenta y 1 campaña.','fijo',120.00,'€','remoto',NULL,'Madrid','Madrid','España','28010',40.43190000,-3.70570000,true,false,false,220,19,4.00,6,48,'Estructura, keywords','No incluye presupuesto publicitario','https://video.example.com/v/ads1')
+'Campaña Google Ads (setup)','Configuración de cuenta y 1 campaña.','fijo',120.00,'€','remoto',NULL,'Madrid','Madrid','España','28010',40.43190000,-3.70570000,true,false,false,220,19,4.00,6,48,'Estructura, keywords','No incluye presupuesto publicitario','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000014','d30c2a59-dfb4-4f9a-9b7a-98a5033d615f','c0000000-0000-0000-0000-000000000008',
-'Clases de inglés conversación','Enfoque speaking, nivel A2-B2.','por_hora',18.00,'€','remoto',NULL,'Barcelona','Barcelona','España','08005',41.40360000,2.18990000,true,true,true,500,66,4.80,40,3,'Material y feedback','No incluye certificación oficial','https://video.example.com/v/eng1')
+'Clases de inglés conversación','Enfoque speaking, nivel A2-B2.','por_hora',18.00,'€','remoto',NULL,'Barcelona','Barcelona','España','08005',41.40360000,2.18990000,true,true,true,500,66,4.80,40,3,'Material y feedback','No incluye certificación oficial','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000015','def344f6-6f59-4091-bf49-b070ce6f7538','c0000000-0000-0000-0000-000000000009',
-'Yoga suave (sesión 45min)','Yoga para movilidad y respiración.','fijo',0.00,'€','remoto',NULL,'Alicante','Alicante','España','03001',38.34520000,-0.48100000,true,false,false,80,5,4.20,4,6,'Sesión guiada','No incluye plan personalizado','https://video.example.com/v/yoga1')
+'Yoga suave (sesión 45min)','Yoga para movilidad y respiración.','fijo',0.00,'€','remoto',NULL,'Alicante','Alicante','España','03001',38.34520000,-0.48100000,true,false,false,80,5,4.20,4,6,'Sesión guiada','No incluye plan personalizado','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
 VALUES
 ('a0000000-0000-0000-0000-000000000016','e2060f0c-20ac-4c04-8cf5-7257cc417606','c0000000-0000-0000-0000-000000000010',
-'Cuidado de gatos (visita)','Visita diaria: comida, agua y arenero.','fijo',15.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28003',40.44690000,-3.70040000,true,false,true,115,11,4.60,9,2,'Reporte con fotos','No incluye medicación inyectable','https://video.example.com/v/cat1')
+'Cuidado de gatos (visita)','Visita diaria: comida, agua y arenero.','fijo',15.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28003',40.44690000,-3.70040000,true,false,true,115,11,4.60,9,2,'Reporte con fotos','No incluye medicación inyectable','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000017','018de432-0d71-4d8e-8b24-181c266f2a97','c0000000-0000-0000-0000-000000000003','Pintura de habitación','Pintado de una habitación estándar.','fijo',150.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08008',41.39540000,2.16180000,true,false,false,60,4,4.10,3,24,'Protección de suelo, 2 manos','No incluye pintura especial','https://video.example.com/v/paint1')
+VALUES ('a0000000-0000-0000-0000-000000000017','018de432-0d71-4d8e-8b24-181c266f2a97','c0000000-0000-0000-0000-000000000003','Pintura de habitación','Pintado de una habitación estándar.','fijo',150.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08008',41.39540000,2.16180000,true,false,false,60,4,4.10,3,24,'Protección de suelo, 2 manos','No incluye pintura especial','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000018','060a39a7-621b-42ab-9249-a7383a8eb7b4','c0000000-0000-0000-0000-000000000002','Limpieza fin de obra (por m2)','Limpieza post reforma ligera.','fijo',120.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28004',40.42300000,-3.69900000,true,true,false,140,13,4.30,6,12,'Polvo, suelos, cristales interiores','No incluye retirada de escombros','https://video.example.com/v/post1')
+VALUES ('a0000000-0000-0000-0000-000000000018','060a39a7-621b-42ab-9249-a7383a8eb7b4','c0000000-0000-0000-0000-000000000002','Limpieza fin de obra (por m2)','Limpieza post reforma ligera.','fijo',120.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28004',40.42300000,-3.69900000,true,true,false,140,13,4.30,6,12,'Polvo, suelos, cristales interiores','No incluye retirada de escombros','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000019','1f7c40ba-aa81-4aa3-835a-20b283b17c57','c0000000-0000-0000-0000-000000000005','Instalación impresora + wifi','Configuro impresora y red doméstica.','fijo',35.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46010',39.48690000,-0.36490000,true,false,true,88,8,4.50,8,6,'Drivers, test impresión','No incluye router nuevo','https://video.example.com/v/print1')
+VALUES ('a0000000-0000-0000-0000-000000000019','1f7c40ba-aa81-4aa3-835a-20b283b17c57','c0000000-0000-0000-0000-000000000005','Instalación impresora + wifi','Configuro impresora y red doméstica.','fijo',35.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46010',39.48690000,-0.36490000,true,false,true,88,8,4.50,8,6,'Drivers, test impresión','No incluye router nuevo','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000020','624fb14b-cda2-4def-8775-12cf6d5b4acb','c0000000-0000-0000-0000-000000000006','Tarjeta de visita','Diseño para imprimir (2 caras).','fijo',25.00,'€','remoto',NULL,'Madrid','Madrid','España','28005',40.41080000,-3.70740000,true,false,true,70,6,4.20,5,24,'PDF listo para imprenta','No incluye impresión','https://video.example.com/v/card1')
+VALUES ('a0000000-0000-0000-0000-000000000020','624fb14b-cda2-4def-8775-12cf6d5b4acb','c0000000-0000-0000-0000-000000000006','Tarjeta de visita','Diseño para imprimir (2 caras).','fijo',25.00,'€','remoto',NULL,'Madrid','Madrid','España','28005',40.41080000,-3.70740000,true,false,true,70,6,4.20,5,24,'PDF listo para imprenta','No incluye impresión','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000021','7243312e-bb97-4960-9dbf-d4052208018f','c0000000-0000-0000-0000-000000000007','Auditoría SEO básica','Revisión on-page y recomendaciones.','fijo',80.00,'€','remoto',NULL,'Valencia','Valencia','España','46003',39.47640000,-0.37500000,true,false,false,95,9,4.10,4,48,'Checklist y documento','No incluye implementación','https://video.example.com/v/seo1')
+VALUES ('a0000000-0000-0000-0000-000000000021','7243312e-bb97-4960-9dbf-d4052208018f','c0000000-0000-0000-0000-000000000007','Auditoría SEO básica','Revisión on-page y recomendaciones.','fijo',80.00,'€','remoto',NULL,'Valencia','Valencia','España','46003',39.47640000,-0.37500000,true,false,false,95,9,4.10,4,48,'Checklist y documento','No incluye implementación','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000022','782d0d95-fcca-4c40-bc8e-6abd1d998127','c0000000-0000-0000-0000-000000000008','Clases de física (Bachillerato)','Problemas y preparación EBAU.','por_hora',22.00,'€','mixto',NULL,'Sevilla','Sevilla','España','41002',37.39720000,-5.98690000,true,false,true,140,12,4.70,10,6,'Ejercicios y simulacros','No incluye academia','https://video.example.com/v/phy1')
+VALUES ('a0000000-0000-0000-0000-000000000022','782d0d95-fcca-4c40-bc8e-6abd1d998127','c0000000-0000-0000-0000-000000000008','Clases de física (Bachillerato)','Problemas y preparación EBAU.','por_hora',22.00,'€','mixto',NULL,'Sevilla','Sevilla','España','41002',37.39720000,-5.98690000,true,false,true,140,12,4.70,10,6,'Ejercicios y simulacros','No incluye academia','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000023','81399510-7b33-46d5-8806-0cdfe5986470','c0000000-0000-0000-0000-000000000009','Entrenamiento personal (1h)','Rutina adaptada y seguimiento.','por_hora',30.00,'€','a_domicilio',NULL,'Bilbao','Bizkaia','España','48002',43.26200000,-2.94800000,true,true,false,160,21,4.40,12,4,'Calentamiento, rutina','No incluye dieta','https://video.example.com/v/train1')
+VALUES ('a0000000-0000-0000-0000-000000000023','81399510-7b33-46d5-8806-0cdfe5986470','c0000000-0000-0000-0000-000000000009','Entrenamiento personal (1h)','Rutina adaptada y seguimiento.','por_hora',30.00,'€','a_domicilio',NULL,'Bilbao','Bizkaia','España','48002',43.26200000,-2.94800000,true,true,false,160,21,4.40,12,4,'Calentamiento, rutina','No incluye dieta','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000024','96808fea-c124-43b7-9068-15f99f0e005c','c0000000-0000-0000-0000-000000000010','Adiestramiento básico (sesión)','Órdenes básicas y conducta en paseo.','por_hora',28.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08003',41.38730000,2.18150000,true,false,true,190,23,4.60,14,4,'Guía y ejercicios','No incluye collar especial','https://video.example.com/v/trainDog1')
+VALUES ('a0000000-0000-0000-0000-000000000024','96808fea-c124-43b7-9068-15f99f0e005c','c0000000-0000-0000-0000-000000000010','Adiestramiento básico (sesión)','Ordenes básicas y conducta en paseo.','por_hora',28.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08003',41.38730000,2.18150000,true,false,true,190,23,4.60,14,4,'Guía y ejercicios','No incluye collar especial','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000025','983b9c31-2017-4a26-b9fa-65284050d26f','c0000000-0000-0000-0000-000000000003','Electricista: enchufe y lámpara','Instalación o sustitución básica.','fijo',55.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28006',40.43260000,-3.68170000,true,false,true,110,9,4.30,7,8,'Mano de obra','No incluye materiales premium','https://video.example.com/v/elect1')
+VALUES ('a0000000-0000-0000-0000-000000000025','983b9c31-2017-4a26-b9fa-65284050d26f','c0000000-0000-0000-0000-000000000003','Electricista: enchufe y lámpara','Instalación o sustitución básica.','fijo',55.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28006',40.43260000,-3.68170000,true,false,true,110,9,4.30,7,8,'Mano de obra','No incluye materiales premium','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000026','b2cc63ee-cd3e-4a60-ae7f-d2822778ed54','c0000000-0000-0000-0000-000000000002','Plancha a domicilio (1h)','Planchado de ropa por hora.','por_hora',16.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46004',39.46570000,-0.37740000,true,false,false,75,5,4.00,3,6,'Planchado estándar','No incluye lavado','https://video.example.com/v/iron1')
+VALUES ('a0000000-0000-0000-0000-000000000026','b2cc63ee-cd3e-4a60-ae7f-d2822778ed54','c0000000-0000-0000-0000-000000000002','Plancha a domicilio (1h)','Planchado de ropa por hora.','por_hora',16.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46004',39.46570000,-0.37740000,true,false,false,75,5,4.00,3,6,'Planchado estándar','No incluye lavado','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000027','b86bcd2b-48fd-4b89-b4c5-3466de152099','c0000000-0000-0000-0000-000000000005','Optimización PC gaming','Ajustes de rendimiento y drivers.','fijo',75.00,'€','a_domicilio',NULL,'Zaragoza','Zaragoza','España','50002',41.64220000,-0.88770000,true,true,true,260,30,4.80,16,2,'Drivers, benchmarks','No incluye upgrade hardware','https://video.example.com/v/gaming1')
+VALUES ('a0000000-0000-0000-0000-000000000027','b86bcd2b-48fd-4b89-b4c5-3466de152099','c0000000-0000-0000-0000-000000000005','Optimización PC gaming','Ajustes de rendimiento y drivers.','fijo',75.00,'€','a_domicilio',NULL,'Zaragoza','Zaragoza','España','50002',41.64220000,-0.88770000,true,true,true,260,30,4.80,16,2,'Drivers, benchmarks','No incluye upgrade hardware','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000028','c0ffa176-8858-41f9-a09f-ec87807c62b8','c0000000-0000-0000-0000-000000000006','Plantilla CV ATS','Diseño limpio + versión Word.','fijo',20.00,'€','remoto',NULL,'Málaga','Málaga','España','29002',36.71260000,-4.42780000,true,false,true,180,15,4.60,12,24,'PDF + DOCX','No incluye redacción completa','https://video.example.com/v/cv1')
+VALUES ('a0000000-0000-0000-0000-000000000028','c0ffa176-8858-41f9-a09f-ec87807c62b8','c0000000-0000-0000-0000-000000000006','Plantilla CV ATS','Diseño limpio + versión Word.','fijo',20.00,'€','remoto',NULL,'Málaga','Málaga','España','29002',36.71260000,-4.42780000,true,false,true,180,15,4.60,12,24,'PDF + DOCX','No incluye redacción completa','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000029','cb4c48e9-a44d-4be7-a1aa-f015a3a02b16','c0000000-0000-0000-0000-000000000007','Email marketing (setup)','Automatización básica y plantilla.','fijo',65.00,'€','remoto',NULL,'Madrid','Madrid','España','28011',40.40780000,-3.73170000,true,false,false,120,10,4.10,5,48,'Segmentación y plantilla','No incluye copy semanal','https://video.example.com/v/email1')
+VALUES ('a0000000-0000-0000-0000-000000000029','cb4c48e9-a44d-4be7-a1aa-f015a3a02b16','c0000000-0000-0000-0000-000000000007','Email marketing (setup)','Automatización básica y plantilla.','fijo',65.00,'€','remoto',NULL,'Madrid','Madrid','España','28011',40.40780000,-3.73170000,true,false,false,120,10,4.10,5,48,'Segmentación y plantilla','No incluye copy semanal','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000030','d30c2a59-dfb4-4f9a-9b7a-98a5033d615f','c0000000-0000-0000-0000-000000000008','Preparación entrevista (1h)','Simulación + feedback.','por_hora',25.00,'€','remoto',NULL,'Barcelona','Barcelona','España','08010',41.39400000,2.17500000,true,true,true,210,20,4.70,9,6,'Guía y recomendaciones','No incluye CV','https://video.example.com/v/interview1')
+VALUES ('a0000000-0000-0000-0000-000000000030','d30c2a59-dfb4-4f9a-9b7a-98a5033d615f','c0000000-0000-0000-0000-000000000008','Preparación entrevista (1h)','Simulación + feedback.','por_hora',25.00,'€','remoto',NULL,'Barcelona','Barcelona','España','08010',41.39400000,2.17500000,true,true,true,210,20,4.70,9,6,'Guía y recomendaciones','No incluye CV','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000031','def344f6-6f59-4091-bf49-b070ce6f7538','c0000000-0000-0000-0000-000000000009','Meditación guiada (30min)','Sesión para reducir estrés.','fijo',0.00,'€','remoto',NULL,'Alicante','Alicante','España','03002',38.34360000,-0.48400000,true,false,false,65,3,4.00,2,2,'Sesión guiada','No incluye seguimiento','https://video.example.com/v/med1')
+VALUES ('a0000000-0000-0000-0000-000000000031','def344f6-6f59-4091-bf49-b070ce6f7538','c0000000-0000-0000-0000-000000000009','Meditación guiada (30min)','Sesión para reducir estrés.','fijo',0.00,'€','remoto',NULL,'Alicante','Alicante','España','03002',38.34360000,-0.48400000,true,false,false,65,3,4.00,2,2,'Sesión guiada','No incluye seguimiento','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000032','e2060f0c-20ac-4c04-8cf5-7257cc417606','c0000000-0000-0000-0000-000000000010','Corte de uñas mascota','Servicio básico en casa.','fijo',10.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28012',40.41530000,-3.70740000,true,false,true,50,4,4.20,3,12,'Corte y revisión','No incluye peluquería completa','https://video.example.com/v/pet1')
+VALUES ('a0000000-0000-0000-0000-000000000032','e2060f0c-20ac-4c04-8cf5-7257cc417606','c0000000-0000-0000-0000-000000000010','Corte de uñas mascota','Servicio básico en casa.','fijo',10.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28012',40.41530000,-3.70740000,true,false,true,50,4,4.20,3,12,'Corte y revisión','No incluye peluquería completa','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000033','018de432-0d71-4d8e-8b24-181c266f2a97','c0000000-0000-0000-0000-000000000002','Limpieza de oficinas (2h)','Limpieza de zona de trabajo y baño.','por_hora',20.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08018',41.40880000,2.19750000,true,false,false,105,9,4.30,6,4,'Consumibles básicos','No incluye limpieza industrial','https://video.example.com/v/office1')
+VALUES ('a0000000-0000-0000-0000-000000000033','018de432-0d71-4d8e-8b24-181c266f2a97','c0000000-0000-0000-0000-000000000002','Limpieza de oficinas (2h)','Limpieza de zona de trabajo y baño.','por_hora',20.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08018',41.40880000,2.19750000,true,false,false,105,9,4.30,6,4,'Consumibles básicos','No incluye limpieza industrial','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000034','060a39a7-621b-42ab-9249-a7383a8eb7b4','c0000000-0000-0000-0000-000000000003','Cambio de cerradura','Sustitución de cerradura estándar.','fijo',85.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28013',40.41800000,-3.70990000,true,true,true,145,11,4.50,8,3,'Mano de obra, ajuste','No incluye cerradura alta seguridad','https://video.example.com/v/lock1')
+VALUES ('a0000000-0000-0000-0000-000000000034','060a39a7-621b-42ab-9249-a7383a8eb7b4','c0000000-0000-0000-0000-000000000003','Cambio de cerradura','Sustitución de cerradura estándar.','fijo',85.00,'€','a_domicilio',NULL,'Madrid','Madrid','España','28013',40.41800000,-3.70990000,true,true,true,145,11,4.50,8,3,'Mano de obra, ajuste','No incluye cerradura alta seguridad','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000035','1f7c40ba-aa81-4aa3-835a-20b283b17c57','c0000000-0000-0000-0000-000000000004','Configuración domótica básica','Conecto dispositivos a la red y app.','fijo',55.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46020',39.49200000,-0.36300000,true,false,true,95,8,4.40,5,12,'Configuración 3 dispositivos','No incluye compra de dispositivos','https://video.example.com/v/iot1')
+VALUES ('a0000000-0000-0000-0000-000000000035','1f7c40ba-aa81-4aa3-835a-20b283b17c57','c0000000-0000-0000-0000-000000000004','Configuración domótica básica','Conecto dispositivos a la red y app.','fijo',55.00,'€','a_domicilio',NULL,'Valencia','Valencia','España','46020',39.49200000,-0.36300000,true,false,true,95,8,4.40,5,12,'Configuración 3 dispositivos','No incluye compra de dispositivos','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000036','624fb14b-cda2-4def-8775-12cf6d5b4acb','c0000000-0000-0000-0000-000000000006','Portada para ebook','Diseño de portada profesional.','fijo',60.00,'€','remoto',NULL,'Madrid','Madrid','España','28014',40.41550000,-3.69200000,true,false,true,110,14,4.70,9,24,'JPG/PNG alta','No incluye maquetación interior','https://video.example.com/v/ebook1')
+VALUES ('a0000000-0000-0000-0000-000000000036','624fb14b-cda2-4def-8775-12cf6d5b4acb','c0000000-0000-0000-0000-000000000006','Portada para ebook','Diseño de portada profesional.','fijo',60.00,'€','remoto',NULL,'Madrid','Madrid','España','28014',40.41550000,-3.69200000,true,false,true,110,14,4.70,9,24,'JPG/PNG alta','No incluye maquetación interior','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000037','7243312e-bb97-4960-9dbf-d4052208018f','c0000000-0000-0000-0000-000000000007','Gestión TikTok (mensual)','8 vídeos editados + calendario.','fijo',220.00,'€','remoto',NULL,'Valencia','Valencia','España','46005',39.46000000,-0.35200000,true,false,false,200,17,4.00,6,24,'Edición básica','No incluye grabación presencial','https://video.example.com/v/tiktok1')
+VALUES ('a0000000-0000-0000-0000-000000000037','7243312e-bb97-4960-9dbf-d4052208018f','c0000000-0000-0000-0000-000000000007','Gestión TikTok (mensual)','8 vídeos editados + calendario.','fijo',220.00,'€','remoto',NULL,'Valencia','Valencia','España','46005',39.46000000,-0.35200000,true,false,false,200,17,4.00,6,24,'Edición básica','No incluye grabación presencial','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000038','782d0d95-fcca-4c40-bc8e-6abd1d998127','c0000000-0000-0000-0000-000000000008','Clases de programación (Python)','Fundamentos + ejercicios prácticos.','por_hora',30.00,'€','remoto',NULL,'Sevilla','Sevilla','España','41003',37.38900000,-5.97500000,true,true,true,320,40,4.80,18,6,'Repositorio ejercicios','No incluye certificación','https://video.example.com/v/py1')
+VALUES ('a0000000-0000-0000-0000-000000000038','782d0d95-fcca-4c40-bc8e-6abd1d998127','c0000000-0000-0000-0000-000000000008','Clases de programación (Python)','Fundamentos + ejercicios prácticos.','por_hora',30.00,'€','remoto',NULL,'Sevilla','Sevilla','España','41003',37.38900000,-5.97500000,true,true,true,320,40,4.80,18,6,'Repositorio ejercicios','No incluye certificación','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000039','81399510-7b33-46d5-8806-0cdfe5986470','c0000000-0000-0000-0000-000000000009','Plan de entrenamiento 4 semanas','Rutina personalizada en PDF.','fijo',35.00,'€','remoto',NULL,'Bilbao','Bizkaia','España','48003',43.26800000,-2.93400000,true,false,false,85,6,4.20,4,24,'Rutina + progresión','No incluye videollamadas','https://video.example.com/v/plan1')
+VALUES ('a0000000-0000-0000-0000-000000000039','81399510-7b33-46d5-8806-0cdfe5986470','c0000000-0000-0000-0000-000000000009','Plan de entrenamiento 4 semanas','Rutina personalizada en PDF.','fijo',35.00,'€','remoto',NULL,'Bilbao','Bizkaia','España','48003',43.26800000,-2.93400000,true,false,false,85,6,4.20,4,24,'Rutina + progresión','No incluye videollamadas','')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicios (id, proveedor_id, categoria_id, titulo, descripcion, tipo_precio, precio, moneda, tipo_ubicacion, direccion, ciudad, estado, pais, codigo_postal, latitud, longitud, esta_activo, es_destacado, esta_verificado, vistas, conteo_favoritos, promedio_calificacion, total_resenas, tiempo_respuesta_horas, incluye, no_incluye, url_video)
-VALUES ('a0000000-0000-0000-0000-000000000040','96808fea-c124-43b7-9068-15f99f0e005c','c0000000-0000-0000-0000-000000000010','Guardería de día (perro)','Cuidado 8h con paseos.','fijo',25.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08009',41.39200000,2.16400000,true,true,true,240,30,4.70,16,2,'2 paseos, agua, fotos','No incluye comida especial','https://video.example.com/v/daycare1')
+VALUES ('a0000000-0000-0000-0000-000000000040','96808fea-c124-43b7-9068-15f99f0e005c','c0000000-0000-0000-0000-000000000010','Guardería de día (perro)','Cuidado 8h con paseos.','fijo',25.00,'€','a_domicilio',NULL,'Barcelona','Barcelona','España','08009',41.39200000,2.16400000,true,true,true,240,30,4.70,16,2,'2 paseos, agua, fotos','No incluye comida especial','')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
@@ -1175,31 +1175,31 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO imagenes_servicios (id, servicio_id, url_imagen, url_miniatura, pie_de_foto, es_principal, indice_orden, ancho, alto)
 VALUES 
-('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001','https://cdn.example.com/services/s1/1.jpg','https://cdn.example.com/services/s1/1_sm.jpg','Antes y después',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000001','https://cdn.example.com/services/s1/2.jpg','https://cdn.example.com/services/s1/2_sm.jpg','Productos utilizados',false,2,1200,800),
-('b0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000002','https://cdn.example.com/services/s2/1.jpg','https://cdn.example.com/services/s2/1_sm.jpg','Montaje en progreso',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000003','https://cdn.example.com/services/s3/1.jpg','https://cdn.example.com/services/s3/1_sm.jpg','Equipo y herramientas',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000004','https://cdn.example.com/services/s4/1.jpg','https://cdn.example.com/services/s4/1_sm.jpg','Ejemplos de logos',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000005','https://cdn.example.com/services/s5/1.jpg','https://cdn.example.com/services/s5/1_sm.jpg','Feed de ejemplo',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000006','https://cdn.example.com/services/s6/1.jpg','https://cdn.example.com/services/s6/1_sm.jpg','Material de clase',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000007','https://cdn.example.com/services/s7/1.jpg','https://cdn.example.com/services/s7/1_sm.jpg','Zona de masaje',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000008','https://cdn.example.com/services/s8/1.jpg','https://cdn.example.com/services/s8/1_sm.jpg','Paseo en parque',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000009','https://cdn.example.com/services/s9/1.jpg','https://cdn.example.com/services/s9/1_sm.jpg','Cocina a fondo',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000010','https://cdn.example.com/services/s10/1.jpg','https://cdn.example.com/services/s10/1_sm.jpg','Reparación de fuga',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000011','https://cdn.example.com/services/s11/1.jpg','https://cdn.example.com/services/s11/1_sm.jpg','Soporte remoto',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000012','https://cdn.example.com/services/s12/1.jpg','https://cdn.example.com/services/s12/1_sm.jpg','Banners',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000013','https://cdn.example.com/services/s13/1.jpg','https://cdn.example.com/services/s13/1_sm.jpg','Panel Ads',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000014','https://cdn.example.com/services/s14/1.jpg','https://cdn.example.com/services/s14/1_sm.jpg','Clases por videollamada',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000015','https://cdn.example.com/services/s15/1.jpg','https://cdn.example.com/services/s15/1_sm.jpg','Yoga en casa',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000016','https://cdn.example.com/services/s16/1.jpg','https://cdn.example.com/services/s16/1_sm.jpg','Visita gatos',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000020','https://cdn.example.com/services/s20/1.jpg','https://cdn.example.com/services/s20/1_sm.jpg','Tarjeta ejemplo',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000021','https://cdn.example.com/services/s21/1.jpg','https://cdn.example.com/services/s21/1_sm.jpg','Informe SEO',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000024','https://cdn.example.com/services/s24/1.jpg','https://cdn.example.com/services/s24/1_sm.jpg','Sesión adiestramiento',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000027','https://cdn.example.com/services/s27/1.jpg','https://cdn.example.com/services/s27/1_sm.jpg','Benchmark',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000028','https://cdn.example.com/services/s28/1.jpg','https://cdn.example.com/services/s28/1_sm.jpg','Plantilla CV',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000033','https://cdn.example.com/services/s33/1.jpg','https://cdn.example.com/services/s33/1_sm.jpg','Oficina',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000038','https://cdn.example.com/services/s38/1.jpg','https://cdn.example.com/services/s38/1_sm.jpg','Código ejemplo',true,1,1200,800),
-('b0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000040','https://cdn.example.com/services/s40/1.jpg','https://cdn.example.com/services/s40/1_sm.jpg','Guardería',true,1,1200,800)
+('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Antes y después',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000001','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Productos utilizados',false,2,1200,800),
+('b0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000002','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Montaje en progreso',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000003','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Equipo y herramientas',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000004','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Ejemplos de logos',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000005','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Feed de ejemplo',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000006','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Material de clase',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000007','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Zona de masaje',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000008','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Paseo en parque',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000009','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Cocina a fondo',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000010','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Reparación de fuga',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000011','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Soporte remoto',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000012','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Banners',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000013','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Panel Ads',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000014','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Clases por videollamada',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000015','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Yoga en casa',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000016','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Visita gatos',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000020','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Tarjeta ejemplo',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000021','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Informe SEO',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000024','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Sesión adiestramiento',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000027','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Benchmark',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000028','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Plantilla CV',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000033','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Oficina',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000038','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Código ejemplo',true,1,1200,800),
+('b0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000040','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','/uploads/services/4d8768b0-3e15-4388-9885-4dce6c969843.jpeg','Guardería',true,1,1200,800)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================

@@ -152,7 +152,7 @@
       <ion-card-content>
         <div class="details-list">
           <div class="detail-item">
-            <ion-icon name="location-outline"></ion-icon>
+            <div class="gps-icon"></div>
             <div class="detail-content">
               <span class="detail-label">Ubicación</span>
               <span class="detail-value">{{ getLocationText() }}</span>
@@ -169,7 +169,7 @@
           </div>
 
           <div class="detail-item" *ngIf="servicio.radio_servicio_km">
-            <ion-icon name="location-outline"></ion-icon>
+            <div class="gps-icon"></div>
             <div class="detail-content">
               <span class="detail-label">Radio de servicio</span>
               <span class="detail-value">{{ servicio.radio_servicio_km }} km</span>

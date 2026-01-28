@@ -12,6 +12,7 @@ ion-content {
   justify-content: space-between;
   padding: 1rem;
   background: var(--ion-background-color, #ffffff);
+  margin-bottom: 15px;
   
   .header-title {
     margin: 0;
@@ -199,9 +200,13 @@ ion-toolbar {
       border: 2px solid transparent;
       cursor: pointer;
       transition: all 0.2s;
+      position: relative;
       
       &.active {
-        border-color: var(--ion-color-primary);
+        border: 2px solid transparent;
+        background: 
+          linear-gradient(var(--ion-background-color), var(--ion-background-color)) padding-box,
+          $primary-gradient border-box;
       }
       
       img {
@@ -439,10 +444,26 @@ ion-card {
     gap: 1rem;
     align-items: flex-start;
     
+    .gps-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      margin-top: 0.25rem;
+      background: $primary-gradient;
+      mask-image: url('/assets/gps.svg');
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      -webkit-mask-image: url('/assets/gps.svg');
+      -webkit-mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+    }
+    
     ion-icon {
       font-size: 1.5rem;
-      color: var(--ion-color-primary);
       margin-top: 0.25rem;
+      color: #3DD598;
     }
     
     .detail-content {
