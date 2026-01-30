@@ -8,13 +8,13 @@ import { saveBase64Image, generateInitialsAvatar } from '../utils/image.util';
  * Acceso a datos de usuarios en PostgreSQL
  */
 class UserDatabase {
-  
+
   /**
    * Buscar usuario por credencial (username, email o phone)
    */
   async findByCredential(credencial: string): Promise<User | undefined> {
     const credencialNormalizada = credencial.toLowerCase().trim();
-    
+
     try {
       const query = `
         SELECT 
@@ -35,13 +35,13 @@ class UserDatabase {
            OR telefono = $1
         LIMIT 1
       `;
-      
+
       const result = await pool.query(query, [credencialNormalizada]);
-      
+
       if (result.rows.length === 0) {
         return undefined;
       }
-      
+
       return result.rows[0] as User;
     } catch (error) {
       console.error('Error al buscar usuario por credencial:', error);
@@ -100,13 +100,13 @@ class UserDatabase {
       // Hashear la contraseña
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(userData.password, saltRounds);
-      
+
       // Limpiar el teléfono de espacios
       const telefonoLimpio = userData.telefono ? userData.telefono.replace(/\s/g, '') : null;
-      
+
       // Generar ID único
       const idUsuario = uuidv4();
-      
+
       // Procesar foto de perfil si existe, o generar avatar con iniciales
       let urlAvatar = null;
       if (userData.fotoPerfilBase64) {
@@ -115,7 +115,7 @@ class UserDatabase {
         // Generar avatar con las iniciales del nombre y apellido
         urlAvatar = generateInitialsAvatar(userData.nombre, userData.apellidos, 'uploads/avatars');
       }
-      
+
       const query = `
         INSERT INTO usuarios (
           id, usuario, correo, hash_password,
@@ -145,7 +145,7 @@ class UserDatabase {
           bloqueado_hasta, ultimo_login,
           creado_en, actualizado_en
       `;
-      
+
       const values = [
         idUsuario,                           // $1 - id
         userData.usuario,                    // $2 - usuario
@@ -164,20 +164,20 @@ class UserDatabase {
         0.00,                                // $15 - promedio_calificacion
         0                                    // $16 - total_resenas
       ];
-      
+
       const result = await pool.query(query, values);
-      
+
       if (result.rows.length === 0) {
         return undefined;
       }
-      
+
       return result.rows[0] as User;
     } catch (error) {
       console.error('Error al crear usuario:', error);
       return undefined;
     }
   }
-  
+
   /**
    * Buscar usuario por ID
    */
@@ -199,20 +199,20 @@ class UserDatabase {
         FROM usuarios 
         WHERE id = $1
       `;
-      
+
       const result = await pool.query(query, [id]);
-      
+
       if (result.rows.length === 0) {
         return undefined;
       }
-      
+
       return result.rows[0] as User;
     } catch (error) {
       console.error('Error al buscar usuario por ID:', error);
       return undefined;
     }
   }
-  
+
   /**
    * Actualizar usuario
    */
@@ -221,7 +221,7 @@ class UserDatabase {
       const fields: string[] = [];
       const values: any[] = [];
       let paramCounter = 1;
-      
+
       // Mapeo de campos TypeScript a columnas PostgreSQL
       const fieldMapping: Record<string, string> = {
         isActive: 'esta_activo',
@@ -229,21 +229,21 @@ class UserDatabase {
         lockUntil: 'bloqueado_hasta',
         updatedAt: 'actualizado_en',
       };
-      
+
       for (const [key, value] of Object.entries(updates)) {
         const dbColumn = fieldMapping[key] || key;
         fields.push(`${dbColumn} = $${paramCounter}`);
         values.push(value);
         paramCounter++;
       }
-      
+
       // Agregar updated_at automáticamente
       fields.push(`actualizado_en = CURRENT_TIMESTAMP`);
-      
+
       if (fields.length === 0) {
         return this.findById(id);
       }
-      
+
       values.push(id);
       const query = `
         UPDATE usuarios 
@@ -254,20 +254,20 @@ class UserDatabase {
                   bloqueado_hasta, creado_en,
                   actualizado_en
       `;
-      
+
       const result = await pool.query(query, values);
-      
+
       if (result.rows.length === 0) {
         return undefined;
       }
-      
+
       return result.rows[0] as User;
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
       return undefined;
     }
   }
-  
+
   /**
    * Incrementar intentos fallidos
    */
@@ -284,13 +284,13 @@ class UserDatabase {
             actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $1
       `;
-      
+
       await pool.query(query, [id]);
     } catch (error) {
       console.error('Error al incrementar intentos fallidos:', error);
     }
   }
-  
+
   /**
    * Resetear intentos fallidos
    */
@@ -304,7 +304,7 @@ class UserDatabase {
             actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $1
       `;
-      
+
       await pool.query(query, [id]);
     } catch (error) {
       console.error('Error al resetear intentos fallidos:', error);
@@ -322,7 +322,7 @@ class UserDatabase {
             actualizado_en = CURRENT_TIMESTAMP
         WHERE id = $2
       `;
-      
+
       const result = await pool.query(query, [hashedPassword, userId]);
       return result.rowCount !== null && result.rowCount > 0;
     } catch (error) {
@@ -330,7 +330,7 @@ class UserDatabase {
       return false;
     }
   }
-  
+
   /**
    * Obtener perfil público de un usuario por ID
    */
@@ -354,13 +354,13 @@ class UserDatabase {
         FROM usuarios u
         WHERE u.id::text = $1 AND u.esta_activo = true
       `;
-      
+
       const result = await pool.query(query, [userId]);
-      
+
       if (result.rows.length === 0) {
         return null;
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error al obtener usuario por ID:', error);
@@ -397,9 +397,12 @@ class UserDatabase {
         LEFT JOIN categorias c ON c.id = s.categoria_id
         WHERE s.proveedor_id::text = $1
         GROUP BY s.id, c.nombre, c.color, c.url_icono
-        ORDER BY s.creado_en DESC
+        ORDER BY 
+        s.esta_activo DESC,
+        s.creado_en DESC
+
       `;
-      
+
       const result = await pool.query(query, [userId]);
       const services = result.rows;
 
@@ -454,10 +457,10 @@ class UserDatabase {
         ORDER BY promedio_calificacion DESC NULLS LAST, nombre ASC
         LIMIT $2
       `;
-      
+
       const searchPattern = `%${query.toLowerCase()}%`;
       const result = await pool.query(searchQuery, [searchPattern, limit]);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error al buscar usuarios:', error);
@@ -485,7 +488,7 @@ class UserDatabase {
         ORDER BY promedio_calificacion DESC NULLS LAST, nombre ASC
         LIMIT $1
       `;
-      
+
       const result = await pool.query(query, [limit]);
       return result.rows;
     } catch (error) {
@@ -493,7 +496,7 @@ class UserDatabase {
       throw error;
     }
   }
-  
+
   /**
    * Convertir a usuario seguro (sin contraseña)
    */

@@ -39,6 +39,10 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/servicios/alta-servicio/alta-servicios.page').then(m => m.AltaServicioPage)
       },
       {
+        path: 'editar-servicio/:id',
+        loadComponent: () => import('./tabs/servicios/editar-servicio/editar-servicio.page').then(m => m.EditarServicioPage)
+      },
+      {
         path: 'buscar-servicio-persona',
         loadComponent: () => import('./tabs/servicios/buscar-servicio-persona/buscar-servicio-persona.page').then(m => m.BuscarServicioPersonaPage)
       },

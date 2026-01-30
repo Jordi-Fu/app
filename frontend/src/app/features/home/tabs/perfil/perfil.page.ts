@@ -131,6 +131,11 @@ export class PerfilPage implements OnInit, OnDestroy {
     this.router.navigate(['/home/servicios', servicioId]);
   }
 
+  editarServicio(event: Event, servicioId: string) {
+    event.stopPropagation();
+    this.router.navigate(['/home/editar-servicio', servicioId]);
+  }
+
   irResenasRecibidas() {
     this.router.navigate(['/home/mis-resenas']);
   }

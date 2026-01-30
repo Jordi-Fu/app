@@ -113,4 +113,18 @@ export class ServiceService {
   createService(data: CreateServiceRequest): Observable<CreateServiceResponse> {
     return this.http.post<CreateServiceResponse>(this.apiUrl, data);
   }
+
+  /**
+   * Actualizar un servicio existente
+   */
+  updateService(id: string, data: any): Observable<{ success: boolean; message: string; data?: Service }> {
+    return this.http.put<{ success: boolean; message: string; data?: Service }>(`${this.apiUrl}/${id}`, data);
+  }
+
+  /**
+   * Eliminar un servicio
+   */
+  deleteService(id: string): Observable<{ success: boolean; message: string }> {
+    return this.http.delete<{ success: boolean; message: string }>(`${this.apiUrl}/${id}`);
+  }
 }

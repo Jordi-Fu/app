@@ -74,6 +74,9 @@
       <!-- Si hay servicios -->
       <div class="services-list" *ngIf="serviciosActivos && serviciosActivos.length > 0">
         <div class="service-item" *ngFor="let servicio of serviciosActivos" (click)="verDetalleServicio(servicio.id)">
+          <button class="edit-service-btn" (click)="editarServicio($event, servicio.id)">
+            <span class="edit-icon"></span>
+          </button>
           <div class="service-image">
             <img *ngIf="servicio.images && servicio.images.length > 0" 
                  [src]="getServiceImageUrl(servicio.images[0].url_imagen)" 

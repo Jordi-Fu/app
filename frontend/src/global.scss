@@ -243,6 +243,348 @@ body.dark {
   }
 }
 
+// ===================== MODALES DE ACCIÓN GLOBALES =====================
+// Estilos para los popups de configuración de servicios
+// Deben estar en global.scss porque son position:fixed fuera del scope del componente
+
+.service-action-popup,
+.activate-popup,
+.deactivate-popup,
+.delete-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .popup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .popup-content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 320px;
+    width: calc(100% - 40px);
+    margin: 20px;
+    text-align: center;
+    z-index: 100000;
+    animation: popupSlideIn 0.2s ease-out;
+
+    .popup-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 28px;
+
+      &.success {
+        background: rgba(61, 213, 152, 0.1);
+      }
+
+      &.warning {
+        background: rgba(245, 158, 11, 0.1);
+      }
+
+      &.danger {
+        background: rgba(239, 68, 68, 0.1);
+      }
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: #333333;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666666;
+      line-height: 1.5;
+      margin: 0 0 20px 0;
+
+      strong {
+        color: #3dd598;
+      }
+    }
+
+    .popup-buttons {
+      display: flex;
+      gap: 12px;
+
+      &.vertical {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+      }
+
+      .btn-cancel {
+        background: #f5f5f5;
+        color: #666666;
+
+        &:hover {
+          background: #e0e0e0;
+        }
+      }
+
+      .btn-confirm {
+        background: linear-gradient(90deg, #3dd598, #13b5b5);
+        color: white;
+
+        &:hover {
+          background: linear-gradient(90deg, #2fc085, #0fa0a0);
+        }
+
+        &.warning {
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+
+          &:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+          }
+        }
+
+        &.danger {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+
+          &:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+          }
+        }
+      }
+
+      .btn-action {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        text-align: left;
+        padding: 14px 16px;
+
+        .btn-icon {
+          font-size: 24px;
+        }
+
+        .btn-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          strong {
+            font-size: 15px;
+            color: #333333;
+          }
+
+          small {
+            font-size: 12px;
+            color: #666666;
+            font-weight: 400;
+          }
+        }
+
+        &:hover {
+          background: #f0f1f2;
+        }
+
+        &.activate:hover {
+          border-color: #3dd598;
+          background: rgba(61, 213, 152, 0.05);
+
+          .btn-text strong {
+            color: #3dd598;
+          }
+        }
+
+        &.deactivate:hover {
+          border-color: #f59e0b;
+          background: rgba(245, 158, 11, 0.05);
+
+          .btn-text strong {
+            color: #f59e0b;
+          }
+        }
+
+        &.delete:hover {
+          border-color: #ef4444;
+          background: rgba(239, 68, 68, 0.05);
+
+          .btn-text strong {
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Modo oscuro para modales de acción (antes del otro body.dark)
+body.dark {
+  .service-action-popup,
+  .activate-popup,
+  .deactivate-popup,
+  .delete-popup {
+    .popup-overlay {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .popup-content {
+      background: #2a2a2a;
+
+      .popup-icon {
+        &.success {
+          background: rgba(61, 213, 152, 0.2);
+        }
+
+        &.warning {
+          background: rgba(245, 158, 11, 0.2);
+        }
+
+        &.danger {
+          background: rgba(239, 68, 68, 0.2);
+        }
+      }
+
+      h3 {
+        color: #ffffff;
+      }
+
+      p {
+        color: #b3b3b3;
+
+        strong {
+          color: #3dd598;
+        }
+      }
+
+      .popup-buttons {
+        .btn-cancel {
+          background: #404040;
+          color: #ffffff;
+
+          &:hover {
+            background: #505050;
+          }
+        }
+
+        .btn-action {
+          background: #3a3a3a;
+          border-color: #4a4a4a;
+          color: #fff;
+          
+          .btn-text strong {
+            color: #fff;
+          }
+          .btn-text small {
+            color: #999;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Modo oscuro usando media query como fallback
+@media (prefers-color-scheme: dark) {
+  .service-action-popup,
+  .activate-popup,
+  .deactivate-popup,
+  .delete-popup {
+    .popup-overlay {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .popup-content {
+      background: #2a2a2a;
+
+      .popup-icon {
+        &.success {
+          background: rgba(61, 213, 152, 0.2);
+        }
+
+        &.warning {
+          background: rgba(245, 158, 11, 0.2);
+        }
+
+        &.danger {
+          background: rgba(239, 68, 68, 0.2);
+        }
+      }
+
+      h3 {
+        color: #ffffff;
+      }
+
+      p {
+        color: #b3b3b3;
+
+        strong {
+          color: #3dd598;
+        }
+      }
+
+      .popup-buttons {
+        .btn-cancel {
+          background: #404040;
+          color: #ffffff;
+
+          &:hover {
+            background: #505050;
+          }
+        }
+
+        .btn-action {
+          background: #3a3a3a;
+          border-color: #4a4a4a;
+          color: #fff;
+          
+          .btn-text strong {
+            color: #fff;
+          }
+          .btn-text small {
+            color: #999;
+          }
+        }
+      }
+    }
+  }
+}
+
 body.dark {
   .subcategory-action-sheet {
     .action-sheet-group {

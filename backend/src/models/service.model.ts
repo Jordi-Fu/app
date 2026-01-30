@@ -204,8 +204,10 @@ class ServiceModel {
     latitud?: number;
     longitud?: number;
     radio_servicio_km?: number;
-    incluye?: string;
-    no_incluye?: string;
+    que_incluye?: string;
+    que_no_incluye?: string;
+    requisitos?: string;
+    politica_cancelacion?: string;
     disponibilidad_urgencias?: boolean;
     precio_urgencias?: number;
     imagenes?: Array<{
@@ -238,8 +240,10 @@ class ServiceModel {
       latitud: data.latitud,
       longitud: data.longitud,
       radio_servicio_km: data.radio_servicio_km,
-      incluye: data.incluye,
-      no_incluye: data.no_incluye,
+      que_incluye: data.que_incluye,
+      que_no_incluye: data.que_no_incluye,
+      requisitos: data.requisitos,
+      politica_cancelacion: data.politica_cancelacion,
       disponibilidad_urgencias: data.disponibilidad_urgencias,
       precio_urgencias: data.precio_urgencias,
     });
@@ -277,6 +281,58 @@ class ServiceModel {
     esta_disponible: boolean;
   }) {
     return await serviceDatabase.createAvailability(data);
+  }
+
+  /**
+   * Actualizar un servicio existente
+   */
+  async updateService(id: string, data: {
+    titulo?: string;
+    descripcion?: string;
+    categoria_id?: string;
+    tipo_precio?: string;
+    precio?: number;
+    moneda?: string;
+    duracion_minutos?: number;
+    tipo_ubicacion?: string;
+    direccion?: string;
+    ciudad?: string;
+    estado?: string;
+    pais?: string;
+    codigo_postal?: string;
+    latitud?: number;
+    longitud?: number;
+    radio_servicio_km?: number;
+    que_incluye?: string;
+    que_no_incluye?: string;
+    requisitos?: string;
+    politica_cancelacion?: string;
+    disponibilidad_urgencias?: boolean;
+    precio_urgencias?: number;
+    esta_activo?: boolean;
+  }) {
+    return await serviceDatabase.update(id, data);
+  }
+
+  /**
+   * Eliminar un servicio permanentemente (hard delete)
+   */
+  async deleteService(id: string) {
+    return await serviceDatabase.hardDelete(id);
+  }
+
+  /**
+   * Eliminar imágenes de un servicio
+   */
+  async deleteServiceImages(serviceId: string) {
+    return await serviceDatabase.deleteImages(serviceId);
+  }
+
+  /**
+   * Eliminar disponibilidad de un servicio
+   */
+  async deleteServiceAvailability(serviceId: string) {
+    return await serviceDatabase.deleteAvailability(serviceId);
   }
 }
 

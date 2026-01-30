@@ -323,8 +323,10 @@ class ServiceController {
         latitud,
         longitud,
         radio_servicio_km,
-        incluye,
-        no_incluye,
+        que_incluye,
+        que_no_incluye,
+        requisitos,
+        politica_cancelacion,
         disponibilidad_urgencias,
         precio_urgencias,
         imagenes,
@@ -350,8 +352,10 @@ class ServiceController {
         latitud: latitud ? Number(latitud) : undefined,
         longitud: longitud ? Number(longitud) : undefined,
         radio_servicio_km: radio_servicio_km ? Number(radio_servicio_km) : undefined,
-        incluye,
-        no_incluye,
+        que_incluye,
+        que_no_incluye,
+        requisitos,
+        politica_cancelacion,
         disponibilidad_urgencias: disponibilidad_urgencias || false,
         precio_urgencias: precio_urgencias ? Number(precio_urgencias) : undefined,
       });
@@ -419,6 +423,215 @@ class ServiceController {
       res.status(500).json({
         success: false,
         message: 'Error al crear el servicio',
+      });
+    }
+  }
+
+  /**
+   * PUT /api/services/:id
+   * Actualizar un servicio existente
+   */
+  async updateService(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user?.idUsuario || (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Usuario no autenticado',
+        });
+        return;
+      }
+
+      // Verificar que el servicio existe y pertenece al usuario
+      const existingService = await serviceService.getServiceById(id);
+      if (!existingService) {
+        res.status(404).json({
+          success: false,
+          message: 'Servicio no encontrado',
+        });
+        return;
+      }
+
+      if (existingService.proveedor_id !== userId) {
+        res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para editar este servicio',
+        });
+        return;
+      }
+
+      const {
+        titulo,
+        descripcion,
+        categoria_id,
+        tipo_precio,
+        precio,
+        moneda,
+        duracion_minutos,
+        tipo_ubicacion,
+        direccion,
+        ciudad,
+        estado,
+        pais,
+        codigo_postal,
+        latitud,
+        longitud,
+        radio_servicio_km,
+        que_incluye,
+        que_no_incluye,
+        requisitos,
+        politica_cancelacion,
+        disponibilidad_urgencias,
+        precio_urgencias,
+        esta_activo,
+        imagenes,
+        disponibilidad,
+      } = req.body;
+
+      // Actualizar el servicio
+      const updatedService = await serviceService.updateService(id, {
+        titulo,
+        descripcion,
+        categoria_id,
+        tipo_precio,
+        precio: precio ? Number(precio) : undefined,
+        moneda,
+        duracion_minutos: duracion_minutos ? Number(duracion_minutos) : undefined,
+        tipo_ubicacion,
+        direccion,
+        ciudad,
+        estado,
+        pais,
+        codigo_postal,
+        latitud: latitud ? Number(latitud) : undefined,
+        longitud: longitud ? Number(longitud) : undefined,
+        radio_servicio_km: radio_servicio_km ? Number(radio_servicio_km) : undefined,
+        que_incluye,
+        que_no_incluye,
+        requisitos,
+        politica_cancelacion,
+        disponibilidad_urgencias,
+        precio_urgencias: precio_urgencias ? Number(precio_urgencias) : undefined,
+        esta_activo,
+      });
+
+      // Procesar y guardar nuevas imágenes si se proporcionaron
+      if (imagenes && Array.isArray(imagenes) && imagenes.length > 0) {
+        const uploadsDir = path.join(__dirname, '../../uploads/services');
+        
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        // Eliminar imágenes anteriores
+        await serviceService.deleteServiceImages(id);
+
+        for (let i = 0; i < imagenes.length; i++) {
+          const img = imagenes[i];
+          if (img.base64) {
+            const base64Data = img.base64.replace(/^data:image\/\w+;base64,/, '');
+            const formato = img.formato || 'jpeg';
+            const fileName = `${uuidv4()}.${formato}`;
+            const filePath = path.join(uploadsDir, fileName);
+
+            fs.writeFileSync(filePath, base64Data, 'base64');
+
+            await serviceService.addServiceImage({
+              servicio_id: id,
+              url_imagen: `/uploads/services/${fileName}`,
+              es_principal: i === 0,
+              indice_orden: i,
+            });
+          } else if (img.url_imagen) {
+            // Imagen existente, solo actualizar orden
+            await serviceService.addServiceImage({
+              servicio_id: id,
+              url_imagen: img.url_imagen,
+              es_principal: i === 0,
+              indice_orden: i,
+            });
+          }
+        }
+      }
+
+      // Actualizar disponibilidad si se proporcionó
+      if (disponibilidad && Array.isArray(disponibilidad)) {
+        // Eliminar disponibilidad anterior
+        await serviceService.deleteServiceAvailability(id);
+
+        for (const slot of disponibilidad) {
+          await serviceService.addServiceAvailability({
+            servicio_id: id,
+            dia_semana: slot.dia_semana,
+            hora_inicio: slot.hora_inicio,
+            hora_fin: slot.hora_fin,
+            esta_disponible: slot.esta_disponible !== false,
+          });
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Servicio actualizado correctamente',
+        data: updatedService,
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en updateService:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al actualizar el servicio',
+      });
+    }
+  }
+
+  /**
+   * DELETE /api/services/:id
+   * Eliminar un servicio
+   */
+  async deleteService(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user?.idUsuario || (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Usuario no autenticado',
+        });
+        return;
+      }
+
+      // Verificar que el servicio existe y pertenece al usuario
+      const existingService = await serviceService.getServiceById(id);
+      if (!existingService) {
+        res.status(404).json({
+          success: false,
+          message: 'Servicio no encontrado',
+        });
+        return;
+      }
+
+      if (existingService.proveedor_id !== userId) {
+        res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para eliminar este servicio',
+        });
+        return;
+      }
+
+      await serviceService.deleteService(id);
+
+      res.status(200).json({
+        success: true,
+        message: 'Servicio eliminado correctamente',
+      });
+    } catch (error) {
+      console.error('[SERVICE] Error en deleteService:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar el servicio',
       });
     }
   }

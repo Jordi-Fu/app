@@ -20,6 +20,16 @@ router.post(
   serviceValidators.create(),
   serviceController.createService.bind(serviceController)
 );
+router.put(
+  '/:id',
+  authMiddleware,
+  serviceController.updateService.bind(serviceController)
+);
+router.delete(
+  '/:id',
+  authMiddleware,
+  serviceController.deleteService.bind(serviceController)
+);
 router.post('/:id/views', authMiddleware, serviceController.incrementViews.bind(serviceController));
 router.post('/:id/favorite', authMiddleware, serviceController.toggleFavorite.bind(serviceController));
 router.get('/:id/is-favorite', authMiddleware, serviceController.checkIsFavorite.bind(serviceController));

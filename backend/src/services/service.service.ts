@@ -130,8 +130,10 @@ class ServiceService {
     latitud?: number;
     longitud?: number;
     radio_servicio_km?: number;
-    incluye?: string;
-    no_incluye?: string;
+    que_incluye?: string;
+    que_no_incluye?: string;
+    requisitos?: string;
+    politica_cancelacion?: string;
     disponibilidad_urgencias?: boolean;
     precio_urgencias?: number;
     imagenes?: Array<{
@@ -188,6 +190,78 @@ class ServiceService {
       return await serviceModel.addServiceAvailability(data);
     } catch (error) {
       console.error('Error en ServiceService.addServiceAvailability:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualizar un servicio existente
+   */
+  async updateService(id: string, data: {
+    titulo?: string;
+    descripcion?: string;
+    categoria_id?: string;
+    tipo_precio?: string;
+    precio?: number;
+    moneda?: string;
+    duracion_minutos?: number;
+    tipo_ubicacion?: string;
+    direccion?: string;
+    ciudad?: string;
+    estado?: string;
+    pais?: string;
+    codigo_postal?: string;
+    latitud?: number;
+    longitud?: number;
+    radio_servicio_km?: number;
+    que_incluye?: string;
+    que_no_incluye?: string;
+    requisitos?: string;
+    politica_cancelacion?: string;
+    disponibilidad_urgencias?: boolean;
+    precio_urgencias?: number;
+    esta_activo?: boolean;
+  }) {
+    try {
+      return await serviceModel.updateService(id, data);
+    } catch (error) {
+      console.error('Error en ServiceService.updateService:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar un servicio
+   */
+  async deleteService(id: string) {
+    try {
+      return await serviceModel.deleteService(id);
+    } catch (error) {
+      console.error('Error en ServiceService.deleteService:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar imágenes de un servicio
+   */
+  async deleteServiceImages(serviceId: string) {
+    try {
+      return await serviceModel.deleteServiceImages(serviceId);
+    } catch (error) {
+      console.error('Error en ServiceService.deleteServiceImages:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar disponibilidad de un servicio
+   */
+  async deleteServiceAvailability(serviceId: string) {
+    try {
+      return await serviceModel.deleteServiceAvailability(serviceId);
+    } catch (error) {
+      console.error('Error en ServiceService.deleteServiceAvailability:', error);
       throw error;
     }
   }

@@ -172,8 +172,10 @@ CREATE TABLE servicios (
   promedio_calificacion DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio_calificacion >= 0 AND promedio_calificacion <= 5),
   total_resenas INTEGER DEFAULT 0,
   tiempo_respuesta_horas INTEGER,
-  incluye TEXT, -- Qué incluye el servicio
-  no_incluye TEXT, -- Qué no incluye el servicio
+  que_incluye TEXT, -- Qué incluye el servicio
+  que_no_incluye TEXT, -- Qué no incluye el servicio
+  requisitos TEXT, -- Requisitos para solicitar el servicio
+  politica_cancelacion TEXT, -- Política de cancelación del servicio
   disponibilidad_urgencias BOOLEAN DEFAULT false, -- Si acepta servicios de urgencia
   precio_urgencias DECIMAL(10,2), -- Precio especial para urgencias
   url_video VARCHAR(500),
